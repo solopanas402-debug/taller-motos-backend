@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Backend en Python con Lambdas y API Gateway
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: python3.12
+    MemorySize: 256
+
+Resources:
+  CustomersApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/customers/
+      Handler: handler.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /customers
+            Method: get
+
+  MechanicsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/mechanics/
+      Handler: handler.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /mechanics
+            Method: get
+
+  ProductsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/products/
+      Handler: handler.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: get
+
+  ProvidersApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../src/providers/
+      Handler: handler.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /providers
+            Method: get
