@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         repository = ProductRepository(db_client)
         usecase = ProductUseCase(repository)
 
-        response_product = usecase.add_product(product.to_dict())
+        response_product = usecase.add_product(product)
 
         if response_product is None:
             return {

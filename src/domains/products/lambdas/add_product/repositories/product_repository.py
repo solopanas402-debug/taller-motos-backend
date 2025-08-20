@@ -8,7 +8,7 @@ class ProductRepository:
 
     def save(self, product: Product):
         try:
-            response = self.db_client.table("products").insert(product).execute()
+            response = self.db_client.table("products").insert(product.to_dict()).execute()
             return response.data
         except Exception as e:
             raise Exception(f'Ha ocurrido un problema al insertar el producto {e}')
