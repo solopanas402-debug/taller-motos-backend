@@ -1,4 +1,6 @@
 import json
+import sys
+
 from events import events
 from lambdas import lambdas
 
@@ -10,7 +12,9 @@ class Context:
         self.invoked_function_arn = "arn:aws:lambda:local:test"
         self.aws_request_id = "1234"
 
+
 context = Context()
+
 
 def run(lambda_name, event_name):
     if lambda_name not in lambdas:
@@ -27,6 +31,8 @@ def run(lambda_name, event_name):
     result = lambda_function(event, context)
     print(json.dumps(result, indent=2))
 
+
 if __name__ == "__main__":
-    run("customers_get", "customers_get")
+    lambda_name = "get_product_by_id"
+    run(lambda_name, lambda_name)
     # run("orders_post", "orders_post")

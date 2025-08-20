@@ -1,0 +1,132 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Backend en Python con Lambdas y API Gateway
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: python3.12
+    MemorySize: 256
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+
+Resources:
+  GetCustomersApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetCustomersApi-${Environment}"
+      CodeUri: src/domains/customers/lambdas/get_customers
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /customers
+            Method: get
+
+  AddCustomerApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddCustomerApi-${Environment}"
+      CodeUri: src/domains/customers/lambdas/add_customer
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /customers
+            Method: post
+
+  GetMechanicsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetMechanicsApi-${Environment}"
+      CodeUri: src/domains/mechanics/lambdas/get_mechanics
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /mechanics
+            Method: get
+
+  AddMechanicApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddMechanicApi-${Environment}"
+      CodeUri: src/domains/mechanics/lambdas/add_mechanic
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /mechanics
+            Method: post
+
+  GetProductsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetProductsApi-${Environment}"
+      CodeUri: src/domains/products/lambdas/get_products
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: get
+
+  GetProductByIdApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetProductByIdApi-${Environment}"
+      CodeUri: src/domains/products/lambdas/get_product_by_id
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /products/{id}
+            Method: get
+
+  AddProductApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddProductApi-${Environment}"
+      CodeUri: src/domains/products/lambdas/add_product
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: post
+
+  GetSuppliersApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetSuppliersApi-${Environment}"
+      CodeUri: src/domains/suppliers/lambdas/get_suppliers
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /suppliers
+            Method: get
+
+  AddSupplierApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddSupplierApi-${Environment}"
+      CodeUri: src/domains/suppliers/lambdas/add_supplier
+      Handler: main.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /suppliers
+            Method: post
