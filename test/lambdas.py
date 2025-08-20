@@ -1,21 +1,21 @@
-from src.domains.customers.lambdas.add_customer import main as add_customers_handler
-from src.domains.customers.lambdas.get_customers import main as get_customers_handler
-from src.domains.mechanics.lambdas.add_mechanic import main as add_mechanic_handler
-from src.domains.mechanics.lambdas.get_mechanics import main as get_mechanics_handler
-from src.domains.products.lambdas.add_product import main as add_product_handler
-from src.domains.products.lambdas.get_products import main as get_products_handler
-from src.domains.products.lambdas.get_product_by_id import main as get_product_handler
-from src.domains.suppliers.lambdas.add_supplier import main as add_supplier_handler
-from src.domains.suppliers.lambdas.get_suppliers import main as get_suppliers_handler
+import importlib
 
-lambdas = {
-    "add_customer": add_customers_handler.lambda_handler,
-    "get_customers": get_customers_handler.lambda_handler,
-    "add_mechanic": add_mechanic_handler.lambda_handler,
-    "get_mechanics": get_mechanics_handler.lambda_handler,
-    "add_product": add_product_handler.lambda_handler,
-    "get_product_by_id": get_product_handler.lambda_handler,
-    "get_products": get_products_handler.lambda_handler,
-    "add_supplier": add_supplier_handler.lambda_handler,
-    "get_suppliers": get_suppliers_handler.lambda_handler,
+LAMBDA_MODULES = {
+    "add_customer": "src.domains.customers.lambdas.add_customer.main",
+    "get_customers": "src.domains.customers.lambdas.get_customers.main",
+    "add_mechanic": "src.domains.mechanics.lambdas.add_mechanic.main",
+    "get_mechanics": "src.domains.mechanics.lambdas.get_mechanics.main",
+    "add_product": "src.domains.products.lambdas.add_product.main",
+    "get_product_by_id": "src.domains.products.lambdas.get_product_by_id.main",
+    "get_products": "src.domains.products.lambdas.get_products.main",
+    "add_supplier": "src.domains.suppliers.lambdas.add_supplier.main",
+    "get_suppliers": "src.domains.suppliers.lambdas.get_suppliers.main",
 }
+
+def get_lambda(name):
+    if name not in LAMBDA_MODULES:
+        raise ValueError(f"Lambda '{name}' no encontrada")
+
+    module_path = LAMBDA_MODULES[name]
+    module = importlib.import_module(module_path)
+    return module.lambda_handler

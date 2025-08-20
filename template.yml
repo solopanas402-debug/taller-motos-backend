@@ -12,14 +12,41 @@ Parameters:
   Environment:
     Type: String
     Default: dev
+  DBUrl:
+    Type: String
+    Default: https://ezmzjivappfgenfygsqg.supabase.co
+  DBKey:
+    Type: String
+    Default: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bXpqaXZhcHBmZ2VuZnlnc3FnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MTgyMzAsImV4cCI6MjA3MDk5NDIzMH0.CS_4_lZhO6aTDA8LO03vNBgikEaYO0aN1ZREvs6F88k
+
 
 Resources:
+
+  SharedLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: shared-layer
+      Description: "Shared utilities for Lambdas"
+      ContentUri: layers/shared
+      CompatibleRuntimes:
+        - python3.12
+    Metadata:
+      BuildMethod: python3.12
+      BuildProperties:
+        PIP_REQUIREMENTS: requirements.txt
+
   GetCustomersApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "GetCustomersApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/customers/lambdas/get_customers
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -31,8 +58,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "AddCustomerApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/customers/lambdas/add_customer
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -44,8 +77,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "GetMechanicsApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/mechanics/lambdas/get_mechanics
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -57,8 +96,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "AddMechanicApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/mechanics/lambdas/add_mechanic
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -70,8 +115,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "GetProductsApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/products/lambdas/get_products
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -83,21 +134,33 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "GetProductByIdApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/products/lambdas/get_product_by_id
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /products/{id}
+            Path: /products/searchById
             Method: get
 
   AddProductApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "AddProductApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/products/lambdas/add_product
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -109,8 +172,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "GetSuppliersApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/suppliers/lambdas/get_suppliers
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -122,8 +191,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "AddSupplierApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
       CodeUri: src/domains/suppliers/lambdas/add_supplier
       Handler: main.lambda_handler
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api

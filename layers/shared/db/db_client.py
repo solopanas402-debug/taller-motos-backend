@@ -1,5 +1,6 @@
 from supabase import create_client, Client
-from src.config.config import Config
+from config.config import Config
+
 
 class DBClient:
     @staticmethod

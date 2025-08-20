@@ -1,8 +1,7 @@
 import json
-import sys
 
 from events import events
-from lambdas import lambdas
+from lambdas import get_lambda
 
 
 class Context:
@@ -17,17 +16,17 @@ context = Context()
 
 
 def run(lambda_name, event_name):
-    if lambda_name not in lambdas:
-        print(f"Lambda '{lambda_name}' no encontrada.")
-        return
+    # if lambda_name not in LAMBDA_MODULES:
+    #     raise ValueError(f"Lambda '{lambda_name}' no encontrada")
     if event_name not in events:
         print(f"Evento '{event_name}' no encontrado.")
         return
 
-    lambda_function = lambdas[lambda_name]
+    # lambda_function = lambdas[lambda_name]
+    lambda_function = get_lambda(lambda_name)
     event = events[event_name]
 
-    print(f"\n=== Ejecutando {lambda_name} con evento {event_name} ===")
+    print(f"\n=== Ejecutando {lambda_name} con evento {event_name} ===\n")
     result = lambda_function(event, context)
     print(json.dumps(result, indent=2))
 

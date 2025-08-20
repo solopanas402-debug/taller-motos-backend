@@ -1,15 +1,24 @@
 import json
 
-from ...repositories.product_repository import ProductRepository
-from ...use_cases.product_use_cases import ProductUseCase
-from .....shared.db.db_client import DBClient
+from repositories.product_repository import ProductRepository
+from use_cases.product_use_cases import ProductUseCase
+from db.db_client import DBClient
 
 
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
-    parameters = event['queryStringParameters']
+    parameters = event.get('queryStringParameters', None)
+
+    if parameters is None:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": f"Se debe proporcionar el id del producto",
+            })
+        }
+
     id = parameters['id']
 
     db_client = DBClient().get_client()

@@ -1,15 +1,25 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from ...entities.product import Product
-from .....shared.utils.validators import validate_length, validate_quantity
+from entities.product import Product
+from utils.validators import validate_length, validate_quantity
 
 
 def load_initial_parameters(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
-    request_body = json.loads(event['body'])
+    request_body = event.get('body', None)
+
+    if request_body is None:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": "Se debe proporcinar el cuerpo de la peticion"
+            })
+        }
+
+    request_body = json.loads(request_body)
 
     print(f'request_body: {request_body}')
 

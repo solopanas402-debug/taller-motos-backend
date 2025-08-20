@@ -1,12 +1,13 @@
 import json
 
 from load_initial_parameters import load_initial_parameters
-from ...repositories.product_repository import ProductRepository
-from ...use_cases.product_use_cases import ProductUseCase
-from .....shared.db.db_client import DBClient
+from repositories.product_repository import ProductRepository
+from use_cases.product_use_cases import ProductUseCase
+from db.db_client import DBClient
 
 
 def lambda_handler(event, context):
+    response_product = None
     try:
         product = load_initial_parameters(event, context)
 
@@ -16,12 +17,11 @@ def lambda_handler(event, context):
         repository = ProductRepository(db_client)
         usecase = ProductUseCase(repository)
 
-        response_product = None
         response_product = usecase.add_product(product.to_dict())
 
         if response_product is None:
             return {
-                "statusCode": 200,
+                "statusCode": 501,
                 "body": json.dumps({
                     "message": f"No se ha podido registrar el producto",
                     # "input": event
@@ -35,8 +35,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "success": False,
-                "error": str(ve)
+                "message": str(ve)
             })
         }
 
@@ -45,13 +44,19 @@ def lambda_handler(event, context):
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "success": False,
-                "error": str(te)
+                "message": str(te)
             })
         }
 
     except Exception as e:
         print(f'Error al registrar el producto {e}')
+        return {
+            "statusCode": 501,
+            "body": json.dumps({
+                "message": f'No se ha podido registrar el producto',
+                # "input": event
+            })
+        }
 
     return {
         "statusCode": 200,
