@@ -25,25 +25,26 @@ def load_initial_parameters(event, context):
 
     validate_fields(request_body)
 
-    product = Product(id=str(uuid.uuid4()), code=request_body["code"], name=request_body["name"],
+    product = Product(id_product=str(uuid.uuid4()), code=request_body["code"], name=request_body["name"],
                       description=request_body["description"], price=float(request_body["price"]),
                       stock=int(request_body["stock"]), min_stock=int(request_body.get("min_stock", 0)),
-                      provider_id=request_body["provider_id"],
-                      category=request_body.get("category", ""),
-                      brand=request_body.get("brand", ""),
-                      is_active=True,
+                      max_stock=int(request_body.get("max_stock", 0)),
+                      id_supplier=request_body["id_supplier"],
+                      id_category=request_body.get("id_category", ""),
+                      id_brand=request_body.get("id_brand", ""),
+                      active=True,
                       created_at=datetime.now(timezone.utc),
                       updated_at=datetime.now(timezone.utc))
 
     return product
 
 
-def validate_fields(product:dict):
+def validate_fields(product: dict):
     required_fields = {
-        'str' : ['code', 'name', 'description', 'provider_id', 'category', 'brand'],
-        'int': ['stock', 'min_stock'],
+        'str': ['code', 'name', 'description', 'id_supplier', 'id_category', 'id_brand'],
+        'int': ['stock', 'min_stock', 'max_stock'],
         'float': ['price'],
-        'bool': ['is_active']
+        'bool': ['active']
     }
 
     for type, fields in required_fields.items():
@@ -65,7 +66,3 @@ def validate_fields(product:dict):
                 validate_length(field, value, min_len=1, max_len=255)
             if type in ['int', 'float']:
                 validate_quantity(field, value)
-
-
-
-

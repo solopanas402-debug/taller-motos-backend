@@ -9,7 +9,7 @@ class ProductRepository:
     def find_all(self):
         try:
             response = self.db_client.table("products").select(
-                "id, code, name, description, price, stock, min_stock,provider_id, category, brand, is_active, created_at, updated_at").execute()
+                "id_product, code, name, description, price, stock, min_stock, max_stock, id_supplier, id_category, id_brand, model, qr_url, active, created_at, updated_at").execute()
 
             if not response:
                 return None

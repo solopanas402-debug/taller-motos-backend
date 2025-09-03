@@ -19,7 +19,7 @@ def lambda_handler(event, context):
             })
         }
 
-    id = parameters['id']
+    id = parameters['id_product']
 
     db_client = DBClient().get_client()
     repository = ProductRepository(db_client)

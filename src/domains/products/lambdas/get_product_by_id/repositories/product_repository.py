@@ -8,8 +8,8 @@ class ProductRepository:
     def find_by_id(self, id: str):
         try:
             response = self.db_client.table('products').select(
-                "id, code, name, description, price, stock, min_stock,provider_id, category, brand, is_active, created_at, updated_at").eq(
-                'id', id).single().execute()
+                "id_product, code, name, description, price, stock, min_stock, max_stock, id_supplier, id_category, id_brand, model, qr_url, active, created_at, updated_at").eq(
+                'id_product', id).single().execute()
             print(f"Respuesta de BD: {response}")
             product = response.data
 
