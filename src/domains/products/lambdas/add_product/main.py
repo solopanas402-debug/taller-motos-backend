@@ -5,17 +5,17 @@ from repositories.product_repository import ProductRepository
 from use_cases.product_use_cases import ProductUseCase
 from db.db_client import DBClient
 
+db_client = DBClient().get_client()
+repository = ProductRepository(db_client)
+usecase = ProductUseCase(repository)
+
 
 def lambda_handler(event, context):
     response_product = None
     try:
-        product = load_initial_parameters(event, context)
+        product = load_initial_parameters(event)
 
         # print(f"PRODUCTO RESULTANTE: {product}")
-
-        db_client = DBClient().get_client()
-        repository = ProductRepository(db_client)
-        usecase = ProductUseCase(repository)
 
         response_product = usecase.add_product(product)
 

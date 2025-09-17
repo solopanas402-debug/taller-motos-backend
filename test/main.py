@@ -34,5 +34,6 @@ def run(lambda_name, event_name):
 if __name__ == "__main__":
     # lambda_name = "add_product"
     lambda_name = "get_products"
+    # lambda_name = "add_sale"
     run(lambda_name, lambda_name)
     # run("orders_post", "orders_post")

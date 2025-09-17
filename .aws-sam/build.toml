@@ -81,6 +81,15 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["AddSupplierApiFunction"]
 
+[function_build_definitions.cdcde587-cc30-45d8-90a1-bee26522c628]
+codeuri = "D:\\Proyectos\\python_lambdas\\src\\domains\\sales\\lambdas\\add_sale"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["AddSaleApiFunction"]
+
 [layer_build_definitions.cb2ebc69-a0a9-438a-a87f-f7570d9af766]
 layer_name = "SharedLayer"
 codeuri = "D:\\Proyectos\\python_lambdas\\layers\\shared"

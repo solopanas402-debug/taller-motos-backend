@@ -4,14 +4,14 @@ from repositories.product_repository import ProductRepository
 from use_cases.product_use_cases import ProductUseCase
 from db.db_client import DBClient
 
+db_client = DBClient().get_client()
+repository = ProductRepository(db_client)
+usecase = ProductUseCase(repository)
 
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
-    db_client = DBClient().get_client()
-    repository = ProductRepository(db_client)
-    usecase = ProductUseCase(repository)
     products = []
 
     try:

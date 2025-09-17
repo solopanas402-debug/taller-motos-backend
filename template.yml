@@ -416,3 +416,36 @@ Resources:
       RetentionInDays: !Ref LogRetentionDays
     DeletionPolicy: Retain
     DependsOn: AddSupplierApiFunction
+
+  AddSaleApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddSaleApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/add_sale
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /sales
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+
+  AddSaleApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddSaleApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddSupplierApiFunction

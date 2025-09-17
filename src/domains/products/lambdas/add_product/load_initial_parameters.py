@@ -5,9 +5,9 @@ from entities.product import Product
 from utils.validators import validate_length, validate_quantity
 
 
-def load_initial_parameters(event, context):
-    print(f'event: {event}')
-    print(f'context: {context}')
+def load_initial_parameters(event):
+    print(f'Begin load_initial_parameters')
+    print(f'Event: {event}')
 
     request_body = event.get('body', None)
 
@@ -23,7 +23,7 @@ def load_initial_parameters(event, context):
 
     print(f'request_body: {request_body}')
 
-    validate_fields(request_body)
+    validate_product_fields(request_body)
 
     product = Product(id_product=str(uuid.uuid4()), code=request_body["code"], name=request_body["name"],
                       description=request_body["description"], price=float(request_body["price"]),
@@ -39,7 +39,7 @@ def load_initial_parameters(event, context):
     return product
 
 
-def validate_fields(product: dict):
+def validate_product_fields(product: dict):
     required_fields = {
         'str': ['code', 'name', 'description', 'id_supplier', 'id_category', 'id_brand'],
         'int': ['stock', 'min_stock', 'max_stock'],

@@ -41,8 +41,17 @@ events = {
             # "updated_at": self.updated_at
         })
     },
+    "add_sale": {
+        "httpMethod": "POST",
+        "path": "/sales",
+        "body": json.dumps(
+            {"id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7", "id_seller": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+             "products": [{'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 5, 'unit_price': 30.00,
+                           'discount': 0.00}, ],
+             "subtotal": 150.00, "total": 172.50})
+    },
     "get_suppliers": {
-        "httpMethod": "providers",
+        "httpMethod": "GET",
         "path": "/orders",
         "body": json.dumps({"order_id": "456", "product": "Zapatos"})
     }

@@ -10,7 +10,9 @@ LAMBDA_MODULES = {
     "get_products": "src.domains.products.lambdas.get_products.main",
     "add_supplier": "src.domains.suppliers.lambdas.add_supplier.main",
     "get_suppliers": "src.domains.suppliers.lambdas.get_suppliers.main",
+    "add_sale": "src.domains.sales.lambdas.add_sale.main",
 }
+
 
 def get_lambda(name):
     if name not in LAMBDA_MODULES:
