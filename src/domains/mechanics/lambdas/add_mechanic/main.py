@@ -1,8 +1,8 @@
 import json
 from supabase import Client
 from load_initial_parameters import load_initial_parameters
-from get_mechanics.repositories.mechanic_repository import MechanicRepository
-from get_mechanics.use_cases.mechanic_use_case import MechanicUseCase
+from repositories.mechanic_repository import MechanicRepository
+from use_cases.mechanic_use_case import MechanicUseCase
 
 db_client = Client.get_client()
 repository = MechanicRepository(db_client)

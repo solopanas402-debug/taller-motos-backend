@@ -69,6 +69,6 @@ events = {
     "get_mechanics": {
         "httpMethod": "GET",
         "path": "/mechanics",
-        "queryStringParameters": {"page": "1", "limit": "5", "search": "Juan"}
+        "queryStringParameters": {"page": "1", "limit": "5"}
     }
 }

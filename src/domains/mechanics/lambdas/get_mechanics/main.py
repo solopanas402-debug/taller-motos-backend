@@ -1,7 +1,7 @@
 import json
 from layers.shared.db.db_client import DBClient
-from src.domains.mechanics.lambdas.get_mechanics.repositories.mechanic_repository import MechanicRepository
-from src.domains.mechanics.lambdas.get_mechanics.use_cases.mechanic_use_case import MechanicUseCase
+from repositories.mechanic_repository import MechanicRepository
+from use_cases.mechanic_use_case import MechanicUseCase
 
 db_client = DBClient.get_client()
 repository = MechanicRepository(db_client)
