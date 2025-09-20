@@ -1,5 +1,5 @@
 import json
-from layers.shared.db.db_client import DBClient
+from db.db_client import DBClient
 from repositories.mechanic_repository import MechanicRepository
 from use_cases.mechanic_use_case import MechanicUseCase
 

@@ -1,5 +1,5 @@
 from typing import List
-from layers.shared.entities.mechanic import Mechanic
+from entities.mechanic import Mechanic
 
 class MechanicRepository:
     def __init__(self, db_client):

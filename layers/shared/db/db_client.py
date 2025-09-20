@@ -1,5 +1,5 @@
 from supabase import create_client, Client
-from layers.shared.config.config import Config
+from config.config import Config
 
 
 class DBClient:
