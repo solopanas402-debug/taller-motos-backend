@@ -54,5 +54,21 @@ events = {
         "httpMethod": "GET",
         "path": "/orders",
         "body": json.dumps({"order_id": "456", "product": "Zapatos"})
+    },
+    
+    "add_mechanic": {
+        "httpMethod": "POST",
+        "path": "/mechanics",
+        "body": json.dumps({
+            "name": "Juan Pérez",
+            "phone": "555-1234",
+            "email": "juan@example.com"
+        })
+    },
+    
+    "get_mechanics": {
+        "httpMethod": "GET",
+        "path": "/mechanics",
+        "queryStringParameters": {"page": "1", "limit": "5"}
     }
 }
