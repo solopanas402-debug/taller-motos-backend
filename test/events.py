@@ -6,6 +6,11 @@ events = {
         "path": "/customers",
         "queryStringParameters": {"id": "123"}
     },
+    "get_customer_by_id": {
+        "httpMethod": "GET",
+        "path": "/customers",
+        "queryStringParameters": {"id_number": "5647382910567"}
+    },
     "get_mechanics": {
         "httpMethod": "POST",
         "path": "/mechanics",

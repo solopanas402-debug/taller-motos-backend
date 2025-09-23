@@ -3,6 +3,7 @@ import importlib
 LAMBDA_MODULES = {
     "add_customer": "src.domains.customers.lambdas.add_customer.main",
     "get_customers": "src.domains.customers.lambdas.get_customers.main",
+    "get_customer_by_id": "src.domains.customers.lambdas.get_customers_by_id.main",
     "add_mechanic": "src.domains.mechanics.lambdas.add_mechanic.main",
     "get_mechanics": "src.domains.mechanics.lambdas.get_mechanics.main",
     "add_product": "src.domains.products.lambdas.add_product.main",
