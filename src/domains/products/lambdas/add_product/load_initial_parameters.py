@@ -1,8 +1,8 @@
 import json
-import uuid
 from datetime import datetime, timezone
 from entities.product import Product
-from utils.validators import validate_length, validate_quantity
+from exceptions import validation_exception
+from utils.uuid_generator import generate_uuid_hex
 
 
 def load_initial_parameters(event):
@@ -25,7 +25,7 @@ def load_initial_parameters(event):
 
     validate_product_fields(request_body)
 
-    product = Product(id_product=str(uuid.uuid4()), code=request_body["code"], name=request_body["name"],
+    product = Product(id_product=generate_uuid_hex(), code=request_body["code"], name=request_body["name"],
                       description=request_body["description"], price=float(request_body["price"]),
                       stock=int(request_body["stock"]), min_stock=int(request_body.get("min_stock", 0)),
                       max_stock=int(request_body.get("max_stock", 0)),
@@ -41,28 +41,10 @@ def load_initial_parameters(event):
 
 def validate_product_fields(product: dict):
     required_fields = {
-        'str': ['code', 'name', 'description', 'id_supplier', 'id_category', 'id_brand'],
-        'int': ['stock', 'min_stock', 'max_stock'],
-        'float': ['price'],
-        'bool': ['active']
+        str: ['code', 'name', 'description', 'id_supplier', 'id_category', 'id_brand'],
+        int: ['stock', 'min_stock', 'max_stock'],
+        float: ['price'],
+        bool: ['active']
     }
 
-    for type, fields in required_fields.items():
-        for field in fields:
-            if field not in product:
-                raise ValueError(f"El campo '{field}' es obligatorio.")
-            value = product[field]
-
-            if type == 'str' and not isinstance(value, str):
-                raise TypeError(f"El campo '{field}' debe ser una cadena de caracteres.")
-            if type == 'int' and not isinstance(value, int):
-                raise TypeError(f"El campo '{field}' debe ser entero.")
-            if type == 'float' and not isinstance(value, (float, int)):
-                raise TypeError(f"El campo '{field}' debe ser decimal (float).")
-            if type == 'bool' and not isinstance(value, bool):
-                raise TypeError(f"El campo '{field}' debe ser booleano.")
-
-            if type == 'str':
-                validate_length(field, value, min_len=1, max_len=255)
-            if type in ['int', 'float']:
-                validate_quantity(field, value)
+    validation_exception.validate_fields(product, required_fields, )

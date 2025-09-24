@@ -33,6 +33,6 @@ def run(lambda_name, event_name):
 
 if __name__ == "__main__":
     # lambda_name = "add_product"
-    lambda_name = "get_mechanics"
-    run("get_mechanics", lambda_name)
+    resource_name = "add_repair"
+    run(resource_name, resource_name)
     # run("orders_post", "orders_post")

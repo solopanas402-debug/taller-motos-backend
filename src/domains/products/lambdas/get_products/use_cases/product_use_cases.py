@@ -7,13 +7,9 @@ class ProductUseCase:
         self.repository = repository
 
     def get_all_products(self):
-        try:
-            products = self.repository.find_all()
+        response = self.repository.find_all()
 
-            if len(products) == 0:
-                return []
+        if len(response) == 0:
+            return []
 
-            # products_dict = [product.to_dict() for product in products]
-            return products
-        except Exception as e:
-            raise Exception(f"No se pudo consultar los productos: {e}")
+        return response

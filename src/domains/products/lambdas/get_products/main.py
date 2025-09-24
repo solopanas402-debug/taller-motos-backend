@@ -8,15 +8,14 @@ db_client = DBClient().get_client()
 repository = ProductRepository(db_client)
 usecase = ProductUseCase(repository)
 
+
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
-    products = []
-
     try:
-        products = usecase.get_all_products()
-        print(f'Productos recuperados: {products}')
+        response = usecase.get_all_products()
+        print(f'Productos recuperados: {response}')
     except Exception as e:
         print(f'Error al consultar los productos: {e}')
         return {
@@ -27,13 +26,10 @@ def lambda_handler(event, context):
             })
         }
 
-    # response = dbClient.table("products").select("*").execute()
-    # print(f'RESPUESTA DE BD PRODUCTOS: {response}')
-
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "data": products,
+            "data": response,
             # "input": event
         })
     }

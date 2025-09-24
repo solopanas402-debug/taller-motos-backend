@@ -11,6 +11,7 @@ LAMBDA_MODULES = {
     "add_supplier": "src.domains.suppliers.lambdas.add_supplier.main",
     "get_suppliers": "src.domains.suppliers.lambdas.get_suppliers.main",
     "add_sale": "src.domains.sales.lambdas.add_sale.main",
+    "add_repair": "src.domains.repairs.lambdas.add_repair.main",
     # "add_mechanic": "src.domains.mechanics.lambdas.add_mechanic.main",
     # "get_mechanics": "src.domains.mechanics.lambdas.get_mechanics.main",
 }
