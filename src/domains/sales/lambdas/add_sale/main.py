@@ -7,7 +7,7 @@ from repositories.sale_detail_repository import SaleDetailRepository
 from repositories.sale_repository import SaleRepository
 from use_cases.sale_use_case import SaleUseCase
 
-db_client = DBClient.get_client()
+db_client = DBClient().get_client()
 sale_repository = SaleRepository(db_client)
 sale_detail_repository = SaleDetailRepository(db_client)
 use_case = SaleUseCase(sale_repository, sale_detail_repository)
