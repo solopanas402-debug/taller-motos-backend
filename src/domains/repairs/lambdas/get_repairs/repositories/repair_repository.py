@@ -1,5 +1,4 @@
 from typing import List, Tuple
-
 from db.db_client import DBClient
 
 
@@ -10,9 +9,8 @@ class RepairRepository:
     def find_all(self, page: int = 1, limit: int = 10, search: str | None = None) -> Tuple[List[dict], int]:
         offset = (page - 1) * limit
 
-        # 1) Traer repairs paginados (sin joins)
+        # 1) Repairs paginados (sin joins)
         repairs_query = self.db_client.table("repairs").select("*", count="exact")
-
         if search:
             search_pattern = f"%{search}%"
             repairs_query = repairs_query.or_(
@@ -24,11 +22,10 @@ class RepairRepository:
         repairs_resp = repairs_query.range(offset, offset + limit - 1).execute()
         repairs = repairs_resp.data or []
         total = repairs_resp.count or 0
-
         if not repairs:
             return [], total
 
-        # 2) Resolver referencias en lote
+        # 2) Resolver referencias: mechanics, vehicles, users, services y customers
         id_mechanics = list({r.get("id_mechanic") for r in repairs if r.get("id_mechanic")})
         id_vehicles = list({r.get("id_vehicle") for r in repairs if r.get("id_vehicle")})
         id_created_by = list({r.get("id_created_by") for r in repairs if r.get("id_created_by")})
@@ -38,6 +35,7 @@ class RepairRepository:
         mechanics_map: dict = {}
         vehicles_map: dict = {}
         users_map: dict = {}
+        customers_map: dict = {}
         services_map: dict = {rid: [] for rid in id_repairs}
 
         if id_mechanics:
@@ -53,12 +51,23 @@ class RepairRepository:
         if id_vehicles:
             v_resp = (
                 self.db_client.table("vehicles")
-                .select("id_vehicle,brand,model,plate_number")
+                .select("id_vehicle,id_customer,brand,model,license_plate")
                 .in_("id_vehicle", id_vehicles)
                 .execute()
             )
             for v in (v_resp.data or []):
                 vehicles_map[v["id_vehicle"]] = v
+
+            id_customers = list({v.get("id_customer") for v in (v_resp.data or []) if v.get("id_customer")})
+            if id_customers:
+                c_resp = (
+                    self.db_client.table("customers")
+                    .select("id_customer,name,surname")
+                    .in_("id_customer", id_customers)
+                    .execute()
+                )
+                for c in (c_resp.data or []):
+                    customers_map[c["id_customer"]] = c
 
         user_ids = list(set(id_created_by + id_updated_by)) if (id_created_by or id_updated_by) else []
         if user_ids:
@@ -85,7 +94,7 @@ class RepairRepository:
                 else:
                     services_map[rid] = [s]
 
-        # 3) Enriquecer cada repair con datos relacionados
+        # 3) Enriquecer
         enriched: List[dict] = []
         for r in repairs:
             id_mech = r.get("id_mechanic")
@@ -98,17 +107,30 @@ class RepairRepository:
             vehicle = vehicles_map.get(id_veh) if id_veh else None
             created_by = users_map.get(id_cb) if id_cb else None
             updated_by = users_map.get(id_ub) if id_ub else None
+            customer = customers_map.get(vehicle.get("id_customer")) if vehicle else None
 
             enriched.append({
                 **r,
+                # Datos base de relación
                 "mechanic_name": mechanic.get("name") if mechanic else None,
                 "mechanic_surname": mechanic.get("surname") if mechanic else None,
                 "brand": vehicle.get("brand") if vehicle else None,
                 "model": vehicle.get("model") if vehicle else None,
-                "plate_number": vehicle.get("plate_number") if vehicle else None,
+                "license_plate": vehicle.get("license_plate") if vehicle else None,
+                "customer_name": customer.get("name") if customer else None,
+                "customer_surname": customer.get("surname") if customer else None,
                 "created_by_username": created_by.get("username") if created_by else None,
                 "updated_by_username": updated_by.get("username") if updated_by else None,
                 "services": services_map.get(rid, []),
+                # Campos derivados para la UI solicitada
+                "customer_full_name": (f"{customer.get('name')} {customer.get('surname')}".strip() if customer else None),
+                "mechanic_full_name": (f"{mechanic.get('name')} {mechanic.get('surname')}".strip() if mechanic else None),
+                "vehicle_brand": vehicle.get("brand") if vehicle else None,
+                "vehicle_model": vehicle.get("model") if vehicle else None,
+                # Alias solicitados
+                "falla": r.get("diagnosis"),
+                "estado": r.get("status"),
+                # Los campos fault_description, status y start_date ya vienen de r
             })
 
         return enriched, total
