@@ -474,13 +474,7 @@ Resources:
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
 
-  GetSalesApiLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/GetSalesApi-${Environment}"
-      RetentionInDays: !Ref LogRetentionDays
-    DeletionPolicy: Retain
-    DependsOn: GetSalesApiFunction
+  
 
   GetRepairsApiFunction:
     Type: AWS::Serverless::Function
@@ -506,10 +500,4 @@ Resources:
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
 
-  GetRepairsApiLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/GetRepairsApi-${Environment}"
-      RetentionInDays: !Ref LogRetentionDays
-    DeletionPolicy: Retain
-    DependsOn: GetRepairsApiFunction
+  
