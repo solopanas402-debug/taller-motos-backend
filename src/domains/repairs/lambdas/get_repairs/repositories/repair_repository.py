@@ -112,13 +112,9 @@ class RepairRepository:
             enriched.append({
                 **r,
                 # Datos base de relación
-                "mechanic_name": mechanic.get("name") if mechanic else None,
-                "mechanic_surname": mechanic.get("surname") if mechanic else None,
                 "brand": vehicle.get("brand") if vehicle else None,
                 "model": vehicle.get("model") if vehicle else None,
                 "license_plate": vehicle.get("license_plate") if vehicle else None,
-                "customer_name": customer.get("name") if customer else None,
-                "customer_surname": customer.get("surname") if customer else None,
                 "created_by_username": created_by.get("username") if created_by else None,
                 "updated_by_username": updated_by.get("username") if updated_by else None,
                 "services": services_map.get(rid, []),
@@ -127,9 +123,6 @@ class RepairRepository:
                 "mechanic_full_name": (f"{mechanic.get('name')} {mechanic.get('surname')}".strip() if mechanic else None),
                 "vehicle_brand": vehicle.get("brand") if vehicle else None,
                 "vehicle_model": vehicle.get("model") if vehicle else None,
-                # Alias solicitados
-                "falla": r.get("diagnosis"),
-                "estado": r.get("status"),
                 # Los campos fault_description, status y start_date ya vienen de r
             })
 
