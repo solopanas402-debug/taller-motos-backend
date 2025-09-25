@@ -10,7 +10,7 @@ from repositories.vehicle_repository import VehicleRepository
 from use_cases.repair_use_case import RepairUseCase
 from use_cases.save_images_use_case import SaveImagesUseCase
 
-db_client = DBClient.get_client()
+db_client = DBClient().get_client()
 repair_repository = RepairRepository(db_client)
 vehicle_repository = VehicleRepository(db_client)
 repair_use_case = RepairUseCase(repair_repository, vehicle_repository)

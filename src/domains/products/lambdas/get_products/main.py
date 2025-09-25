@@ -10,26 +10,25 @@ usecase = ProductUseCase(repository)
 
 
 def lambda_handler(event, context):
-    print(f'event: {event}')
-    print(f'context: {context}')
+    print(f"event: {event}")
+    print(f"context: {context}")
+
+    params = event.get("queryStringParameters") or {}
+    page = int(params.get("page", 1))
+    limit = int(params.get("limit", 10))
+    search = params.get("search")
 
     try:
-        response = usecase.get_all_products()
-        print(f'Productos recuperados: {response}')
+        response = usecase.get_all_products(page, limit, search)
     except Exception as e:
-        print(f'Error al consultar los productos: {e}')
         return {
             "statusCode": 501,
             "body": json.dumps({
-                "message": "A ocurrido un problema al consultar los productos",
-                # "input": event
+                "message": "Ha ocurrido un problema al consultar los productos"
             })
         }
 
     return {
         "statusCode": 200,
-        "body": json.dumps({
-            "data": response,
-            # "input": event
-        })
+        "body": json.dumps(response)
     }

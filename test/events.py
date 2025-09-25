@@ -18,9 +18,9 @@ events = {
         "queryStringParameters": {"id_product": "b03196fd-a140-4781-a529-3862119f8b8c"}
     },
     "get_products": {
-        "httpMethod": "POST",
+        "httpMethod": "GET",
         "path": "/products",
-        "body": json.dumps({"order_id": "456", "product": "Zapatos"})
+        "queryStringParameters": {"page": "1", "limit": "10", "search": ""}
     },
     "add_product": {
         "httpMethod": "POST",
@@ -41,6 +41,21 @@ events = {
             # "created_at": self.created_at,
             # "updated_at": self.updated_at
         })
+    },
+    "get_repairs": {
+        "httpMethod": "GET",
+        "path": "/repair",
+        "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
+    },
+    "get_sale": {
+        "httpMethod": "GET",
+        "path": "/sales",
+        "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
+    },
+    "get_sales": {
+        "httpMethod": "GET",
+        "path": "/sales",
+        "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
     },
     "add_sale": {
         "httpMethod": "POST",
