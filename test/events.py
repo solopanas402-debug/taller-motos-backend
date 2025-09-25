@@ -74,9 +74,9 @@ events = {
         "httpMethod": "POST",
         "path": "/customers",
         "body": json.dumps({
-            "id_number": "1753532041",
-            "name": "Lesly",
-            "surname": "Villarruel",
+            "id_number": "0803473784",
+            "name": "Jonathan",
+            "surname": "Valencia",
             "address": "La Ermita",
             "phone": "0987621276",
             "email": "lesly123@gmail.com",

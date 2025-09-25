@@ -1,5 +1,6 @@
 from entities.identification_type import IdentificationType
 from entities.gender import Gender
+from datetime import date, datetime
 
 class Customer:
     def __init__(self, id_customer, id_number, name, surname, email, address=None, phone=None, identification_type=IdentificationType, birth_date=None,gender=Gender, active=True, created_at=None, updated_at=None):
@@ -46,9 +47,9 @@ class Customer:
             "phone": self.phone,
             "email": self.email,
             "identification_type": self.identification_type.value,
-            "birth_date": self.birth_date,
+            "birth_date": self.birth_date.isoformat() if isinstance(self.birth_date, (date, datetime)) else self.birth_date,
             "gender": self.gender.value,
             "active": self.active,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at
+            "created_at": self.created_at.isoformat() if isinstance(self.created_at, (date, datetime)) else self.created_at,
+            "updated_at": self.updated_at.isoformat() if isinstance(self.updated_at, (date, datetime)) else self.updated_at
         }
