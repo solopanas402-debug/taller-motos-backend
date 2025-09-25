@@ -1,5 +1,8 @@
 import json
-import uuid
+
+from exceptions import validation_exception
+from exceptions.validation_exception import ValidationException
+from utils.uuid_generator import generate_uuid_hex, generate_short_numeric
 
 
 def load_initial_parameters(event):
@@ -26,72 +29,47 @@ def validate_fields(request_body: dict):
     print("Begin validate_fields")
 
     required_fields = {
-        'str': ['id_customer', 'id_seller'],
-        'list': ['products'],
-        'float': ['subtotal', 'total'],
+        str: ['id_customer', 'id_seller'],
+        list: ['products'],
+        float: ['subtotal', 'total'],
     }
 
-    for expected_type, fields in required_fields.items():
-        for field in fields:
-            if field not in request_body or request_body[field] in [None, "", []]:
-                raise ValueError(f"El campo '{field}' es obligatorio y no puede estar vacío")
-
-            value = request_body[field]
-
-            if expected_type == 'str':
-                if not isinstance(value, (str, int)) or str(value).strip() == "":
-                    raise TypeError(f"El campo '{field}' debe ser una cadena válida")
-
-            elif expected_type == 'list':
-                if not isinstance(value, list) or not value:
-                    raise TypeError(f"El campo '{field}' debe ser una lista con al menos un elemento")
-
-            elif expected_type == 'float':
-                if not isinstance(value, (int, float)):
-                    raise TypeError(f"El campo '{field}' debe ser un número")
+    validation_exception.validate_fields(request_body, required_fields,
+                                         extra_validations=[total_greater_equal_subtotal])
 
     product_fields = {
-        'str': ['id_product'],
-        'int': ['quantity'],
-        'float': ['unit_price', 'discount']
+        str: ['id_product'],
+        int: ['quantity', 'stock'],
+        float: ['unit_price', 'discount']
+    }
+
+    field_rules = {
+        "discount": {"allow_zero": True},
     }
 
     products = request_body["products"]
     for idx, product in enumerate(products, start=1):
+
         if not isinstance(product, dict):
             raise ValueError(f"Cada producto debe ser un objeto válido (error en producto #{idx})")
 
-        for expected_type, fields in product_fields.items():
-            for field in fields:
-                if field not in product or product[field] in [None, ""]:
-                    raise ValueError(f"El campo '{field}' es obligatorio en producto #{idx}")
+        validation_exception.validate_fields(product, product_fields, context="products", field_rules=field_rules)
 
-                value = product[field]
 
-                if expected_type == 'str':
-                    if not isinstance(value, (str, int)) or str(value).strip() == "":
-                        raise TypeError(f"El campo '{field}' debe ser un número o cadena válida (producto #{idx})")
-
-                elif expected_type == 'int':
-                    if not isinstance(value, int):
-                        raise TypeError(f"El campo '{field}' debe ser entero (producto #{idx})")
-
-                elif expected_type == 'float':
-                    if not isinstance(value, (int, float)):
-                        raise TypeError(f"El campo '{field}' debe ser decimal (producto #{idx})")
-
-    if request_body["total"] < request_body["subtotal"]:
-        raise ValueError("El campo 'total' no puede ser menor que 'subtotal'")
+def total_greater_equal_subtotal(data):
+    if data["total"] < data["subtotal"]:
+        raise ValidationException("El campo 'total' no puede ser menor que 'subtotal'")
 
 
 def generate_sale_data(request_body: dict) -> dict:
-    id_sale = uuid.uuid4().hex
+    print(f"Begin generate_sale_data")
+    id_sale = generate_uuid_hex()
     subtotal = float(request_body["subtotal"])
     total = float(request_body["total"])
 
     sale = {
         "id_sale": id_sale,
-        "invoice_number": uuid.uuid4().int % (10 ** 8),
+        "invoice_number": generate_short_numeric(),
         "id_customer": request_body["id_customer"],
         "id_seller": request_body["id_seller"],
         "tax": subtotal * 0.15,
@@ -101,14 +79,20 @@ def generate_sale_data(request_body: dict) -> dict:
     }
 
     details = []
+
     for product in request_body["products"]:
         quantity = int(product["quantity"])
         unit_price = float(product["unit_price"])
         discount = float(product.get("discount", 0))
         subtotal_product = (unit_price * quantity) - discount
 
+        updated_stock = product["stock"] - product["quantity"]
+        if updated_stock < 0:
+            raise ValidationException(
+                f"El stock del producto con codigo {product['id_product']} no puede ser menor a 0")
+
         sale_detail = {
-            "id_sale_detail": uuid.uuid4().hex,
+            "id_sale_detail": generate_uuid_hex(),
             "id_sale": id_sale,
             "id_product": product["id_product"],
             "quantity": quantity,
@@ -119,10 +103,6 @@ def generate_sale_data(request_body: dict) -> dict:
         details.append(sale_detail)
 
     return {
-        "sale": sale,
-        "details": details
+        "sale_data": sale,
+        "details_data": details,
     }
-
-
-def validate_customer_existance():
-    print(f'Begin validate_customer_existance')

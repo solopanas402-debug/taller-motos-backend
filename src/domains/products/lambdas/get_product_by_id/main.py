@@ -25,8 +25,6 @@ def lambda_handler(event, context):
 
     id = parameters['id_product']
 
-    product = None
-
     try:
         product = usecase.get_product_by_id(id)
 
@@ -40,7 +38,14 @@ def lambda_handler(event, context):
                 })
             }
 
-        print(f'Productos recuperado: {product}')
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "data": product,
+                # "input": event
+            })
+        }
+
     except Exception as e:
         print(f'Error al consultar los productos: {e}')
         return {
@@ -49,11 +54,3 @@ def lambda_handler(event, context):
                 "message": f"El id del producto no es compatible con el formato uuid: {id}",
             })
         }
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "data": product,
-            # "input": event
-        })
-    }

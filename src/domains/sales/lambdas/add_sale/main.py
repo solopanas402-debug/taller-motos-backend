@@ -1,12 +1,13 @@
 import json
 
 from db.db_client import DBClient
+from exceptions.validation_exception import ValidationException
 from load_initial_parameter import load_initial_parameters
 from repositories.sale_detail_repository import SaleDetailRepository
 from repositories.sale_repository import SaleRepository
 from use_cases.sale_use_case import SaleUseCase
 
-db_client = DBClient.get_client()
+db_client = DBClient().get_client()
 sale_repository = SaleRepository(db_client)
 sale_detail_repository = SaleDetailRepository(db_client)
 use_case = SaleUseCase(sale_repository, sale_detail_repository)
@@ -22,19 +23,11 @@ def lambda_handler(event, context):
             "body": json.dumps(response_sale)
         }
 
-    except ValueError as ve:
+    except ValidationException as e:
         return {
-            "statusCode": 400,
+            "statusCode": 500,
             "body": json.dumps({
-                "message": str(ve),
-            }),
-        }
-
-    except TypeError as te:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({
-                "message": str(te)
+                "message": str(e),
             })
         }
 

@@ -1,5 +1,6 @@
 import json
 
+from exceptions.validation_exception import ValidationException
 from load_initial_parameters import load_initial_parameters
 from repositories.product_repository import ProductRepository
 from use_cases.product_use_cases import ProductUseCase
@@ -11,40 +12,25 @@ usecase = ProductUseCase(repository)
 
 
 def lambda_handler(event, context):
-    response_product = None
     try:
         product = load_initial_parameters(event)
 
-        # print(f"PRODUCTO RESULTANTE: {product}")
-
         response_product = usecase.add_product(product)
 
-        if response_product is None:
-            return {
-                "statusCode": 501,
-                "body": json.dumps({
-                    "message": f"No se ha podido registrar el producto",
-                    # "input": event
-                })
-            }
-
         print(f'Productos recuperado: {response_product}')
-
-    except ValueError as ve:
-        # Captura errores de validación
         return {
-            "statusCode": 400,
+            "statusCode": 201,
             "body": json.dumps({
-                "message": str(ve)
+                "data": response_product,
+                # "input": event
             })
         }
 
-    except TypeError as te:
-        # Captura errores de validación
+    except ValidationException as e:
         return {
-            "statusCode": 400,
+            "statusCode": 500,
             "body": json.dumps({
-                "message": str(te)
+                "message": str(e),
             })
         }
 
@@ -54,14 +40,5 @@ def lambda_handler(event, context):
             "statusCode": 501,
             "body": json.dumps({
                 "message": f'No se ha podido registrar el producto',
-                # "input": event
             })
         }
-
-    return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "data": response_product,
-            # "input": event
-        })
-    }

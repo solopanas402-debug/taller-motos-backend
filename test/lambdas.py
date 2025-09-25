@@ -11,9 +11,15 @@ LAMBDA_MODULES = {
     "add_supplier": "src.domains.suppliers.lambdas.add_supplier.main",
     "get_suppliers": "src.domains.suppliers.lambdas.get_suppliers.main",
     "add_sale": "src.domains.sales.lambdas.add_sale.main",
+    # Mantenemos compatibilidad con clave 'get_sale' y 'get_sales'
+    "get_sale": "src.domains.sales.lambdas.get_sale.main",
+    "get_sales": "src.domains.sales.lambdas.get_sale.main",
+    "add_repair": "src.domains.repairs.lambdas.add_repair.main",
+    "get_repairs": "src.domains.repairs.lambdas.get_repairs.main",
     # "add_mechanic": "src.domains.mechanics.lambdas.add_mechanic.main",
     # "get_mechanics": "src.domains.mechanics.lambdas.get_mechanics.main",
 }
+
 
 
 def get_lambda(name):
