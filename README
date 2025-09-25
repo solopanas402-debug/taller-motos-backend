@@ -1,0 +1,416 @@
+# 🚀 Sistema Centralizado para Lambdas Python
+
+Este sistema proporciona una implementación estandarizada para todas las funciones Lambda, incluyendo manejo automático de CORS, autenticación con AWS Cognito y respuestas consistentes.
+
+## 📁 Estructura del Proyecto
+
+```
+project/
+├── utils/
+│   ├── __init__.py
+│   ├── response_utils.py      # Respuestas estandarizadas y CORS
+│   └── auth_utils.py         # Autenticación AWS Cognito
+├── decorators/
+│   ├── __init__.py
+│   └── lambda_decorators.py  # Decoradores @cors_enabled y @cognito_auth_required
+├── src/domains
+│   ├── get_products/         # Ejemplo de lambda pública
+│   │   └── main.py
+│   ├── create_product/       # Ejemplo de lambda protegida
+│   │   └── main.py
+│   └── get_sales/           # Tu lambda refactorizada
+│       └── main.py
+└── README.md                # Este archivo
+```
+
+### 2. Variables de Entorno
+
+Configura estas variables en todas tus Lambdas:
+
+```bash
+# AWS Cognito Configuration
+AWS_REGION=us-east-1
+COGNITO_USER_POOL_ID=us-east-1_XXXXXXXXX
+COGNITO_APP_CLIENT_ID=43hv2b46h7sglog4vq4sptb0qu
+COGNITO_DOMAIN=motorcycle-repair-shop-user-pool
+
+# Opcional: para desarrollo/testing
+JWT_SECRET_KEY=your-fallback-secret-key
+```
+
+## 🎯 Cómo Implementar en tus Lambdas
+
+### ✅ Ejemplo 1: Lambda Pública (sin autenticación)
+
+```python
+# lambda_functions/get_public_data/main.py
+import json
+from decorators.lambda_decorators import cors_enabled
+from utils.response_utils import ResponseUtils
+# Tus imports existentes...
+
+@cors_enabled  # Solo añade CORS automático
+def lambda_handler(event, context):
+    try:
+        # Tu lógica existente aquí
+        data = get_your_data()
+        
+        # Reemplaza tu return anterior con esto:
+        return ResponseUtils.success_response(data)
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return ResponseUtils.internal_server_error_response(
+            "Error al procesar la solicitud"
+        )
+```
+
+### ✅ Ejemplo 2: Lambda Protegida (con autenticación)
+
+```python
+# lambda_functions/create_resource/main.py
+import json
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
+from utils.response_utils import ResponseUtils
+# Tus imports existentes...
+
+@cors_enabled
+@cognito_auth_required  # ¡ORDEN IMPORTANTE! cognito_auth_required después de cors_enabled
+def lambda_handler(event, context):
+    try:
+        # Información del usuario autenticado (disponible automáticamente)
+        user_info = event["user_payload"]
+        user_id = user_info["user_id"]
+        scopes = user_info["scope"]
+        
+        # Verificar permisos (opcional)
+        if "motorcycerepairshop-api/write" not in scopes:
+            return ResponseUtils.forbidden_response(
+                "Se requiere permiso de escritura"
+            )
+        
+        # Obtener datos del request
+        body = json.loads(event.get("body", "{}"))
+        
+        # Validaciones
+        if not body.get("name"):
+            return ResponseUtils.bad_request_response("El campo 'name' es obligatorio")
+        
+        # Tu lógica de negocio
+        result = create_your_resource(body, user_id)
+        
+        return ResponseUtils.created_response(result)
+        
+    except json.JSONDecodeError:
+        return ResponseUtils.bad_request_response("JSON inválido")
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return ResponseUtils.internal_server_error_response()
+```
+
+### ✅ Ejemplo 3: Lambda con Validaciones Completas
+
+```python
+# lambda_functions/get_sales/main.py
+import json
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
+from utils.response_utils import ResponseUtils
+# Tus imports existentes...
+
+@cors_enabled
+@cognito_auth_required
+def lambda_handler(event, context):
+    try:
+        # Usuario autenticado
+        user_info = event["user_payload"]
+        
+        # Validar parámetros de consulta
+        params = event.get("queryStringParameters") or {}
+        
+        try:
+            page = int(params.get("page", 1))
+            limit = int(params.get("limit", 10))
+        except ValueError:
+            return ResponseUtils.bad_request_response(
+                "Los parámetros 'page' y 'limit' deben ser números"
+            )
+        
+        # Validar rangos
+        if page < 1:
+            return ResponseUtils.bad_request_response("'page' debe ser mayor a 0")
+        
+        if limit < 1 or limit > 100:
+            return ResponseUtils.bad_request_response(
+                "'limit' debe estar entre 1 y 100"
+            )
+        
+        # Tu lógica de negocio
+        result = get_your_data(page, limit)
+        
+        return ResponseUtils.success_response(result)
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return ResponseUtils.internal_server_error_response()
+```
+
+## 📋 Respuestas Disponibles
+
+### Respuestas de Éxito
+```python
+# 200 OK
+return ResponseUtils.success_response(data)
+
+# 201 Created
+return ResponseUtils.created_response(new_resource)
+
+# 204 No Content (para DELETE)
+return ResponseUtils.no_content_response()
+```
+
+### Respuestas de Error
+```python
+# 400 Bad Request
+return ResponseUtils.bad_request_response("Parámetros inválidos")
+
+# 401 Unauthorized
+return ResponseUtils.unauthorized_response("Token requerido")
+
+# 403 Forbidden  
+return ResponseUtils.forbidden_response("Sin permisos")
+
+# 404 Not Found
+return ResponseUtils.not_found_response("Recurso no encontrado")
+
+# 409 Conflict
+return ResponseUtils.conflict_response("El recurso ya existe")
+
+# 422 Unprocessable Entity
+return ResponseUtils.unprocessable_entity_response("Datos inválidos")
+
+# 429 Too Many Requests
+return ResponseUtils.too_many_requests_response("Límite excedido")
+
+# 500 Internal Server Error
+return ResponseUtils.internal_server_error_response("Error interno")
+```
+
+## 🔐 Manejo de Autenticación
+
+### Información del Usuario Disponible
+
+En lambdas con `@cognito_auth_required`, tienes acceso automático a:
+
+```python
+user_info = event["user_payload"]
+
+# Datos básicos
+user_id = user_info["user_id"]        # ID único del usuario
+username = user_info["username"]       # Username (si disponible)
+client_id = user_info["client_id"]     # ID de la aplicación
+
+# Permisos
+scopes = user_info["scope"]            # Lista: ['api/read', 'api/write']
+
+# Metadatos
+token_use = user_info["token_use"]     # Tipo de token
+exp = user_info["exp"]                 # Cuándo expira
+```
+
+### Validación de Permisos
+
+```python
+# Verificar un scope específico
+if "motorcycerepairshop-api/admin" not in user_info["scope"]:
+    return ResponseUtils.forbidden_response("Requiere permisos de admin")
+
+# Verificar múltiples scopes
+required_scopes = ["api/read", "api/write"]
+user_scopes = user_info["scope"]
+
+if not all(scope in user_scopes for scope in required_scopes):
+    return ResponseUtils.forbidden_response(
+        f"Scopes requeridos: {', '.join(required_scopes)}"
+    )
+```
+
+## 🧪 Testing
+
+### Obtener Token de Cognito
+
+**En Insomnia/Postman:**
+```bash
+POST https://motorcycle-repair-shop-user-pool.auth.us-east-1.amazoncognito.com/oauth2/token
+
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+client_id=43hv2b46h7sglog4vq4sptb0qu
+client_secret=534o6b32qaabbhuorb4r71c84hau5c8lc
+scope=motorcycerepairshop-api/read motorcycerepairshop-api/write
+```
+
+**Usar el token:**
+```bash
+# Headers en tus requests
+Authorization: Bearer eyJraWQiOiJXeE5UQ...
+Content-Type: application/json
+```
+
+### Función de Testing
+
+```python
+# utils/test_utils.py
+from utils.auth_utils import AuthUtils
+
+def get_test_token():
+    """Obtiene token para testing"""
+    return AuthUtils.get_cognito_token_with_client_credentials(
+        client_id="43hv2b46h7sglog4vq4sptb0qu",
+        client_secret="534o6b32qaabbhuorb4r71c84hau5c8lc",
+        scope="motorcycerepairshop-api/read motorcycerepairshop-api/write"
+    )
+```
+
+## 🔧 Migración de Lambdas Existentes
+
+### Pasos para Migrar tu Lambda Actual:
+
+1. **Añadir los imports:**
+```python
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
+from utils.response_utils import ResponseUtils
+```
+
+2. **Añadir decoradores:**
+```python
+@cors_enabled                    # Siempre
+@cognito_auth_required                   # Solo si necesitas autenticación
+def lambda_handler(event, context):
+```
+
+3. **Reemplazar returns:**
+```python
+# Antes:
+return {"statusCode": 200, "body": json.dumps(data)}
+
+# Después:
+return ResponseUtils.success_response(data)
+```
+
+4. **Añadir manejo de errores:**
+```python
+try:
+    # Tu lógica
+    return ResponseUtils.success_response(result)
+except Exception as e:
+    print(f"Error: {str(e)}")
+    return ResponseUtils.internal_server_error_response()
+```
+
+## ⚠️ Reglas Importantes
+
+### ✅ DO (Hacer)
+
+1. **Siempre usa `@cors_enabled`** en todas las lambdas
+2. **Orden correcto:** `@cors_enabled` primero, `@cognito_auth_required` segundo
+3. **Usa `ResponseUtils`** para todas las respuestas
+4. **Valida parámetros** antes de procesarlos
+5. **Maneja excepciones** apropiadamente
+
+### ❌ DON'T (No hacer)
+
+1. **No construyas respuestas manualmente** - usa ResponseUtils
+2. **No hardcodees headers** - el sistema los maneja
+3. **No olvides el orden** de los decoradores
+4. **No ignores la validación** de datos de entrada
+5. **No uses tokens hardcodeados** - siempre variables de entorno
+
+## 🐛 Troubleshooting
+
+### "Token de autorización requerido"
+- Verifica que envías el header `Authorization: Bearer token`
+- El frontend debe obtener el token de Cognito primero
+
+### "Token inválido"
+- El token puede estar expirado
+- Verifica las variables de entorno de Cognito
+- Asegúrate de usar el User Pool y Client correcto
+
+### Error de CORS
+- Verifica que uses `@cors_enabled` en tu lambda
+- El decorador debe estar directamente sobre la función
+
+### Error 500 sin mensaje
+- Revisa los logs en CloudWatch
+- Asegúrate de manejar todas las excepciones
+
+## 📞 Soporte
+
+Si tienes problemas con la implementación:
+
+1. **Revisa los logs** de CloudWatch
+2. **Verifica las variables de entorno** 
+3. **Prueba con Insomnia/Postman** primero
+4. **Consulta los ejemplos** en este README
+
+## 🎯 Ejemplos Rápidos
+
+### Lambda GET con parámetros
+```python
+@cors_enabled
+@cognito_auth_required
+def lambda_handler(event, context):
+    params = event.get("queryStringParameters") or {}
+    page = int(params.get("page", 1))
+    
+    result = get_data(page)
+    return ResponseUtils.success_response(result)
+```
+
+### Lambda POST con body
+```python
+@cors_enabled
+@cognito_auth_required  
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event.get("body", "{}"))
+        if not body.get("name"):
+            return ResponseUtils.bad_request_response("Name requerido")
+            
+        result = create_item(body)
+        return ResponseUtils.created_response(result)
+    except json.JSONDecodeError:
+        return ResponseUtils.bad_request_response("JSON inválido")
+```
+
+### Lambda DELETE
+```python
+@cors_enabled
+@cognito_auth_required
+def lambda_handler(event, context):
+    item_id = event["pathParameters"]["id"]
+    
+    if not exists(item_id):
+        return ResponseUtils.not_found_response("Item no encontrado")
+    
+    delete_item(item_id)
+    return ResponseUtils.no_content_response()
+```
+
+---
+
+## 🏁 Resumen
+
+1. **Añade los decoradores** a tu función
+2. **Usa `ResponseUtils`** para respuestas
+3. **Configura variables de entorno** de Cognito
+4. **Maneja errores** apropiadamente
+5. **¡Tu lambda está lista!** 🎉
+
+Con este sistema tendrás:
+- ✅ CORS automático
+- ✅ Autenticación robusta  
+- ✅ Respuestas consistentes
+- ✅ Código más limpio
+- ✅ Fácil mantenimiento
