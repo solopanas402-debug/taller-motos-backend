@@ -4,7 +4,7 @@ events = {
     "get_customers": {
         "httpMethod": "GET",
         "path": "/customers",
-        "queryStringParameters": {"id": "123"}
+        "queryStringParameters": {"page": "1", "limit": "5", "search": "Laura"}
     },
     "get_customer_by_id": {
         "httpMethod": "GET",
@@ -70,7 +70,24 @@ events = {
             "email": "juan@example.com"
         })
     },
-    
+    "add_customer": {
+        "httpMethod": "POST",
+        "path": "/customers",
+        "body": json.dumps({
+            "id_number": "1753532041",
+            "name": "Lesly",
+            "surname": "Villarruel",
+            "address": "La Ermita",
+            "phone": "0987621276",
+            "email": "lesly123@gmail.com",
+            "identification_type": "id_card",
+            # "birth_date": "2001-05-21",
+            "gender": "female",
+            "active": True,
+            # "created_at": self.created_at,
+            # "updated_at": self.updated_at
+        })
+    },
     "get_mechanics": {
         "httpMethod": "GET",
         "path": "/mechanics",

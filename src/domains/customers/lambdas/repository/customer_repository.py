@@ -1,4 +1,3 @@
-from typing import Any
 from db.db_client import DBClient
 from supabase import Client
 
