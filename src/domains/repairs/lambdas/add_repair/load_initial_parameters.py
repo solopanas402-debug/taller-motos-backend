@@ -1,5 +1,8 @@
+import base64
 import json
+import re
 from datetime import datetime
+from requests_toolbelt.multipart import decoder
 
 from exceptions import validation_exception
 from utils.uuid_generator import generate_uuid_hex, generate_short_numeric
@@ -7,21 +10,76 @@ from utils.uuid_generator import generate_uuid_hex, generate_short_numeric
 
 def load_initial_parameters(event) -> dict:
     print("Begin loading_initial_parameters")
-    print(f"Event: {event}")
+    # print(f"Event: {event}")
 
-    requestBody = event.get("body", None)
-    if requestBody is None:
-        return {
-            "statusCode": 400,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({"message": "Se debe proporcionar el cuerpo de la peticion"})
-        }
+    # requestBody = event.get("body", None)
+    requestBody = format_data(event)
 
-    requestBody = json.loads(requestBody)
+    # requestBody = json.loads(requestBody)
     print(f"Request body: {requestBody}")
     validate_fields(requestBody)
 
     return generate_repair_data(requestBody)
+
+
+def format_data(event) -> dict:
+    print("Begin format_data")
+
+    headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
+    content_type = headers.get("content-type")
+    body = event.get("body")
+
+    if body is None:
+        return {
+            "statusCode": 400,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"message": "Se debe proporcionar el cuerpo de la petición"})
+        }
+
+    # Decodificar correctamente los bytes
+    if event.get("isBase64Encoded", False):
+        body_bytes = base64.b64decode(body)
+    else:
+        body_bytes = body.encode("utf-8")  # ¡no latin-1, ni errors="ignore"!
+
+    # Parse multipart
+    multipart_data = decoder.MultipartDecoder(body_bytes, content_type)
+
+    photos = []
+    payload = None
+
+    for idx, part in enumerate(multipart_data.parts):
+        disposition = part.headers.get(b"Content-Disposition", b"").decode(errors="ignore")
+
+        name_match = re.search(r'name="([^"]+)"', disposition) or re.search(r'name=([^;]+)', disposition)
+        part_name = name_match.group(1).strip('" ') if name_match else None
+
+        filename_match = re.search(r'filename="([^"]+)"', disposition)
+        filename = filename_match.group(1) if filename_match else None
+
+        if part_name in ("payload", "body"):
+            try:
+                payload = json.loads(part.text)
+            except Exception as e:
+                print(f"[format_data] Error parseando JSON: {e}")
+                payload = {}
+        elif part_name == "photos" or filename:
+            photos.append({
+                "filename": filename,
+                "content": part.content  # bytes puros, listos para Supabase
+            })
+
+    result = {}
+    if payload:
+        result.update(payload)
+    if photos:
+        result["photos"] = photos
+
+    print("payload presente?:", bool(payload))
+    print("cantidad photos:", len(photos))
+
+    return result
+
 
 
 def validate_fields(request_body: dict):
@@ -131,7 +189,8 @@ def generate_repair_data(request_body: dict) -> dict:
         "repair": repair,
         "vehicle": vehicle,
         "labor": labor,
-        "materials": materials
+        "materials": materials,
+        "photos": request_body["photos"]
     }
 
     return repair_data

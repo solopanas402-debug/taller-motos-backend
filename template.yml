@@ -64,11 +64,11 @@ Resources:
           RequireSymbols: false
 
   # === DOMAIN ===
-  MyUserPoolDomain:
-    Type: AWS::Cognito::UserPoolDomain
-    Properties:
-      Domain: motorcycle-repair-shop-user-pool
-      UserPoolId: !Ref MotorcycleRepairShopUserPool
+#  MyUserPoolDomain:
+#    Type: AWS::Cognito::UserPoolDomain
+#    Properties:
+#      Domain: motorcycle-repair-shop-user-pool
+#      UserPoolId: !Ref MotorcycleRepairShopUserPool
 
   # === RESOURCE SERVER ===
   MotorcycleRepairShopResourceServer:
@@ -448,4 +448,38 @@ Resources:
       LogGroupName: !Sub "/aws/lambda/AddSaleApi-${Environment}"
       RetentionInDays: !Ref LogRetentionDays
     DeletionPolicy: Retain
-    DependsOn: AddSupplierApiFunction
+    DependsOn: AddSaleApiFunction
+
+
+  AddRepairApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddRepairApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/add_repair
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+
+  AddRepairApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddRepairApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddRepairApiFunction
