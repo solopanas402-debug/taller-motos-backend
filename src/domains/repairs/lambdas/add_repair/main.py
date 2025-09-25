@@ -1,6 +1,5 @@
 import json
 
-from config.config import Config
 from db.db_client import DBClient
 from exceptions.validation_exception import ValidationException
 from load_initial_parameters import load_initial_parameters
@@ -23,13 +22,13 @@ def lambda_handler(event, context):
     # print(f'context: {context}')
     try:
         repair_data = load_initial_parameters(event)
-        url_images = image_use_case.execute(repair_data["photos"])
+        # url_images = image_use_case.execute(repair_data["photos"])
 
-        # response = repair_use_case.add_repair(repair_data)
+        response = repair_use_case.execute(repair_data)
         return {
             "statusCode": 201,
             "body": json.dumps({
-                "data": url_images,
+                "data": response,
             })
         }
 

@@ -90,8 +90,17 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["AddSaleApiFunction"]
 
-[function_build_definitions.28480035-9a8d-41d4-a146-ef8bfd383760]
-codeuri = "C:\\Users\\Equipo\\Documents\\taller-motos-backend\\src\\domains\\sales\\lambdas\\get_sale"
+[function_build_definitions.07be7e06-e960-41b8-a2e9-e4cbde9a113e]
+codeuri = "D:\\Proyectos\\python_lambdas\\src\\domains\\repairs\\lambdas\\add_repair"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["AddRepairApiFunction"]
+
+[function_build_definitions.7cf37e35-d936-4c36-8ee8-b241ec5522a7]
+codeuri = "D:\\Proyectos\\python_lambdas\\src\\domains\\sales\\lambdas\\get_sale"
 runtime = "python3.12"
 architecture = "x86_64"
 handler = "main.lambda_handler"
@@ -99,8 +108,8 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["GetSalesApiFunction"]
 
-[function_build_definitions.bf481087-5af4-4d8b-8d23-9c058c9cb295]
-codeuri = "C:\\Users\\Equipo\\Documents\\taller-motos-backend\\src\\domains\\repairs\\lambdas\\get_repairs"
+[function_build_definitions.d53be1b4-ead9-492d-a4bd-0331a43398cf]
+codeuri = "D:\\Proyectos\\python_lambdas\\src\\domains\\repairs\\lambdas\\get_repairs"
 runtime = "python3.12"
 architecture = "x86_64"
 handler = "main.lambda_handler"
@@ -108,7 +117,7 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["GetRepairsApiFunction"]
 
-[layer_build_definitions.a9375b4b-e830-4525-903e-e92fa849ce5e]
+[layer_build_definitions.2c59ab70-3eef-4906-8be2-ea65985bd71e]
 layer_name = "SharedLayer"
 codeuri = "D:\\Proyectos\\python_lambdas\\layers\\shared"
 build_method = "python3.12"

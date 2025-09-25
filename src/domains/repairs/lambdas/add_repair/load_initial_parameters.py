@@ -1,11 +1,16 @@
 import base64
 import json
+import os
 import re
 from datetime import datetime
 from requests_toolbelt.multipart import decoder
 
 from exceptions import validation_exception
 from utils.uuid_generator import generate_uuid_hex, generate_short_numeric
+
+import logging
+
+logging.basicConfig(filename='event.log', level=logging.DEBUG)
 
 
 def load_initial_parameters(event) -> dict:
@@ -26,7 +31,7 @@ def format_data(event) -> dict:
     print("Begin format_data")
 
     headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
-    content_type = headers.get("content-type")
+    content_type = headers.get("content-type", "")
     body = event.get("body")
 
     if body is None:
@@ -40,53 +45,60 @@ def format_data(event) -> dict:
     if event.get("isBase64Encoded", False):
         body_bytes = base64.b64decode(body)
     else:
-        body_bytes = body.encode("utf-8")  # ¡no latin-1, ni errors="ignore"!
+        body_bytes = body if isinstance(body, (bytes, bytearray)) else body.encode()
 
-    # Parse multipart
-    multipart_data = decoder.MultipartDecoder(body_bytes, content_type)
-
-    photos = []
-    payload = None
-
-    for idx, part in enumerate(multipart_data.parts):
-        disposition = part.headers.get(b"Content-Disposition", b"").decode(errors="ignore")
-
-        name_match = re.search(r'name="([^"]+)"', disposition) or re.search(r'name=([^;]+)', disposition)
-        part_name = name_match.group(1).strip('" ') if name_match else None
-
-        filename_match = re.search(r'filename="([^"]+)"', disposition)
-        filename = filename_match.group(1) if filename_match else None
-
-        if part_name in ("payload", "body"):
-            try:
-                payload = json.loads(part.text)
-            except Exception as e:
-                print(f"[format_data] Error parseando JSON: {e}")
-                payload = {}
-        elif part_name == "photos" or filename:
-            photos.append({
-                "filename": filename,
-                "content": part.content  # bytes puros, listos para Supabase
-            })
-
+    # Inicializar resultado
     result = {}
-    if payload:
-        result.update(payload)
+    photos = []
+
+    if "multipart/form-data" in content_type.lower():
+        # Parse multipart/form-data
+        multipart_data = decoder.MultipartDecoder(body_bytes, content_type)
+
+        for idx, part in enumerate(multipart_data.parts):
+            disposition = part.headers.get(b"Content-Disposition", b"").decode(errors="ignore")
+            name_match = re.search(r'name="([^"]+)"', disposition) or re.search(r'name=([^;]+)', disposition)
+            part_name = name_match.group(1).strip('" ') if name_match else None
+            filename_match = re.search(r'filename="([^"]+)"', disposition)
+            filename = filename_match.group(1) if filename_match else None
+
+            if part_name in ("payload", "body"):
+                try:
+                    payload_str = part.content.decode("utf-8")
+                    payload = json.loads(payload_str)
+                    result.update(payload)
+                except Exception as e:
+                    print(f"[format_data] Error parseando JSON: {e}")
+            elif part_name == "photos" or filename:
+                photos.append({
+                    "filename": filename,
+                    "content": part.content
+                })
+
+    else:
+        # Si no es multipart, asumimos JSON raw
+        try:
+            result = json.loads(body_bytes.decode("utf-8"))
+        except Exception as e:
+            print(f"[format_data] Error parseando JSON raw: {e}")
+            result = {}
+
     if photos:
         result["photos"] = photos
 
-    print("payload presente?:", bool(payload))
-    print("cantidad photos:", len(photos))
+    logging.debug(f"IMAGES: {photos}")
+
+    # print("payload presente?:", bool(result))
+    # print("cantidad photos:", len(photos))
 
     return result
-
 
 
 def validate_fields(request_body: dict):
     print("Begin validate_fields")
     required_fields = {
         dict: ["repair", "vehicle", "labor"],
-        list: ["products", "photos"]
+        list: ["products"]
     }
 
     validation_exception.validate_fields(request_body, required_fields)
@@ -101,8 +113,8 @@ def validate_fields(request_body: dict):
 
     repair_fields = {
         str: ["id_mechanic", "fault_description", "diagnosis", "status", "priority", "notes", "id_created_by"],
-        datetime: ["entry_date"],
-        float: ["estimated_cost"]
+        datetime: ["entry_date", "delivery_date"],
+        float: ["estimated_cost", "final_cost"]
     }
 
     repair = request_body["repair"]
@@ -164,8 +176,12 @@ def generate_repair_data(request_body: dict) -> dict:
         "status": request_body["repair"]["status"],
         "priority": request_body["repair"]["priority"],
         "entry_date": request_body["repair"]["entry_date"],
+        "start_date": request_body["labor"]["start_date"],
+        "completion_date": request_body["labor"]["completion_date"],
+        "delivery_date": request_body["repair"]["delivery_date"],
         "notes": request_body["repair"]["notes"],
         "estimated_cost": request_body["repair"]["estimated_cost"],
+        "final_cost": request_body["repair"]["final_cost"],
         "id_created_by": request_body["repair"]["id_created_by"],
     }
 
@@ -190,7 +206,9 @@ def generate_repair_data(request_body: dict) -> dict:
         "vehicle": vehicle,
         "labor": labor,
         "materials": materials,
-        "photos": request_body["photos"]
     }
+
+    if request_body.get("photos", None):
+        repair_data["photos"] = request_body["photos"]
 
     return repair_data
