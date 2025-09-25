@@ -8,6 +8,8 @@ Globals:
     Runtime: python3.12
     MemorySize: 256
   Api:
+    BinaryMediaTypes:
+      - '*/*'
     Auth:
       DefaultAuthorizer: CognitoAuthorizer
       Authorizers:
@@ -441,7 +443,6 @@ Resources:
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
 
-
   AddSaleApiLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -449,6 +450,39 @@ Resources:
       RetentionInDays: !Ref LogRetentionDays
     DeletionPolicy: Retain
     DependsOn: AddSupplierApiFunction
+
+  AddRepairApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddRepairApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/add_repair
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+
+  AddRepairApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddRepairApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddRepairApiFunction
 
   GetSalesApiFunction:
     Type: AWS::Serverless::Function

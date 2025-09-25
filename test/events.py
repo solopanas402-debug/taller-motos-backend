@@ -92,8 +92,10 @@ events = {
                 "status": "pending",
                 "priority": "high",
                 "entry_date": "2025-09-20T14:35:00",
+                "delivery_date": "2025-09-20T14:35:00",
                 "notes": "El carro esta danado",
                 "estimated_cost": 34343.44,
+                "final_cost": 34343.44,
                 "id_created_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
 
             },
@@ -106,12 +108,13 @@ events = {
                 "completion_date": "2025-09-25T14:35:00",
             },
             "products": [
-                {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 5, 'unit_price': 30.00,
-                 'stock': 95,
-                 'discount': 0.00, "usage_date": "2025-09-24T14:35:00", },
-                {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 3, 'unit_price': 15.00,
-                 'stock': 47,
-                 'discount': 0.00, "usage_date": "2025-09-25T14:35:00", }, ],
+                {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 6, 'unit_price': 30.00,
+                 'stock': 90,
+                 'discount': 0.00, "subtotal": 180.00, "type": "repair",
+                 "usage_date": "2025-09-24T14:35:00", },
+                {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 5, 'unit_price': 15.00,
+                 'stock': 44,
+                 'discount': 0.00, "subtotal": 75.00, "type": "repair", "usage_date": "2025-09-25T14:35:00", }, ],
             "photos": [{}]
         })
     },
