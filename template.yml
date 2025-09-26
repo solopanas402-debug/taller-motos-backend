@@ -419,6 +419,30 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: AddSupplierApiFunction
 
+  GetSalesApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetSalesApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/get_sale
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /sales
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+
   AddSaleApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -450,6 +474,30 @@ Resources:
       RetentionInDays: !Ref LogRetentionDays
     DeletionPolicy: Retain
     DependsOn: AddSupplierApiFunction
+
+  GetRepairsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetRepairsApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/get_repairs
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
 
   AddRepairApiFunction:
     Type: AWS::Serverless::Function
@@ -484,13 +532,14 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: AddRepairApiFunction
 
-  GetSalesApiFunction:
+
+  AddBulkProductApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "GetSalesApi-${Environment}"
+      FunctionName: !Sub "AddBulkProductApi-${Environment}"
       Layers:
         - !Ref SharedLayer
-      CodeUri: src/domains/sales/lambdas/get_sale
+      CodeUri: src/domains/bulk_products/lambdas/add_products
       Handler: main.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Environment:
@@ -501,37 +550,12 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /sales
-            Method: get
+            Path: /bulk_products
+            Method: post
             Auth:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
-                - motorcycerepairshop-api/read
+                - motorcycerepairshop-api/create
 
-  
-
-  GetRepairsApiFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "GetRepairsApi-${Environment}"
-      Layers:
-        - !Ref SharedLayer
-      CodeUri: src/domains/repairs/lambdas/get_repairs
-      Handler: main.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          DB_URL: !Ref DBUrl
-          DB_KEY: !Ref DBKey
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /repair
-            Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
 
   
