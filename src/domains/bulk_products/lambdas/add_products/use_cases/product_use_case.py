@@ -1,20 +1,20 @@
 import logging
 import re
 
-from repositories.repair_repository import RepairRepository
+from ports.product_repository import IProductRepository
 
 logger = logging.getLogger(__name__)
 
 
-class RepairUseCase:
-    def __init__(self, repair_repository: RepairRepository):
-        self.repair_repository = repair_repository
+class ProductUseCase:
+    def __init__(self, product_repository: IProductRepository):
+        self.product_repository = product_repository
 
-    def execute(self, repair_data: dict):
-        print("Begin repair_use_case")
+    def execute(self, products_data: dict):
+        logger.info("Begin product_use_case")
         try:
-            inserted_repair = self.repair_repository.save(repair_data)
-            return inserted_repair
+            inserted_products = self.product_repository.save(products_data)
+            return inserted_products
         except Exception as e:
             logger.error(f"Error al registrar la reparacion: {e}")
             msg = str(e)

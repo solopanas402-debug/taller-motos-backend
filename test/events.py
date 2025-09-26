@@ -133,5 +133,54 @@ events = {
             "email": "juan@example.com"
         })
     },
+    "add_products": {
+        "httpMethod": "POST",
+        "path": "/bulk_products",
+        "body": json.dumps([
+            {
+                "code": "MECH004",
+                "name": "Amortiguador trasero",
+                "description": "Amortiguador trasero hidráulico para SUV",
+                "price": 110.00,
+                "stock": 25,
+                "min_stock": 8,
+                "max_stock": 50,
+                "id_supplier": "4cfff20a-b6ef-47ec-acda-0daa132af7dc",
+                "id_category": "1cda8459-7235-4be5-b3e7-498b0518e3dd",
+                "id_brand": "b3b093f4-f05a-41a0-8dd5-5892d7efe05d",
+                "model": "Hilux 2020",
+                "active": True
+            },
+            {
+                "code": "MECH005",
+                "name": "Correa de distribución",
+                "description": "Correa de distribución reforzada de 120 dientes",
+                "price": 35.90,
+                "stock": 60,
+                "min_stock": 15,
+                "max_stock": 100,
+                "id_supplier": "4cfff20a-b6ef-47ec-acda-0daa132af7dc",
+                "id_category": "1cda8459-7235-4be5-b3e7-498b0518e3dd",
+                "id_brand": "b3b093f4-f05a-41a0-8dd5-5892d7efe05d",
+                "model": "Nissan Sentra",
+                "active": True
+            },
+            {
+                "code": "MECH006",
+                "name": "Bomba de agua",
+                "description": "Bomba de agua metálica para sistema de refrigeración",
+                "price": 78.40,
+                "stock": 18,
+                "min_stock": 5,
+                "max_stock": 40,
+                "id_supplier": "4cfff20a-b6ef-47ec-acda-0daa132af7dc",
+                "id_category": "1cda8459-7235-4be5-b3e7-498b0518e3dd",
+                "id_brand": "b3b093f4-f05a-41a0-8dd5-5892d7efe05d",
+                "model": "Chevrolet Aveo",
+                "active": True
+            }
+        ])
+
+    }
 
 }
