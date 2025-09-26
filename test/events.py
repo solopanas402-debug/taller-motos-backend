@@ -51,9 +51,61 @@ events = {
         "path": "/sales",
         "body": json.dumps(
             {"id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7", "id_seller": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
-             "products": [{'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 5, 'unit_price': 30.00,
-                           'discount': 0.00}, ],
-             "subtotal": 150.00, "total": 172.50})
+             "products": [
+                 {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 5, 'unit_price': 30.00,
+                  'stock': 100,
+                  'discount': 0.00},
+                 {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 3, 'unit_price': 15.00,
+                  'stock': 50,
+                  'discount': 0.00}, ],
+             "subtotal": 150.00, "total": 300.00})
+    },
+    "add_repair": {
+        "httpMethod": "POST",
+        "path": "/repair",
+        "body": json.dumps({
+            "vehicle": {
+                "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7",
+                "license_plate": "sdfsdfsd",
+                "brand": "sdfsdf",
+                "model": "sdfsdf",
+                "year": 56756,
+                "color": "sdfsdf",
+                "mileage": 56475675,
+                "active": True
+            },
+            "repair": {
+                "id_mechanic": "33c80fa0-f13e-4961-a9aa-ab21fb213c0c",
+                "fault_description": "Detalle del dano",
+                "diagnosis": "Algo se dano",
+                "status": "pending",
+                "priority": "high",
+                "entry_date": "2025-09-20T14:35:00",
+                "delivery_date": "2025-09-20T14:35:00",
+                "notes": "El carro esta danado",
+                "estimated_cost": 34343.44,
+                "final_cost": 34343.44,
+                "id_created_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+
+            },
+            "labor": {
+                "id_service_type": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+                "agreed_price": 33.33,
+                "actual_hours": 48,
+                "completed": False,
+                "start_date": "2025-09-23T14:35:00",
+                "completion_date": "2025-09-25T14:35:00",
+            },
+            "products": [
+                {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 6, 'unit_price': 30.00,
+                 'stock': 90,
+                 'discount': 0.00, "subtotal": 180.00, "type": "repair",
+                 "usage_date": "2025-09-24T14:35:00", },
+                {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 5, 'unit_price': 15.00,
+                 'stock': 44,
+                 'discount': 0.00, "subtotal": 75.00, "type": "repair", "usage_date": "2025-09-25T14:35:00", }, ],
+            "photos": [{}]
+        })
     },
     "get_suppliers": {
         "httpMethod": "GET",
