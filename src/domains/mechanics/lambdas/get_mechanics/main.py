@@ -63,9 +63,9 @@ def lambda_handler(event, context):
         search = params.get("search")
         if search:
             search = search.strip()
-            if len(search) < 2:
+            if len(search) < 1:
                 return ResponseUtils.bad_request_response(
-                    "El parámetro 'search' debe tener al menos 2 caracteres"
+                    "El parámetro 'search' debe tener al menos 1 caracteres"
                 )
             if len(search) > 100:
                 return ResponseUtils.bad_request_response(
