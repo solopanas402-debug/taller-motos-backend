@@ -8,6 +8,8 @@ Globals:
     Runtime: python3.12
     MemorySize: 256
   Api:
+    BinaryMediaTypes:
+      - '*/*'
     Auth:
       DefaultAuthorizer: CognitoAuthorizer
       Authorizers:
@@ -417,39 +419,6 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: AddSupplierApiFunction
 
-  AddSaleApiFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "AddSaleApi-${Environment}"
-      Layers:
-        - !Ref SharedLayer
-      CodeUri: src/domains/sales/lambdas/add_sale
-      Handler: main.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          DB_URL: !Ref DBUrl
-          DB_KEY: !Ref DBKey
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /sales
-            Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
-
-
-  AddSaleApiLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/AddSaleApi-${Environment}"
-      RetentionInDays: !Ref LogRetentionDays
-    DeletionPolicy: Retain
-    DependsOn: AddSupplierApiFunction
-
   GetSalesApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -474,7 +443,37 @@ Resources:
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
 
-  
+  AddSaleApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddSaleApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/add_sale
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /sales
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+  AddSaleApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddSaleApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddSupplierApiFunction
 
   GetRepairsApiFunction:
     Type: AWS::Serverless::Function
@@ -493,11 +492,70 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /repair
+            Path: /repairs
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
+
+  AddRepairApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddRepairApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/add_repair
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+
+  AddRepairApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddRepairApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddRepairApiFunction
+
+
+  AddBulkProductApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddBulkProductApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/bulk_products/lambdas/add_products
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /bulk_products
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
 
   
