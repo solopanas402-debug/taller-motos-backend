@@ -6,10 +6,21 @@ class ResponseUtils:
     """Utilidad para manejar respuestas estandarizadas con headers CORS"""
     
     @staticmethod
-    def get_cors_headers() -> Dict[str, str]:
+    def get_cors_headers(origin: str = None) -> Dict[str, str]:
         """Obtiene los headers CORS básicos"""
+
+          allowed_origins = [
+            "https://motorcycle-repair-shop-user-pool.auth.us-east-1.amazoncognito.com",  # Dominio de Cognito
+            "http://localhost:3000",  # Localhost para desarrollo
+        ]
+
+         if origin and origin in allowed_origins:
+            allowed_origin = origin
+        else:
+            allowed_origin = allowed_origins[0]
+
         return {
-            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Origin": allowed_origins,
             "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With",
             "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS,PATCH",
             "Access-Control-Allow-Credentials": "true",

@@ -1,7 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from layers.shared.entities.mechanic import Mechanic
+from layers.shared.entities.customer import Customer
 from utils.response_utils import ResponseUtils  
 
 def load_initial_parameters(event):
@@ -22,20 +22,21 @@ def load_initial_parameters(event):
     # Obtener la fecha y hora actual
     now = datetime.now(timezone.utc).isoformat()
 
-    # Crear la instancia del mecánico con los datos recibidos
-    mechanic = Mechanic(
-        id_mechanic=str(uuid.uuid4()),
+    # Crear la instancia del cliente con los datos recibidos
+    customer = Customer(
+        id_customer=str(uuid.uuid4()),
         id_number=data["id_number"],
         name=data["name"],
         surname=data.get("surname"),
+        address=data.get("address"),
         phone=data.get("phone"),
         email=data.get("email"),
-        address=data.get("address"),
-        hire_date=data.get("hire_date"),
-        salary=data.get("salary"),
+        identification_type=data.get("identification_type"),
+        birth_date=data.get("birth_date"),
+        gender=data.get("gender"),
         active=data.get("active", True),
         created_at=now,
         updated_at=now
     )
 
-    return mechanic
+    return customer

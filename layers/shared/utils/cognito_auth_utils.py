@@ -163,9 +163,9 @@ class CognitoAuthUtils:
             
             response = requests.post(token_url, headers=headers, data=data, timeout=10)
             
-            if response.status_code == 200:
-                token_data = response.json()
-                return token_data.get("access_token")
+              if response.status_code == 200:
+            token_data = response.json()
+            return token_data  # Incluye access_token y refresh_token
             else:
                 print(f"Error obteniendo token: {response.status_code} - {response.text}")
                 return None

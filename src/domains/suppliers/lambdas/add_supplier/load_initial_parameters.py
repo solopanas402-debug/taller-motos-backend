@@ -1,7 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from layers.shared.entities.mechanic import Mechanic
+from layers.shared.entities.supplier import Supplier
 from utils.response_utils import ResponseUtils  
 
 def load_initial_parameters(event):
@@ -15,27 +15,26 @@ def load_initial_parameters(event):
         return ResponseUtils.bad_request_response("El cuerpo de la petición no tiene un formato JSON válido")
 
     # Validar los campos obligatorios
-    for field in ["id_number", "name"]:
+    for field in ["name", "ruc"]:
         if not data.get(field):
             return ResponseUtils.bad_request_response(f"El campo {field} es obligatorio")
 
     # Obtener la fecha y hora actual
     now = datetime.now(timezone.utc).isoformat()
 
-    # Crear la instancia del mecánico con los datos recibidos
-    mechanic = Mechanic(
-        id_mechanic=str(uuid.uuid4()),
-        id_number=data["id_number"],
+    # Crear la instancia del proveedor con los datos recibidos
+    supplier = Supplier(
+        id_supplier=str(uuid.uuid4()),
         name=data["name"],
         surname=data.get("surname"),
+        ruc=data["ruc"],
+        address=data.get("address"),
         phone=data.get("phone"),
         email=data.get("email"),
-        address=data.get("address"),
-        hire_date=data.get("hire_date"),
-        salary=data.get("salary"),
+        main_contact=data.get("main_contact"),
         active=data.get("active", True),
         created_at=now,
         updated_at=now
     )
 
-    return mechanic
+    return supplier

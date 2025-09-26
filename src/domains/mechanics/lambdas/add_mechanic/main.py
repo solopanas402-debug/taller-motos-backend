@@ -1,26 +1,41 @@
 import json
-from supabase import Client
-from load_initial_parameters import load_initial_parameters
-from repositories.mechanic_repository import MechanicRepository
 from use_cases.mechanic_use_case import MechanicUseCase
+from utils.response_utils import ResponseUtils
+from decorators.lambda_decorators import cors_enabled, auth_required, role_required
+from repositories.mechanic_repository import MechanicRepository
+from db.db_client import DBClient
+from load_initial_parameters import load_initial_parameters
 
-db_client = Client.get_client()
+# Inicialización de dependencias
+db_client = DBClient.get_client()
 repository = MechanicRepository(db_client)
 use_case = MechanicUseCase(repository)
 
+@cors_enabled  # Habilitar CORS para este endpoint
+@auth_required  # Asegura que el cliente esté autenticado
+@role_required(["ADMIN"])  # Solo los usuarios con rol ADMIN pueden agregar mecánicos
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
     try:
+        # Obtener el client_id y roles del evento (esto proviene del token Cognito)
+        client_id = event["client_id"]  # El client_id debe estar presente en el evento
+        client_roles = event["client_roles"]  # Roles del cliente (verificados desde la base de datos)
+        
+        print(f"Cliente autenticado con ID: {client_id} y roles: {client_roles}")
+
+        # Cargar parámetros del mecánico desde el evento
         mechanic = load_initial_parameters(event)
+
+        if isinstance(mechanic, dict) and "statusCode" in mechanic:
+            return mechanic  # Retornar respuesta de error si algo salió mal
+
+        # Llamar al caso de uso para agregar el mecánico
         result = use_case.add_mechanic(mechanic)
-        return {
-            "statusCode": 201,
-            "body": json.dumps({"data": result})
-        }
+        
+        # Responder con éxito si el mecánico se agregó correctamente
+        return ResponseUtils.created_response({"data": result})
+
     except Exception as e:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"message": str(e)})
-        }
+        return ResponseUtils.internal_server_error_response(f"Error inesperado: {str(e)}")

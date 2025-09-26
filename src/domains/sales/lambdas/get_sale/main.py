@@ -1,41 +1,36 @@
 import json
+from utils.response_utils import ResponseUtils
+from decorators.lambda_decorators import cors_enabled, auth_required
+from decorators.role_required import role_required
 from db.db_client import DBClient
 from repositories.sale_repository import SaleRepository
 from use_cases.sale_use_case import SaleUseCase
-
-# Imports del sistema centralizado
-from decorators.lambda_decorators import cors_enabled, cognito_auth_required
-from utils.response_utils import ResponseUtils
 
 # Inicialización de dependencias
 db_client = DBClient.get_client()
 repository = SaleRepository(db_client)
 use_case = SaleUseCase(repository)
 
-
 @cors_enabled
-@cognito_auth_required  # Requiere autenticación con Cognito
+@auth_required
+@role_required(["ADMIN", "VENDEDOR"])  # Solo estos roles pueden consultar ventas
 def lambda_handler(event, context):
     print(f"event: {event}")
     print(f"context: {context}")
     
     try:
-        # Obtener información del usuario autenticado
-        user_info = event["user_payload"]
-        user_id = user_info["user_id"]
-        scopes = user_info["scope"]
+        # Obtener el client_id del evento (esto proviene del token Cognito)
+        client_id = event["client_id"]  # El client_id debe estar presente en el evento
+        client_roles = event["client_roles"]  # Roles del cliente (verificados desde la base de datos)
         
-        print(f"Usuario autenticado: {user_id}")
-        print(f"Scopes disponibles: {scopes}")
+        print(f"Cliente autenticado con ID: {client_id} y roles: {client_roles}")
+
+         # Obtener el origen de la solicitud (por ejemplo, de un header CORS)
+        origin = event.get("headers", {}).get("Origin", None)  # Obtener el origen dinámico
+        headers = ResponseUtils.get_cors_headers(origin)  # Obtener los headers CORS con el origen dinámico
         
-        # Verificar que tenga permisos para leer ventas
-        required_scope = "motorcycerepairshop-api/read"
-        if required_scope not in scopes:
-            return ResponseUtils.forbidden_response(
-                f"Se requiere el scope: {required_scope}"
-            )
         
-        # Obtener parámetros de consulta
+        # Obtener y validar parámetros de consulta
         params = event.get("queryStringParameters") or {}
         
         # Validar parámetros numéricos
@@ -44,25 +39,60 @@ def lambda_handler(event, context):
             limit = int(params.get("limit", 10))
         except ValueError:
             return ResponseUtils.bad_request_response(
-                "Los parámetros 'page' y 'limit' deben ser números enteros"
+                "Los parámetros 'page' y 'limit' deben ser números enteros válidos"
             )
         
-        # Validar rangos
+        # Validar rangos de paginación
         if page < 1:
-            return ResponseUtils.bad_request_response("El parámetro 'page' debe ser mayor a 0")
-        
-        if limit < 1 or limit > 100:
             return ResponseUtils.bad_request_response(
-                "El parámetro 'limit' debe estar entre 1 y 100"
+                "El parámetro 'page' debe ser mayor o igual a 1"
             )
         
+        if limit < 1:
+            return ResponseUtils.bad_request_response(
+                "El parámetro 'limit' debe ser mayor o igual a 1"
+            )
+        
+        # Límite máximo según el rol
+        max_limit = 100 if "ADMIN" in client_roles else 50  # Si es ADMIN, puede ver más resultados
+        if limit > max_limit:
+            return ResponseUtils.bad_request_response(
+                f"El límite máximo para tus roles ({', '.join(client_roles)}) es {max_limit}"
+            )
+        
+        # Validar parámetro de búsqueda
         search = params.get("search")
+        if search:
+            search = search.strip()
+            if len(search) < 2:
+                return ResponseUtils.bad_request_response(
+                    "El parámetro 'search' debe tener al menos 2 caracteres"
+                )
+            if len(search) > 100:
+                return ResponseUtils.bad_request_response(
+                    "El parámetro 'search' no puede tener más de 100 caracteres"
+                )
+        
+        print(f"Consultando ventas - Página: {page}, Límite: {limit}, Búsqueda: {search}")
         
         # Ejecutar caso de uso
         result = use_case.get_sales(page, limit, search)
         
-        # Verificar si se encontraron resultados
-        if not result or (isinstance(result, dict) and not result.get("data")):
+        # Validar resultado
+        if result is None:
+            return ResponseUtils.internal_server_error_response(
+                "Error interno: el caso de uso retornó None"
+            )
+        
+        # Procesar respuesta vacía
+        if isinstance(result, dict) and "data" in result:
+            if not result["data"]:
+                return ResponseUtils.success_response({
+                    **result,
+                    "client_roles": client_roles,
+                    "message": "No se encontraron ventas con los criterios especificados"
+                })
+        elif isinstance(result, list) and not result:
             return ResponseUtils.success_response({
                 "data": [],
                 "pagination": {
@@ -71,120 +101,37 @@ def lambda_handler(event, context):
                     "total": 0,
                     "total_pages": 0
                 },
+                "client_roles": client_roles,
                 "message": "No se encontraron ventas"
             })
         
         # Respuesta exitosa
-        return ResponseUtils.success_response(result)
+        response_data = result.copy() if isinstance(result, dict) else {"data": result}
+        response_data["client_roles"] = client_roles
+        response_data["permissions"] = {
+            "max_limit": max_limit,
+            "is_admin": "ADMIN" in client_roles  # Verifica si el cliente tiene el rol ADMIN
+        }
         
-    except ValueError as e:
-        # Error de validación de datos
-        return ResponseUtils.bad_request_response(f"Error en los datos: {str(e)}")
+        print(f"Consulta exitosa - Encontradas: {len(result.get('data', result)) if isinstance(result, dict) else len(result)} ventas")
+        return ResponseUtils.success_response(response_data, additional_headers=headers)
         
-    except PermissionError as e:
-        # Error de permisos
-        return ResponseUtils.forbidden_response(f"Sin permisos: {str(e)}")
+    except ValueError as ve:
+        print(f"Error de validación: {str(ve)}")
+        return ResponseUtils.bad_request_response(f"Error en los datos: {str(ve)}")
         
-    except FileNotFoundError as e:
-        # Recurso no encontrado
-        return ResponseUtils.not_found_response(f"Recurso no encontrado: {str(e)}")
+    except PermissionError as pe:
+        print(f"Error de permisos: {str(pe)}")
+        return ResponseUtils.forbidden_response(f"Sin permisos: {str(pe)}")
         
-    except ConnectionError as e:
-        # Error de conexión a base de datos
-        print(f"Error de conexión: {str(e)}")
+    except ConnectionError as ce:
+        print(f"Error de conexión: {str(ce)}")
         return ResponseUtils.internal_server_error_response(
             "Error de conexión con la base de datos"
         )
         
     except Exception as e:
-        # Error genérico
         print(f"Error inesperado: {str(e)}")
         return ResponseUtils.internal_server_error_response(
-            "Ha ocurrido un problema al consultar las ventas"
+            "Ha ocurrido un problema interno al consultar las ventas"
         )
-
-
-# ============== VERSIÓN ALTERNATIVA SIN AUTENTICACIÓN ==============
-# Si quieres que sea un endpoint público, usa esta versión:
-
-@cors_enabled  # Solo CORS, sin autenticación
-def lambda_handler_public(event, context):
-    """Versión pública sin autenticación requerida"""
-    print(f"event: {event}")
-    print(f"context: {context}")
-    
-    try:
-        # Obtener parámetros de consulta
-        params = event.get("queryStringParameters") or {}
-        
-        # Validar parámetros numéricos
-        try:
-            page = int(params.get("page", 1))
-            limit = int(params.get("limit", 10))
-        except ValueError:
-            return ResponseUtils.bad_request_response(
-                "Los parámetros 'page' y 'limit' deben ser números enteros"
-            )
-        
-        # Validar rangos
-        if page < 1:
-            return ResponseUtils.bad_request_response("El parámetro 'page' debe ser mayor a 0")
-        
-        if limit < 1 or limit > 100:
-            return ResponseUtils.bad_request_response(
-                "El parámetro 'limit' debe estar entre 1 y 100"
-            )
-        
-        search = params.get("search")
-        
-        # Ejecutar caso de uso
-        result = use_case.get_sales(page, limit, search)
-        
-        # Respuesta exitosa
-        return ResponseUtils.success_response(result)
-        
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return ResponseUtils.internal_server_error_response(
-            "Ha ocurrido un problema al consultar las ventas"
-        )
-
-
-# ============== VERSIÓN CON CONTROL GRANULAR DE PERMISOS ==============
-# Si quieres diferentes niveles de acceso según el scope:
-
-@cors_enabled
-@cognito_auth_required
-def lambda_handler_with_role_control(event, context):
-    """Versión con control granular de permisos"""
-    try:
-        user_info = event["user_payload"]
-        user_id = user_info["user_id"]
-        scopes = user_info["scope"]
-        client_id = user_info["client_id"]
-        
-        # Obtener parámetros
-        params = event.get("queryStringParameters") or {}
-        page = int(params.get("page", 1))
-        limit = int(params.get("limit", 10))
-        search = params.get("search")
-        
-        # Control de permisos granular
-        if "motorcycerepairshop-api/admin" in scopes:
-            # Admin puede ver todas las ventas
-            result = use_case.get_sales(page, limit, search)
-            
-        elif "motorcycerepairshop-api/read" in scopes:
-            # Usuario normal solo puede ver sus propias ventas
-            result = use_case.get_sales_by_user(user_id, page, limit, search)
-            
-        else:
-            return ResponseUtils.forbidden_response(
-                "No tienes permisos para consultar ventas"
-            )
-        
-        return ResponseUtils.success_response(result)
-        
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return ResponseUtils.internal_server_error_response()

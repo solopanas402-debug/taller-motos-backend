@@ -123,7 +123,6 @@ class RepairRepository:
                 "mechanic_full_name": (f"{mechanic.get('name')} {mechanic.get('surname')}".strip() if mechanic else None),
                 "vehicle_brand": vehicle.get("brand") if vehicle else None,
                 "vehicle_model": vehicle.get("model") if vehicle else None,
-                # Los campos fault_description, status y start_date ya vienen de r
             })
 
         return enriched, total
