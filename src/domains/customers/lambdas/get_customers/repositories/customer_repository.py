@@ -1,8 +1,8 @@
 from typing import List
-from supabase import Client
+from entities.customer import Customer
 
 class CustomerRepository:
-    def __init__(self, db_client : Client):
+    def __init__(self, db_client ):
         self.db_client = db_client
      
     def save(self, customer: Customer):

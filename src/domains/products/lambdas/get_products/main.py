@@ -1,7 +1,7 @@
 import json
 from use_cases.product_use_case import ProductUseCase
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required , debug_event
-from decorators.get_endpoint import get_endpoint
+from decorators.validate_pagination_and_search import validate_pagination_and_search
 from repositories.product_repository import ProductRepository  
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils  # Add this import
@@ -9,11 +9,12 @@ from utils.response_utils import ResponseUtils  # Add this import
 # Inicialización de dependencias
 db_client = DBClient.get_client()
 repository = ProductRepository(db_client)
-use_case = productUseCase(repository)
+use_case = ProductUseCase(repository)
 
 @cors_enabled
 @cognito_auth_required
 @debug_event
+@validate_pagination_and_search()
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')

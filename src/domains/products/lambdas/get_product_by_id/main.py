@@ -18,17 +18,16 @@ def lambda_handler(event, context):
     print(f'context: {context}')
 
     try:
-        # Obtener el origen de la solicitud (por ejemplo, de un header CORS)
-        origin = event.get("headers", {}).get("Origin", None)  # Obtener el origen dinámico
-        headers = ResponseUtils.get_cors_headers(origin)  # Obtener los headers CORS con el origen dinámico
+        # Obtener headers CORS dinámicos
+        origin = event.get("headers", {}).get("Origin")
+        headers = ResponseUtils.get_cors_headers(origin)
 
-        parameters = event.get('queryStringParameters', None)
+        # ✅ Soporte para query params o path params
+        parameters = event.get('queryStringParameters') or {}
+        path_params = event.get("pathParameters") or {}
 
-        if parameters is None:
-            return ResponseUtils.bad_request_response("Se debe proporcionar el id del producto")
+        product_id = parameters.get('id_product') or path_params.get("id_product")
 
-        product_id = parameters.get('id_product')
-        
         if not product_id:
             return ResponseUtils.bad_request_response("El parámetro 'id_product' es obligatorio")
 
@@ -39,13 +38,12 @@ def lambda_handler(event, context):
 
         print(f'Producto recuperado: {product}')
 
-        if product is None:
+        if not product:
             return ResponseUtils.not_found_response(f"No se ha encontrado producto con id: {product_id}")
 
         # Respuesta exitosa
         response_data = {
-            "data": product,
-            "client_roles": client_roles
+            "data": product
         }
         
         return ResponseUtils.success_response(response_data, additional_headers=headers)

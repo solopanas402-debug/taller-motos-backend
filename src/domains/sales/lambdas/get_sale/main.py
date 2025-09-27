@@ -1,7 +1,7 @@
 import json
 from use_cases.sale_use_case import SaleUseCase
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required , debug_event
-from decorators.get_endpoint import get_endpoint
+from decorators.validate_pagination_and_search import validate_pagination_and_search
 from repositories.sale_repository import SaleRepository
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils  # Add this import
@@ -14,6 +14,7 @@ use_case = SaleUseCase(repository)
 @cors_enabled
 @cognito_auth_required
 @debug_event
+@validate_pagination_and_search()
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
