@@ -1,8 +1,8 @@
 from typing import List
-from layers.shared.entities.customer import Customer
+from supabase import Client
 
 class CustomerRepository:
-    def __init__(self, db_client):
+    def __init__(self, db_client : Client):
         self.db_client = db_client
      
     def save(self, customer: Customer):

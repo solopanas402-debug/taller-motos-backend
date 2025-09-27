@@ -1,5 +1,6 @@
+from repositories.supplier_repository import SupplierRepository
 class SupplierUseCase:
-    def __init__(self, repository):
+    def __init__(self, repository : SupplierRepository):
         self.repository = repository
 
     def add_supplier(self, supplier):

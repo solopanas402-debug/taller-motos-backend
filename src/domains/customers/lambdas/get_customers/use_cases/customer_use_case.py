@@ -1,5 +1,8 @@
+
+from repositories.customer_repository import CustomerRepository
+
 class CustomerUseCase:
-    def __init__(self, repository):
+    def __init__(self, repository: CustomerRepository):
         self.repository = repository
 
     def add_customer(self, customer):

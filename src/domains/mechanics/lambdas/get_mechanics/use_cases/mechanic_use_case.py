@@ -1,3 +1,4 @@
+from repositories.mechanic_repository import MechanicRepository
 class MechanicUseCase:
     def __init__(self, repository):
         self.repository = repository

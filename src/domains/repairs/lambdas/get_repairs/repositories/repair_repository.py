@@ -1,9 +1,7 @@
 from typing import List, Tuple
-from db.db_client import DBClient
-
 
 class RepairRepository:
-    def __init__(self, db_client: DBClient):
+    def __init__(self, db_client):
         self.db_client = db_client
 
     def find_all(self, page: int = 1, limit: int = 10, search: str | None = None) -> Tuple[List[dict], int]:

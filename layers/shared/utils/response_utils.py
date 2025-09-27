@@ -9,21 +9,24 @@ class ResponseUtils:
     def get_cors_headers(origin: str = None) -> Dict[str, str]:
         """Obtiene los headers CORS básicos"""
 
-          allowed_origins = [
-            "https://motorcycle-repair-shop-user-pool.auth.us-east-1.amazoncognito.com",  # Dominio de Cognito
-            "http://localhost:3000",  # Localhost para desarrollo
-        ]
+        # allowed_origins = [
+        #     "https://motorcycle-repair-shop-user-pool.auth.us-east-1.amazoncognito.com",
+        #     "http://localhost:3000",
+        #     "https://localhost:3000",
+        #     "*"  # Para desarrollo, considera remover en producción
+        # ]
 
-         if origin and origin in allowed_origins:
-            allowed_origin = origin
-        else:
-            allowed_origin = allowed_origins[0]
+        # # Determinar el origen permitido
+        # if origin and origin in allowed_origins:
+        #     allowed_origin = origin
+        # else:
+        #     # Si no hay origin específico o no está en la lista, usar "*" o el primero
+        #     allowed_origin = "*"  # O allowed_origins[0] si prefieres ser más restrictivo
 
         return {
-            "Access-Control-Allow-Origin": allowed_origins,
+            "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With",
             "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS,PATCH",
-            "Access-Control-Allow-Credentials": "true",
             "Content-Type": "application/json"
         }
     
@@ -38,7 +41,7 @@ class ResponseUtils:
         return {
             "statusCode": status_code,
             "headers": headers,
-            "body": json.dumps(data, ensure_ascii=False)
+            "body": json.dumps(data, ensure_ascii=False, default=str)  # ✅ default=str para serializar objetos complejos
         }
     
     @staticmethod
@@ -58,7 +61,7 @@ class ResponseUtils:
         return {
             "statusCode": status_code,
             "headers": headers,
-            "body": json.dumps(error_data, ensure_ascii=False)
+            "body": json.dumps(error_data, ensure_ascii=False, default=str)
         }
     
     @staticmethod
@@ -128,4 +131,3 @@ class ResponseUtils:
     def too_many_requests_response(message: str = "Demasiadas solicitudes", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 429 Too Many Requests"""
         return ResponseUtils.error_response(message, 429, additional_headers)
-

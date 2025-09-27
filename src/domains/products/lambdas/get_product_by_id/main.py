@@ -1,8 +1,8 @@
 import json
 from use_cases.product_use_cases import ProductUseCase
 from utils.response_utils import ResponseUtils
-from decorators.lambda_decorators import cors_enabled, auth_required
-from decorators.role_required import role_required
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
+
 from repositories.product_repository import ProductRepository
 from db.db_client import DBClient
 
@@ -12,19 +12,12 @@ repository = ProductRepository(db_client)
 use_case = ProductUseCase(repository)
 
 @cors_enabled
-@auth_required
-@role_required(["ADMIN", "VENDEDOR"])  # Solo estos roles pueden consultar productos
+@cognito_auth_required
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
     try:
-        # Obtener el client_id del evento (esto proviene del token Cognito)
-        client_id = event["client_id"]  # El client_id debe estar presente en el evento
-        client_roles = event["client_roles"]  # Roles del cliente (verificados desde la base de datos)
-        
-        print(f"Cliente autenticado con ID: {client_id} y roles: {client_roles}")
-
         # Obtener el origen de la solicitud (por ejemplo, de un header CORS)
         origin = event.get("headers", {}).get("Origin", None)  # Obtener el origen dinámico
         headers = ResponseUtils.get_cors_headers(origin)  # Obtener los headers CORS con el origen dinámico

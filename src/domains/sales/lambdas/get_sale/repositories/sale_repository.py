@@ -1,6 +1,5 @@
 from typing import List, Tuple
 
-
 class SaleRepository:
     def __init__(self, db_client):
         self.db_client = db_client

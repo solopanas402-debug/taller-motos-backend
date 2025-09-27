@@ -1,9 +1,8 @@
 from entities.product import Product
-from supabase import Client
 
 
 class ProductRepository:
-    def __init__(self, db_client: Client):
+    def __init__(self, db_client):
         self.db_client = db_client
 
     def find_all(self, page: int = 1, limit: int = 10, search: str | None = None):

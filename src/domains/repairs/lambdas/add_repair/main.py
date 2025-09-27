@@ -1,6 +1,6 @@
 import json
 from utils.response_utils import ResponseUtils
-from decorators.lambda_decorators import cors_enabled, auth_required, role_required
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from db.db_client import DBClient
 from load_initial_parameters import load_initial_parameters
 from repositories.repair_repository import RepairRepository
@@ -18,19 +18,12 @@ storage_repository = StorageRepository(db_client, "repairs-images")
 image_use_case = SaveImagesUseCase(storage_repository)
 
 @cors_enabled  # Habilitar CORS para este endpoint
-@auth_required  # Asegura que el cliente esté autenticado
-@role_required(["ADMIN", "MECANICO"])  # Solo los usuarios con rol ADMIN o MECANICO pueden agregar reparaciones
+@cognito_auth_required # Asegura que el cliente esté autenticado
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
     try:
-        # Obtener el client_id y roles del evento (esto proviene del token Cognito)
-        client_id = event["client_id"]  # El client_id debe estar presente en el evento
-        client_roles = event["client_roles"]  # Roles del cliente (verificados desde la base de datos)
-        
-        print(f"Cliente autenticado con ID: {client_id} y roles: {client_roles}")
-
         # Cargar parámetros de la reparación desde el evento
         repair_data = load_initial_parameters(event)
 

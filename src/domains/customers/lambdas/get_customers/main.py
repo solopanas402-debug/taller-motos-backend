@@ -1,10 +1,11 @@
 import json
 from use_cases.customer_use_case import CustomerUseCase
-from decorators.lambda_decorators import cors_enabled, auth_required
-from decorators.role_required import role_required
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required , debug_event
+
 from decorators.get_endpoint import get_endpoint
 from repositories.customer_repository import CustomerRepository
 from db.db_client import DBClient
+from utils.response_utils import ResponseUtils
 
 # Inicialización de dependencias
 db_client = DBClient.get_client()
@@ -12,20 +13,19 @@ repository = CustomerRepository(db_client)
 use_case = CustomerUseCase(repository)
 
 @cors_enabled
-@auth_required
-@role_required(["ADMIN", "VENDEDOR"])  # Solo estos roles pueden consultar clientes
-@get_endpoint(entity_name="customers", max_limit_admin=100, max_limit_other=50)
+@cognito_auth_required
+@debug_event
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
     
-    # Obtener parámetros validados del decorador
     validated_params = event.get("validated_params", {})
     page = validated_params.get("page", 1)
     limit = validated_params.get("limit", 10)
     search = validated_params.get("search")
     
-    # Ejecutar caso de uso
+    # 1. Llamas al use case
     result = use_case.get_customers(page, limit, search)
-    
-    return result
+
+    # 2. Envuelves el resultado
+    return ResponseUtils.success_response(result)

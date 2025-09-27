@@ -1,8 +1,8 @@
 from typing import List
 from entities.supplier import Supplier
-
+from supabase import Client
 class SupplierRepository:
-    def __init__(self, db_client):
+    def __init__(self, db_client : Client):
         self.db_client = db_client
     
     def save(self, supplier: Supplier):
