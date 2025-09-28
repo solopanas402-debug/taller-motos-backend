@@ -1,5 +1,8 @@
 from supabase import Client
 
+from entities.mechanic import Mechanic
+
+
 class MechanicRepository:
     def __init__(self, db_client : Client):
         self.db_client = db_client

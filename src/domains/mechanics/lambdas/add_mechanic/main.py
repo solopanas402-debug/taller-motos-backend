@@ -1,7 +1,7 @@
 import json
 from use_cases.mechanic_use_case import MechanicUseCase
 from utils.response_utils import ResponseUtils
-from decorators.lambda_decorators import cors_enabled, auth_required
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from repositories.mechanic_repository import MechanicRepository
 from db.db_client import DBClient
 from load_initial_parameters import load_initial_parameters
