@@ -1,44 +1,35 @@
 import json
-
-from exceptions.validation_exception import ValidationException
-from load_initial_parameters import load_initial_parameters
-from repositories.product_repository import ProductRepository
 from use_cases.product_use_cases import ProductUseCase
+from utils.response_utils import ResponseUtils
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
+from repositories.product_repository import ProductRepository
 from db.db_client import DBClient
+from load_initial_parameters import load_initial_parameters
 
-db_client = DBClient().get_client()
+# Inicialización de dependencias
+db_client = DBClient.get_client()
 repository = ProductRepository(db_client)
-usecase = ProductUseCase(repository)
+use_case = ProductUseCase(repository)
 
-
+@cors_enabled  # Habilitar CORS para este endpoint
+@cognito_auth_required # Asegura que el cliente esté autenticado
 def lambda_handler(event, context):
+    print(f'event: {event}')
+    print(f'context: {context}')
+
     try:
+
+        # Cargar parámetros del producto desde el evento
         product = load_initial_parameters(event)
 
-        response_product = usecase.add_product(product)
+        if isinstance(product, dict) and "statusCode" in product:
+            return product  # Retornar respuesta de error si algo salió mal
 
-        print(f'Productos recuperado: {response_product}')
-        return {
-            "statusCode": 201,
-            "body": json.dumps({
-                "data": response_product,
-                # "input": event
-            })
-        }
-
-    except ValidationException as e:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({
-                "message": str(e),
-            })
-        }
+        # Llamar al caso de uso para agregar el producto
+        result = use_case.add_product(product)
+        
+        # Responder con éxito si el producto se agregó correctamente
+        return ResponseUtils.created_response({"data": result})
 
     except Exception as e:
-        print(f'Error al registrar el producto {e}')
-        return {
-            "statusCode": 501,
-            "body": json.dumps({
-                "message": f'No se ha podido registrar el producto',
-            })
-        }
+        return ResponseUtils.internal_server_error_response(f"Error inesperado: {str(e)}")
