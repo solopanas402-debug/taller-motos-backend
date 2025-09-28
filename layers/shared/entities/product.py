@@ -48,6 +48,7 @@ class Product:
             "id_supplier": self.id_supplier,
             "id_category": self.id_category,
             "id_brand": self.id_brand,
+            "discount": self.discount,
             "active": self.active,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
