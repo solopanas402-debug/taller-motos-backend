@@ -4,11 +4,11 @@ from utils.uuid_generator import generate_uuid_str
 
 
 class Product:
-    def __init__(self, id_product: str, code: str, name: str, description: str, price: float, discount: float,
+    def __init__(self, id_product: str, code: str, name: str, description: str, price: float,
                  stock: int,
                  min_stock: int, max_stock: int,
                  id_supplier: str, id_category: str, id_brand: str, active: bool, created_at: datetime,
-                 updated_at: datetime):
+                 updated_at: datetime, discount: float = 0.0):
         self.id_product = id_product
         self.code = code
         self.name = name
@@ -48,6 +48,7 @@ class Product:
             "id_supplier": self.id_supplier,
             "id_category": self.id_category,
             "id_brand": self.id_brand,
+            "discount": self.discount,
             "active": self.active,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None

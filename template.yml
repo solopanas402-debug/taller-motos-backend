@@ -14,8 +14,8 @@ Globals:
       AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With'"
       AllowOrigin: "'*'" # O especifica tus dominios
       #AllowCredentials: true
-    BinaryMediaTypes:
-      - "*/*"
+    # BinaryMediaTypes:
+    #   - "*/*"
     Auth:
       DefaultAuthorizer: CognitoAuthorizer
       Authorizers:
