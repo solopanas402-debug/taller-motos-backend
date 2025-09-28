@@ -1,7 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from layers.shared.entities.mechanic import Mechanic
+from entities.mechanic import Mechanic
 from utils.response_utils import ResponseUtils  
 
 def load_initial_parameters(event):
