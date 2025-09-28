@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Any, List, Type, Callable
+from typing import Dict, Any, List, Type, Callable, Union
 
 
 class ValidationException(Exception):
@@ -12,7 +12,7 @@ class ValidationException(Exception):
 
 def validate_fields(
         data: Dict[str, Any],
-        schema: Dict[Type, List[str]],
+        schema: Dict[Union[Type, tuple], List[str]],
         context: str = "",
         extra_validations: List[Callable[[Dict[str, Any]], None]] = None,
         field_rules: Dict[str, Dict[str, Any]] = None
@@ -34,6 +34,26 @@ def validate_fields(
             if value in (None, "", [], {}):
                 continue
 
+            if isinstance(expected_type, tuple):
+                if not isinstance(value, expected_type):
+                    type_names = " o ".join([t.__name__ for t in expected_type])
+                    raise ValidationException(
+                        f"El campo '{field}' {f'en {context}' if context else ''} debe ser de tipo {type_names}"
+                    )
+                
+                if any(t in (int, float) for t in expected_type) and isinstance(value, (int, float)):
+                    allow_zero = rules.get("allow_zero", False)
+                    if not allow_zero and value <= 0:
+                        raise ValidationException(
+                            f"El campo '{field}' {f'en {context}' if context else ''} debe ser mayor a 0"
+                        )
+                    if allow_zero and value < 0:
+                        raise ValidationException(
+                            f"El campo '{field}' {f'en {context}' if context else ''} no puede ser negativo"
+                        )
+                continue
+
+            # Handle datetime validation
             if expected_type is datetime:
                 if isinstance(value, str):
                     try:
@@ -68,14 +88,6 @@ def validate_fields(
                 if not (1 <= len(value) <= 255):
                     raise ValidationException(
                         f"El campo '{field}' {f'en {context}' if context else ''} debe tener entre 1 y 255 caracteres")
-
-            # if expected_type is str:
-            #     min_len = rules.get("min_len", 1)
-            #     max_len = rules.get("max_len", 255)
-            #     if not (min_len <= len(value) <= max_len):
-            #         raise ValidationException(
-            #             f"El campo '{field}' {f'en {context}' if context else ''} debe tener entre {min_len} y {max_len} caracteres"
-            #         )
 
     if extra_validations:
         for validation_func in extra_validations:
