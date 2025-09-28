@@ -8,8 +8,8 @@ Globals:
     Runtime: python3.12
     MemorySize: 256
   Api:
-    BinaryMediaTypes:
-      - '*/*'
+#    BinaryMediaTypes:
+#      - '*/*'
     Auth:
       DefaultAuthorizer: CognitoAuthorizer
       Authorizers:
