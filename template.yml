@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Backend en Python con Lambdas y API Gateway
 
@@ -8,8 +8,14 @@ Globals:
     Runtime: python3.12
     MemorySize: 256
   Api:
-#    BinaryMediaTypes:
-#      - '*/*'
+    # ✅ Configuración CORS global
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS,PATCH'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With'"
+      AllowOrigin: "'*'" # O especifica tus dominios
+      #AllowCredentials: true
+    # BinaryMediaTypes:
+    #   - "*/*"
     Auth:
       DefaultAuthorizer: CognitoAuthorizer
       Authorizers:
@@ -30,9 +36,7 @@ Parameters:
     Type: Number
     Default: 14
 
-
 Resources:
-
   # === IAM ROLE ===
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -128,7 +132,6 @@ Resources:
       BuildProperties:
         PIP_REQUIREMENTS: requirements.txt
 
-
   # === LAMBDAS ===
   GetCustomersApiFunction:
     Type: AWS::Serverless::Function
@@ -143,6 +146,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -175,6 +181,10 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+
       Events:
         ApiEvent:
           Type: Api
@@ -207,6 +217,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -239,6 +252,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -271,6 +287,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -303,6 +322,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -335,6 +357,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -367,6 +392,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -399,6 +427,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -409,7 +440,6 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-
 
   AddSupplierApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -432,6 +462,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -456,6 +489,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -488,6 +524,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -512,6 +551,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -523,7 +565,6 @@ Resources:
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
 
-
   AddRepairApiLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -531,7 +572,6 @@ Resources:
       RetentionInDays: !Ref LogRetentionDays
     DeletionPolicy: Retain
     DependsOn: AddRepairApiFunction
-
 
   AddBulkProductApiFunction:
     Type: AWS::Serverless::Function
@@ -546,6 +586,9 @@ Resources:
         Variables:
           DB_URL: !Ref DBUrl
           DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
       Events:
         ApiEvent:
           Type: Api
@@ -556,6 +599,3 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-
-
-  

@@ -1,9 +1,7 @@
 from typing import List, Tuple
-from db.db_client import DBClient
-
 
 class RepairRepository:
-    def __init__(self, db_client: DBClient):
+    def __init__(self, db_client):
         self.db_client = db_client
 
     def find_all(self, page: int = 1, limit: int = 10, search: str | None = None) -> Tuple[List[dict], int]:
@@ -123,7 +121,6 @@ class RepairRepository:
                 "mechanic_full_name": (f"{mechanic.get('name')} {mechanic.get('surname')}".strip() if mechanic else None),
                 "vehicle_brand": vehicle.get("brand") if vehicle else None,
                 "vehicle_model": vehicle.get("model") if vehicle else None,
-                # Los campos fault_description, status y start_date ya vienen de r
             })
 
         return enriched, total

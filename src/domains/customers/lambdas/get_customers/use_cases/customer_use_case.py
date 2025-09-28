@@ -1,12 +1,14 @@
-from repositories.mechanic_repository import MechanicRepository
-class MechanicUseCase:
-    def __init__(self, repository):
+
+from repositories.customer_repository import CustomerRepository
+
+class CustomerUseCase:
+    def __init__(self, repository: CustomerRepository):
         self.repository = repository
 
-    def add_mechanic(self, mechanic):
-        return self.repository.save(mechanic)
+    def add_customer(self, customer):
+        return self.repository.save(customer)
 
-    def get_mechanics(self, page=1, limit=10, search=None):
+    def get_customers(self, page=1, limit=10, search=None):
         data, total = self.repository.find_all(page, limit, search)
         return {
             "data": data,
