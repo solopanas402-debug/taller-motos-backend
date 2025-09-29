@@ -32,6 +32,7 @@ def load_initial_parameters(event):
                       id_supplier=request_body["id_supplier"],
                       id_category=request_body.get("id_category", ""),
                       id_brand=request_body.get("id_brand", ""),
+                      model=request_body.get("model", ""),
                       active=True,
                       created_at=datetime.now(timezone.utc),
                       updated_at=datetime.now(timezone.utc))
