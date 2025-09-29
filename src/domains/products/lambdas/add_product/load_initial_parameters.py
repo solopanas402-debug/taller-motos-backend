@@ -27,11 +27,13 @@ def load_initial_parameters(event):
 
     product = Product(id_product=generate_uuid_hex(), code=request_body["code"], name=request_body["name"],
                       description=request_body["description"], price=float(request_body["price"]),
+                      discount=float(request_body.get("discount", 0.00)),
                       stock=int(request_body["stock"]), min_stock=int(request_body.get("min_stock", 0)),
                       max_stock=int(request_body.get("max_stock", 0)),
                       id_supplier=request_body["id_supplier"],
                       id_category=request_body.get("id_category", ""),
                       id_brand=request_body.get("id_brand", ""),
+                      model=request_body.get("model", ""),
                       active=True,
                       created_at=datetime.now(timezone.utc),
                       updated_at=datetime.now(timezone.utc))
