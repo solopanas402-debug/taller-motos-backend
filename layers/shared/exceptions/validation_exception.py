@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Any, List, Type, Callable
+from typing import Dict, Any, List, Type, Callable, Union
 
 
 class ValidationException(Exception):
@@ -12,7 +12,7 @@ class ValidationException(Exception):
 
 def validate_fields(
         data: Dict[str, Any],
-        schema: Dict[Type, List[str]],
+        schema: Dict[Union[Type, tuple], List[str]],
         context: str = "",
         extra_validations: List[Callable[[Dict[str, Any]], None]] = None,
         field_rules: Dict[str, Dict[str, Any]] = None
@@ -34,24 +34,26 @@ def validate_fields(
             if value in (None, "", [], {}):
                 continue
 
-            if expected_type is datetime:
-                if isinstance(value, str):
-                    try:
-                        datetime.fromisoformat(value)
-                    except ValueError:
-                        raise ValidationException(
-                            f"El campo '{field}' {f'en {context}' if context else ''} debe ser una fecha válida"
-                        )
-                elif not isinstance(value, datetime):
+            if isinstance(expected_type, tuple):
+                if not isinstance(value, expected_type):
+                    type_names = " o ".join([t.__name__ for t in expected_type])
                     raise ValidationException(
-                        f"El campo '{field}' {f'en {context}' if context else ''} debe ser de tipo fecha"
+                        f"El campo '{field}' {f'en {context}' if context else ''} debe ser de tipo {type_names}"
                     )
+                
+                if any(t in (int, float) for t in expected_type) and isinstance(value, (int, float)):
+                    allow_zero = rules.get("allow_zero", False)
+                    if not allow_zero and value <= 0:
+                        raise ValidationException(
+                            f"El campo '{field}' {f'en {context}' if context else ''} debe ser mayor a 0"
+                        )
+                    if allow_zero and value < 0:
+                        raise ValidationException(
+                            f"El campo '{field}' {f'en {context}' if context else ''} no puede ser negativo"
+                        )
                 continue
 
-            if not isinstance(value, expected_type):
-                raise ValidationException(
-                    f"El campo '{field}' {f'en {context}' if context else ''} debe ser de tipo {expected_type.__name__}"
-                )
+            # Handle datetime validation
 
             if expected_type in (int, float):
                 allow_zero = rules.get("allow_zero", False)
