@@ -13,7 +13,7 @@ class ProductRepository:
             query = query.or_(
                 f"name.ilike.{search_pattern},"
                 f"description.ilike.{search_pattern},"
-                f"sku.ilike.{search_pattern}"
+                f"code.ilike.{search_pattern}"
             )
         response = query.range(offset, offset + limit - 1).execute()
         return (response.data or [], response.count or 0)

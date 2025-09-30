@@ -1,7 +1,7 @@
 from functools import wraps
 from utils.response_utils import ResponseUtils
 
-def validate_pagination_and_search():
+def validate_pagination_and_search(max_limit: int = 100):
     """
     Decorador para endpoints públicos GET con parámetros:
     - page: int (>=1)
@@ -27,19 +27,19 @@ def validate_pagination_and_search():
                     return ResponseUtils.bad_request_response(
                         "El parámetro 'page' debe ser mayor o igual a 1"
                     )
+                
                 if limit < 1:
                     return ResponseUtils.bad_request_response(
                         "El parámetro 'limit' debe ser mayor o igual a 1"
                     )
+                
+                # Añadimos el límite máximo de registros
+                if limit > max_limit:
+                    limit = max_limit
 
                 # Validar search (opcional)
-                search = query_params.get("search")
+                search = query_params.get("search", "").strip() if query_params.get("search") else None
                 if search:
-                    search = search.strip()
-                    if len(search) < 1:
-                        return ResponseUtils.bad_request_response(
-                            "El parámetro 'search' debe tener al menos 1 caracter"
-                        )
                     if len(search) > 100:
                         return ResponseUtils.bad_request_response(
                             "El parámetro 'search' no puede tener más de 100 caracteres"
@@ -54,9 +54,8 @@ def validate_pagination_and_search():
 
                 return func(event, context)
 
-            except Exception as e:
-                print(f"❌ Error en public_get_params: {str(e)}")
-                return ResponseUtils.bad_request_response("Parámetros inválidos")
+            except Exception:
+                return ResponseUtils.bad_request_response("Parámetros de paginación inválidos")
         
         return wrapper
     return decorator
