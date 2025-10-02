@@ -100,11 +100,6 @@ Resources:
     Properties:
       ClientName: motorcycle-repair-shop-client
       UserPoolId: !Ref MotorcycleRepairShopUserPool
-      #GenerateSecret: false
-      #      ExplicitAuthFlows:
-      #        - ALLOW_USER_PASSWORD_AUTH
-      #        - ALLOW_REFRESH_TOKEN_AUTH
-      #        - ALLOW_USER_SRP_AUTH
       GenerateSecret: true
       AllowedOAuthFlows:
         - client_credentials
@@ -132,7 +127,9 @@ Resources:
       BuildProperties:
         PIP_REQUIREMENTS: requirements.txt
 
-  # === LAMBDAS ===
+  # ============================================
+  # === CUSTOMERS CRUD ===
+  # ============================================
   GetCustomersApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -148,7 +145,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -160,6 +157,284 @@ Resources:
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
 
+  GetSalesApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/GetSalesApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: GetSalesApiFunction
+
+  GetSaleByIdApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetSaleByIdApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/get_sale_by_id
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /sales/{id}
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+
+  AddSaleApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddSaleApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/add_sale
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /sales
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+  AddSaleApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddSaleApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddSaleApiFunction
+
+  UpdateSaleApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "UpdateSaleApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/update_sale
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /sales/{id}
+            Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/update
+
+  DeleteSaleApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "DeleteSaleApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/delete_sale
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /sales/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/delete
+
+  # ============================================
+  # === REPAIRS CRUD ===
+  # ============================================
+  GetRepairsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetRepairsApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/get_repairs
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+
+  GetRepairsApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/GetRepairsApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: GetRepairsApiFunction
+
+  GetRepairByIdApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetRepairByIdApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/get_repair_by_id
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs/{id}
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+
+  AddRepairApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddRepairApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/add_repair
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+  AddRepairApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddRepairApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddRepairApiFunction
+
+  UpdateRepairApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "UpdateRepairApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/update_repair
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs/{id}
+            Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/update
+
+  DeleteRepairApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "DeleteRepairApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/repairs/lambdas/delete_repair
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /repairs/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/delete
+
   GetCustomersApiLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -167,6 +442,33 @@ Resources:
       RetentionInDays: !Ref LogRetentionDays
     DeletionPolicy: Retain
     DependsOn: GetCustomersApiFunction
+
+  GetCustomerByIdApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetCustomerByIdApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/customers/lambdas/get_customer_by_id
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /customers/{id}
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
 
   AddCustomerApiFunction:
     Type: AWS::Serverless::Function
@@ -183,8 +485,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
-
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -204,6 +505,63 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: AddCustomerApiFunction
 
+  UpdateCustomerApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "UpdateCustomerApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/customers/lambdas/update_customer
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /customers/{id}
+            Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/update
+
+  DeleteCustomerApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "DeleteCustomerApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/customers/lambdas/delete_customer
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /customers/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/delete
+
+  # ============================================
+  # === MECHANICS CRUD ===
+  # ============================================
   GetMechanicsApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -219,7 +577,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -239,6 +597,33 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: GetMechanicsApiFunction
 
+  GetMechanicByIdApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetMechanicByIdApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/mechanics/lambdas/get_mechanic_by_id
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /mechanics/{id}
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+
   AddMechanicApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -254,7 +639,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -274,6 +659,63 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: AddMechanicApiFunction
 
+  UpdateMechanicApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "UpdateMechanicApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/mechanics/lambdas/update_mechanic
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /mechanics/{id}
+            Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/update
+
+  DeleteMechanicApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "DeleteMechanicApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/mechanics/lambdas/delete_mechanic
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /mechanics/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/delete
+
+  # ============================================
+  # === PRODUCTS CRUD ===
+  # ============================================
   GetProductsApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -289,7 +731,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -324,7 +766,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -359,7 +801,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -379,6 +821,93 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: AddProductApiFunction
 
+  UpdateProductApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "UpdateProductApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/products/lambdas/update_product
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /products/{id}
+            Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/update
+
+  DeleteProductApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "DeleteProductApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/products/lambdas/delete_product
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /products/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/delete
+
+  # ============================================
+  # === BULK PRODUCTS ===
+  # ============================================
+  AddBulkProductApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddBulkProductApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/bulk_products/lambdas/add_products
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /bulk_products
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+
+  # ============================================
+  # === SUPPLIERS CRUD ===
+  # ============================================
   GetSuppliersApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -394,7 +923,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -429,7 +958,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -449,6 +978,63 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: AddSupplierApiFunction
 
+  UpdateSupplierApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "UpdateSupplierApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/suppliers/lambdas/update_supplier
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /suppliers/{id}
+            Method: put
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/update
+
+  DeleteSupplierApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "DeleteSupplierApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/suppliers/lambdas/delete_supplier
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /suppliers/{id}
+            Method: delete
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/delete
+
+  # ============================================
+  # === SALES CRUD ===
+  # ============================================
   GetSalesApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -464,7 +1050,7 @@ Resources:
           DB_KEY: !Ref DBKey
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
       Events:
         ApiEvent:
           Type: Api
@@ -475,127 +1061,3 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-
-  AddSaleApiFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "AddSaleApi-${Environment}"
-      Layers:
-        - !Ref SharedLayer
-      CodeUri: src/domains/sales/lambdas/add_sale
-      Handler: main.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          DB_URL: !Ref DBUrl
-          DB_KEY: !Ref DBKey
-          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
-          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /sales
-            Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
-
-  AddSaleApiLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/AddSaleApi-${Environment}"
-      RetentionInDays: !Ref LogRetentionDays
-    DeletionPolicy: Retain
-    DependsOn: AddSupplierApiFunction
-
-  GetRepairsApiFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "GetRepairsApi-${Environment}"
-      Layers:
-        - !Ref SharedLayer
-      CodeUri: src/domains/repairs/lambdas/get_repairs
-      Handler: main.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          DB_URL: !Ref DBUrl
-          DB_KEY: !Ref DBKey
-          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
-          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /repairs
-            Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
-
-  AddRepairApiFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "AddRepairApi-${Environment}"
-      Layers:
-        - !Ref SharedLayer
-      CodeUri: src/domains/repairs/lambdas/add_repair
-      Handler: main.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          DB_URL: !Ref DBUrl
-          DB_KEY: !Ref DBKey
-          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
-          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /repairs
-            Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
-
-  AddRepairApiLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub "/aws/lambda/AddRepairApi-${Environment}"
-      RetentionInDays: !Ref LogRetentionDays
-    DeletionPolicy: Retain
-    DependsOn: AddRepairApiFunction
-
-  AddBulkProductApiFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub "AddBulkProductApi-${Environment}"
-      Layers:
-        - !Ref SharedLayer
-      CodeUri: src/domains/bulk_products/lambdas/add_products
-      Handler: main.lambda_handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Environment:
-        Variables:
-          DB_URL: !Ref DBUrl
-          DB_KEY: !Ref DBKey
-          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
-          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
-          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool # Tu dominio de Cognito
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /bulk_products
-            Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create

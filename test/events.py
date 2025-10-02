@@ -180,7 +180,122 @@ events = {
                 "active": True
             }
         ])
-
-    }
-
+    },
+    "update_product": {
+        "httpMethod": "PUT",
+        "path": "/products/{id_product}",
+        "pathParameters": {
+            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+        },
+        "body": json.dumps({
+            "name": "PRODUCTO ACTUALIZADO",
+            "description": "Descripción actualizada desde test",
+            "price": 45.99,
+            "stock": 25,
+            "min_stock": 10,
+            "max_stock": 50,
+            "discount": 15.5,
+            "active": True
+        })
+    },
+    
+    "update_product_partial": {
+        "httpMethod": "PUT",
+        "path": "/products/{id_product}",
+        "pathParameters": {
+            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+        },
+        "body": json.dumps({
+            "price": 99.99,
+            "stock": 100
+        })
+    },
+    
+    "delete_product": {
+        "httpMethod": "DELETE",
+        "path": "/products/{id_product}",
+        "pathParameters": {
+            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+        }
+    },
+    
+    "find_product_by_id": {
+        "httpMethod": "GET",
+        "path": "/products/{id_product}",
+        "pathParameters": {
+            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+        }
+    },
+        
+    "add_customer": {
+        "httpMethod": "POST",
+        "path": "/customers",
+        "body": json.dumps({
+            "id_number": "0912345678",
+            "name": "Carlos",
+            "surname": "Rodríguez Pérez",
+            "address": "Av. Principal #123, Guayaquil",
+            "phone": "0987654321",
+            "email": "carlos.rodriguez@example.com",
+            "identification_type": "CEDULA",
+            "birth_date": "1985-03-15",
+            "gender": "M",
+            "active": True
+        })
+    },
+    
+    "update_customer": {
+        "httpMethod": "PUT",
+        "path": "/customers/{id_customer}",
+        "pathParameters": {
+            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+        },
+        "body": json.dumps({
+            "name": "Carlos Alberto",
+            "surname": "Rodríguez García",
+            "address": "Av. Secundaria #456, Guayaquil",
+            "phone": "0991234567",
+            "email": "carlos.nuevo@example.com",
+            "active": True
+        })
+    },
+    
+    "update_customer_partial": {
+        "httpMethod": "PUT",
+        "path": "/customers/{id_customer}",
+        "pathParameters": {
+            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+        },
+        "body": json.dumps({
+            "phone": "0998877665",
+            "email": "nuevo.email@example.com"
+        })
+    },
+    
+    "update_customer_email_only": {
+        "httpMethod": "PUT",
+        "path": "/customers/{id_customer}",
+        "pathParameters": {
+            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+        },
+        "body": json.dumps({
+            "email": "actualizado@example.com"
+        })
+    },
+    
+    "delete_customer": {
+        "httpMethod": "DELETE",
+        "path": "/customers/{id_customer}",
+        "pathParameters": {
+            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+        }
+    },
+    
+    "find_customer_by_id": {
+        "httpMethod": "GET",
+        "path": "/customers/{id_customer}",
+        "pathParameters": {
+            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+        }
+    },
 }
