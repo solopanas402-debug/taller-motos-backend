@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from entities.supplier import Supplier
 from supabase import Client
 class SupplierRepository:
@@ -10,7 +10,7 @@ class SupplierRepository:
         response = self.db_client.table("suppliers").insert(data).execute()
         return response.data
     
-    def find_all(self, page: int = 1, limit: int = 10, search: str = None) -> List[dict]:
+    def find_all(self, page: int = 1, limit: int = 10, search: str = None) -> Tuple[List[dict], int]:
         offset = (page - 1) * limit
         query = self.db_client.table("suppliers").select("*", count="exact")
         

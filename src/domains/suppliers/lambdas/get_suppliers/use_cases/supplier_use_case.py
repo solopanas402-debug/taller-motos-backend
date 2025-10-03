@@ -1,5 +1,9 @@
-from repositories.supplier_repository import SupplierRepository
+
 import math
+
+from src.domains.suppliers.lambdas.get_suppliers.repositories.supplier_repository import SupplierRepository
+
+
 class SupplierUseCase:
     def __init__(self, repository : SupplierRepository):
         self.repository = repository
@@ -8,7 +12,7 @@ class SupplierUseCase:
         return self.repository.save(supplier)
 
     def get_suppliers(self, page=1, limit=10, search=None):
-        data, total = self.repository.find_all(page, limit, search),
+        data, total = self.repository.find_all(page, limit, search)
         totalPages = math.ceil(total / limit )  if limit > 0 else 0
         return {
             "data": data,
