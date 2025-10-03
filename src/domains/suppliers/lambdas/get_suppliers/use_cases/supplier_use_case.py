@@ -1,7 +1,7 @@
 
 import math
 
-from src.domains.suppliers.lambdas.get_suppliers.repositories.supplier_repository import SupplierRepository
+from repositories.supplier_repository import SupplierRepository
 
 
 class SupplierUseCase:

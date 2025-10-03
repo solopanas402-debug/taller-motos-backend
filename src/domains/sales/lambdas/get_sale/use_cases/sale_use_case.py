@@ -1,7 +1,7 @@
 
 import math
 
-from src.domains.sales.lambdas.get_sale.repositories.sale_repository import SaleRepository
+from repositories.sale_repository import SaleRepository
 
 
 class SaleUseCase:

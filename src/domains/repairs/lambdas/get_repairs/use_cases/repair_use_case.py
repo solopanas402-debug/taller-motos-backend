@@ -1,7 +1,7 @@
 
 import math
 
-from src.domains.repairs.lambdas.get_repairs.repositories.repair_repository import RepairRepository
+from repositories.repair_repository import RepairRepository
 
 
 class RepairUseCase:
