@@ -13,7 +13,7 @@ use_case = SupplierUseCase(repository)
 
 
 @cors_enabled
-# @cognito_auth_required
+@cognito_auth_required
 @debug_event
 @validate_pagination_and_search()
 def lambda_handler(event, context):

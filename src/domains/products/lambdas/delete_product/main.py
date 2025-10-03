@@ -1,5 +1,6 @@
 import json
-from use_cases.product_use_cases import ProductUseCase
+
+from use_cases.product_use_case import ProductUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from repositories.product_repository import ProductRepository
