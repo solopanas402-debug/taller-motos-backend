@@ -1,6 +1,6 @@
 import json
 from use_cases.product_use_case import ProductUseCase
-from decorators.lambda_decorators import cors_enabled, cognito_auth_required , debug_event
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
 from decorators.validate_pagination_and_search import validate_pagination_and_search
 from repositories.product_repository import ProductRepository  
 from db.db_client import DBClient

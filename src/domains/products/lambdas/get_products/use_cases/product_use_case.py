@@ -7,7 +7,7 @@ class ProductUseCase:
         self.repository = repository
 
     def get_all_products(self, page=1, limit=10, search=None):
-        data, total = self.repository.find_all(page, limit, search),
+        data, total = self.repository.find_all(page, limit, search)
         totalPages = math.ceil(total / limit )  if limit > 0 else 0
         return {
             "data": data,
