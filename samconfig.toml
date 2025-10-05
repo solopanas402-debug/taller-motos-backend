@@ -7,6 +7,6 @@ s3_prefix = "motorcycle-repair-shop"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_NAMED_IAM"
-disable_rollback = false
+disable_rollback = true
 image_repositories = []
 parameter_overrides = "Environment=\"dev\" DBUrl=\"https://ygmozqwtzcvyqiekhqce.supabase.co\" DBKey=\"sb_publishable_pa3AhahiiA4VyvWIk-lGnw_tHocqZRl\" LogRetentionDays=\"14\""
