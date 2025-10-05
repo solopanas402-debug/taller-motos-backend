@@ -1,6 +1,4 @@
-import json
-
-from use_cases.product_use_case import ProductUseCase
+from use_case.product_use_cases import ProductUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from repositories.product_repository import ProductRepository
@@ -40,9 +38,9 @@ def lambda_handler(event, context):
 
     except Exception as e:
         error_message = str(e)
-        
+
         # Manejo específico para producto no encontrado
         if "No se encontró el producto" in error_message:
             return ResponseUtils.not_found_response(error_message)
-        
+
         return ResponseUtils.internal_server_error_response(f"Error inesperado: {error_message}")

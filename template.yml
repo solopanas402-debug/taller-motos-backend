@@ -647,7 +647,7 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /products/searchById
+            Path: /products/{id}
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
@@ -839,7 +839,7 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Path: /suppliers/searchById
+            Path: /suppliers/{id}
             Method: get
             Auth:
               Authorizer: CognitoAuthorizer
