@@ -11,12 +11,12 @@ def load_delete_parameters(event):
 
     # Get customer ID from path parameters
     path_parameters = event.get('pathParameters', None)
-    if path_parameters is None or 'id_customer' not in path_parameters:
+    if path_parameters is None or 'id' not in path_parameters:
         return ResponseUtils.bad_request_response(
             "Se debe proporcionar el ID del cliente en la ruta"
         )
 
-    id_customer = path_parameters['id_customer']
+    id_customer = path_parameters['id']
     if not id_customer or id_customer.strip() == '':
         return ResponseUtils.bad_request_response(
             "El ID del cliente no puede estar vacío"

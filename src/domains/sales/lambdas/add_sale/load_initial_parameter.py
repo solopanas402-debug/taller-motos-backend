@@ -66,6 +66,8 @@ def generate_sale_data(request_body: dict) -> dict:
     id_sale = generate_uuid_hex()
     subtotal = float(request_body["subtotal"])
     total = float(request_body["total"])
+    status = request_body["status"] if "status" in request_body else "pending"
+    notes = request_body["notes"] if "notes" in request_body else None
 
     sale = {
         "id_sale": id_sale,
@@ -75,7 +77,8 @@ def generate_sale_data(request_body: dict) -> dict:
         "tax": subtotal * 0.15,
         "subtotal": subtotal,
         "total": total,
-        "status": "paid"
+        "status": status,
+        "notes": notes
     }
 
     details = []

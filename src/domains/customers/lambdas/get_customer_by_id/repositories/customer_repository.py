@@ -1,5 +1,4 @@
 from supabase import Client
-from layers.shared.entities.customer import Customer
 
 
 class CustomerRepository:

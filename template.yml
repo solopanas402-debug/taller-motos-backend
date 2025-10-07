@@ -1113,7 +1113,7 @@ Resources:
       FunctionName: !Sub "GetSalesApi-${Environment}"
       Layers:
         - !Ref SharedLayer
-      CodeUri: src/domains/sales/lambdas/get_sale
+      CodeUri: src/domains/sales/lambdas/get_sales
       Handler: main.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Environment:

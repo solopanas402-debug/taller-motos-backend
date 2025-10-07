@@ -47,15 +47,10 @@ events = {
         "path": "/repair",
         "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
     },
-    "get_sale": {
-        "httpMethod": "GET",
-        "path": "/sales",
-        "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
-    },
     "get_sales": {
         "httpMethod": "GET",
         "path": "/sales",
-        "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
+        "queryStringParameters": {"page": "1", "limit": "5", "search": "", "recordType": "quote"}
     },
     "add_sale": {
         "httpMethod": "POST",
