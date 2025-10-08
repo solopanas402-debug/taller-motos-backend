@@ -1,23 +1,27 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from layers.shared.entities.supplier import Supplier
-from utils.response_utils import ResponseUtils  
+from entities.supplier import Supplier
+from exceptions import validation_exception
+from utils.response_utils import ResponseUtils
+
 
 def load_initial_parameters(event):
     body = event.get("body")
     if not body:
         return ResponseUtils.bad_request_response("El cuerpo de la petición es obligatorio")
-    
+
     try:
         data = json.loads(body)
     except json.JSONDecodeError:
         return ResponseUtils.bad_request_response("El cuerpo de la petición no tiene un formato JSON válido")
 
-    # Validar los campos obligatorios
-    for field in ["name", "ruc"]:
-        if not data.get(field):
-            return ResponseUtils.bad_request_response(f"El campo {field} es obligatorio")
+    validate_supplier_fields(data)
+
+    # # Validar los campos obligatorios
+    # for field in ["name", "ruc"]:
+    #     if not data.get(field):
+    #         return ResponseUtils.bad_request_response(f"El campo {field} es obligatorio")
 
     # Obtener la fecha y hora actual
     now = datetime.now(timezone.utc).isoformat()
@@ -38,3 +42,16 @@ def load_initial_parameters(event):
     )
 
     return supplier
+
+
+def validate_supplier_fields(data: dict):
+    """
+    Validates and converts product field data types.
+    """
+    # Expected types
+    schema = {
+        str: ['name', 'surname', 'ruc', 'email'],
+    }
+
+    # Validate fields
+    validation_exception.validate_fields(data, schema, context="proveedor")

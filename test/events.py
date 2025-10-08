@@ -12,6 +12,22 @@ events = {
         "path": "/mechanics",
         "queryStringParameters": {"page": "1", "limit": "5"}
     },
+    "add_mechanic": {
+        "httpMethod": "POST",
+        "path": "/mechanics",
+        "body": json.dumps({
+            "name": "Juan Pérez",
+            "phone": "555-1234",
+            "email": "juan@example.com"
+        })
+    },
+    "delete_mechanic": {
+        "httpMethod": "DELETE",
+        "path": "/mechanics/{id}",
+        "pathParameters": {
+            "id": "ec407443-4891-4e61-b7d9-1c2064ba3663"
+        }
+    },
     "get_product_by_id": {
         "httpMethod": "GET",
         "path": "/products",
@@ -118,15 +134,20 @@ events = {
         "path": "/orders",
         "body": json.dumps({"order_id": "456", "product": "Zapatos"})
     },
-
-    "add_mechanic": {
+    "add_supplier": {
         "httpMethod": "POST",
-        "path": "/mechanics",
-        "body": json.dumps({
-            "name": "Juan Pérez",
-            "phone": "555-1234",
-            "email": "juan@example.com"
-        })
+        "path": "/suppliers",
+        "body": json.dumps(
+            {
+                "name": "Prueba para eliminar",
+                "surname": "Leo te odio no haces bien",
+                "main_contact": "Luis Herrera",
+                "phone": "555-3344",
+                "email": "contacto@autorepuestos.com",
+                "address": "Zona Industrial, Edificio 5, Ciudad Norte",
+                "ruc": "SUPP789456123",
+                "active": True
+            })
     },
     "add_products": {
         "httpMethod": "POST",
@@ -178,9 +199,9 @@ events = {
     },
     "update_product": {
         "httpMethod": "PUT",
-        "path": "/products/{id_product}",
+        "path": "/products/{id}",
         "pathParameters": {
-            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
         },
         "body": json.dumps({
             "name": "PRODUCTO ACTUALIZADO",
@@ -193,35 +214,35 @@ events = {
             "active": True
         })
     },
-    
+
     "update_product_partial": {
         "httpMethod": "PUT",
-        "path": "/products/{id_product}",
+        "path": "/products/{id}",
         "pathParameters": {
-            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
         },
         "body": json.dumps({
             "price": 99.99,
             "stock": 100
         })
     },
-    
+
     "delete_product": {
         "httpMethod": "DELETE",
-        "path": "/products/{id_product}",
+        "path": "/products/{id}",
         "pathParameters": {
-            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
         }
     },
-    
+
     "find_product_by_id": {
         "httpMethod": "GET",
-        "path": "/products/{id_product}",
+        "path": "/products/{id}",
         "pathParameters": {
-            "id_product": "b03196fd-a140-4781-a529-3862119f8b8c"
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
         }
     },
-        
+
     "add_customer": {
         "httpMethod": "POST",
         "path": "/customers",
@@ -238,12 +259,12 @@ events = {
             "active": True
         })
     },
-    
+
     "update_customer": {
         "httpMethod": "PUT",
-        "path": "/customers/{id_customer}",
+        "path": "/customers/{id}",
         "pathParameters": {
-            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+            "id": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
         },
         "body": json.dumps({
             "name": "Carlos Alberto",
@@ -254,7 +275,7 @@ events = {
             "active": True
         })
     },
-    
+
     "update_customer_partial": {
         "httpMethod": "PUT",
         "path": "/customers/{id_customer}",
@@ -266,31 +287,31 @@ events = {
             "email": "nuevo.email@example.com"
         })
     },
-    
+
     "update_customer_email_only": {
         "httpMethod": "PUT",
-        "path": "/customers/{id_customer}",
+        "path": "/customers/{id}",
         "pathParameters": {
-            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+            "id": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
         },
         "body": json.dumps({
             "email": "actualizado@example.com"
         })
     },
-    
+
     "delete_customer": {
         "httpMethod": "DELETE",
-        "path": "/customers/{id_customer}",
+        "path": "/customers/{id}",
         "pathParameters": {
-            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+            "id": "2559987b-6a71-48ee-ac76-1919523c49e1"
         }
     },
-    
+
     "find_customer_by_id": {
         "httpMethod": "GET",
-        "path": "/customers/{id_customer}",
+        "path": "/customers/{id}",
         "pathParameters": {
-            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+            "id": "2559987b-6a71-48ee-ac76-1919523c49e1"
         }
     },
 }

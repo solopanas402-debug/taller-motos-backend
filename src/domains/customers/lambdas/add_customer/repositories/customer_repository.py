@@ -1,5 +1,5 @@
 from supabase import Client
-from layers.shared.entities.customer import Customer
+from entities.customer import Customer
 
 class CustomerRepository:
     def __init__(self, db_client : Client):

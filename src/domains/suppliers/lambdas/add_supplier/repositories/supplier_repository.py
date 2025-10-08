@@ -1,5 +1,5 @@
 from supabase import Client
-from layers.shared.entities.supplier import Supplier
+from entities.supplier import Supplier
 
 class SupplierRepository:
     def __init__(self, db_client : Client):
@@ -13,4 +13,5 @@ class SupplierRepository:
             return response.data
         except Exception as e:
             print(f"Error al guardar el proveedor: {str(e)}")
-            return None
+            raise Exception("Error al guardar el proveedor")
+            # return None

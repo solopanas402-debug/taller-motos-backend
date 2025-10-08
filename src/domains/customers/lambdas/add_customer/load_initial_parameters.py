@@ -1,7 +1,7 @@
 import json
 import uuid
 from datetime import datetime, timezone
-from layers.shared.entities.customer import Customer
+from entities.customer import Customer
 from utils.response_utils import ResponseUtils  
 
 def load_initial_parameters(event):

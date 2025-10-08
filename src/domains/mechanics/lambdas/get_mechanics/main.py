@@ -2,7 +2,6 @@ import json
 
 from decorators.validate_pagination_and_search import validate_pagination_and_search
 from use_cases.mechanic_use_case import MechanicUseCase
-from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required , debug_event
 from repositories.mechanic_repository import MechanicRepository
 from db.db_client import DBClient
