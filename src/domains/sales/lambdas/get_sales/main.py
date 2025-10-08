@@ -11,7 +11,6 @@ db_client = DBClient.get_client()
 repository = SaleRepository(db_client)
 use_case = SaleUseCase(repository)
 
-
 @cors_enabled
 @cognito_auth_required
 @debug_event
@@ -20,12 +19,21 @@ def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
 
-    query_params = event.get("queryStringParameters") or {}
+    # Obtener los parámetros de la query string
+    query_params = event.get("queryStringParameters", {}) or {}
+    
+    # Obtener el recordType
     record_type = query_params.get("recordType", None)
+    
+    # Obtener parámetros validados o usar los de la query string como respaldo
     validated_params = event.get("validated_params", {})
-    page = validated_params.get("page", 1)
-    limit = validated_params.get("limit", 10)
-    search = validated_params.get("search")
+    page = int(validated_params.get("page") or query_params.get("page", 1))
+    limit = int(validated_params.get("limit") or query_params.get("limit", 10))
+    search = validated_params.get("search") or query_params.get("search", "")
+    
+    # Asegurarse de que page y limit sean números válidos
+    page = max(1, page)
+    limit = max(1, min(50, limit))
 
     # 1. Llamas al use case
     result = use_case.get_sales(page, limit, search, record_type)

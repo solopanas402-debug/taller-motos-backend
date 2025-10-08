@@ -21,13 +21,18 @@ def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')
     
-    validated_params = event.get("validated_params", {})
-    page = validated_params.get("page", 1)
-    limit = validated_params.get("limit", 10)
-    search = validated_params.get("search")
+    # Obtener los parámetros de la query string
+    query_params = event.get('queryStringParameters', {}) or {}
     
-    # 1. Llamas al use case
+    # Obtener parámetros validados o usar los de la query string como respaldo
+    validated_params = event.get("validated_params", {})
+    page = int(validated_params.get("page") or query_params.get("page", 1))
+    limit = int(validated_params.get("limit") or query_params.get("limit", 10))
+    search = validated_params.get("search") or query_params.get("search", "")
+    
+    # Asegurarse de que page y limit sean números válidos
+    page = max(1, page)
+    limit = max(1, min(50, limit))
+    
     result = use_case.get_mechanics(page, limit, search)
-
-    # 2. Envuelves el resultado
     return ResponseUtils.success_response(result)
