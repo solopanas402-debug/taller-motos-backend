@@ -7,13 +7,13 @@ def load_update_parameters(event):
     print(f'Begin load_update_parameters')
     print(f'Event: {event}')
 
-    # Get product ID from path parameters
+    # Get supplier ID from path parameters
     path_parameters = event.get('pathParameters', None)
     if path_parameters is None or 'id' not in path_parameters:
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "Se debe proporcionar el ID del producto en la ruta"
+                "message": "Se debe proporcionar el ID del proveedor en la ruta"
             })
         }
 
@@ -22,7 +22,7 @@ def load_update_parameters(event):
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "El ID del producto no puede estar vacío"
+                "message": "El ID del proveedor no puede estar vacío"
             })
         }
 
@@ -59,7 +59,7 @@ def load_update_parameters(event):
 
     # Validate and convert fields
     validated_data = validate_and_convert_update_fields(request_body)
-    
+
     # Add updated_at timestamp
     validated_data['updated_at'] = datetime.now(timezone.utc).isoformat()
 

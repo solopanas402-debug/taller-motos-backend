@@ -2,15 +2,55 @@ import datetime
 import json
 
 events = {
+    "add_customer": {
+        "httpMethod": "POST",
+        "path": "/customers",
+        "body": json.dumps({
+            "id_number": "0912345678",
+            "name": "Carlos",
+            "surname": "Rodríguez Pérez",
+            "address": "Av. Principal #123, Guayaquil",
+            "phone": "0987654321",
+            "email": "carlos.rodriguez@example.com",
+            "identification_type": "CEDULA",
+            "birth_date": "1985-03-15",
+            "gender": "M",
+            "active": True
+        })
+    },
     "get_customers": {
         "httpMethod": "GET",
         "path": "/customers",
         "queryStringParameters": {"id": "123"}
     },
-    "get_mechanics": {
-        "httpMethod": "POST",
-        "path": "/mechanics",
-        "queryStringParameters": {"page": "1", "limit": "5"}
+    "get_customer_by_id": {
+        "httpMethod": "GET",
+        "path": "/customers/{id}",
+        "pathParameters": {
+            "id": "2559987b-6a71-48ee-ac76-1919523c49e1"
+        }
+    },
+    "delete_customer": {
+        "httpMethod": "DELETE",
+        "path": "/customers/{id}",
+        "pathParameters": {
+            "id": "2559987b-6a71-48ee-ac76-1919523c49e1"
+        }
+    },
+    "update_customer": {
+        "httpMethod": "PUT",
+        "path": "/customers/{id}",
+        "pathParameters": {
+            "id": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
+        },
+        "body": json.dumps({
+            "name": "Carlos Alberto",
+            "surname": "Rodríguez García",
+            "address": "Av. Secundaria #456, Guayaquil",
+            "phone": "0991234567",
+            "email": "carlos.nuevo@example.com",
+            "active": True
+        })
     },
     "add_mechanic": {
         "httpMethod": "POST",
@@ -21,6 +61,18 @@ events = {
             "email": "juan@example.com"
         })
     },
+    "get_mechanics": {
+        "httpMethod": "POST",
+        "path": "/mechanics",
+        "queryStringParameters": {"page": "1", "limit": "5"}
+    },
+    "get_mechanic_by_id": {
+        "httpMethod": "GET",
+        "path": "/mechanics/{id}",
+        "pathParameters": {
+            "id": "ebd0acc0-44ab-4e80-9ce2-40981c20f360"
+        }
+    },
     "delete_mechanic": {
         "httpMethod": "DELETE",
         "path": "/mechanics/{id}",
@@ -28,15 +80,20 @@ events = {
             "id": "ec407443-4891-4e61-b7d9-1c2064ba3663"
         }
     },
-    "get_product_by_id": {
-        "httpMethod": "GET",
-        "path": "/products",
-        "queryStringParameters": {"id_product": "b03196fd-a140-4781-a529-3862119f8b8c"}
-    },
-    "get_products": {
-        "httpMethod": "GET",
-        "path": "/products",
-        "queryStringParameters": {"page": "1", "limit": "10", "search": ""}
+    "update_mechanic": {
+        "httpMethod": "PUT",
+        "path": "/mechanics/{id}",
+        "pathParameters": {
+            "id": "ebd0acc0-44ab-4e80-9ce2-40981c20f360"
+        },
+        "body": json.dumps({
+            "name": "Carlos Alberto",
+            "surname": "Rodríguez García",
+            "address": "Av. Secundaria #456, Guayaquil",
+            "phone": "0991234567",
+            "email": "carlos.nuevo@example.com",
+            "active": False
+        })
     },
     "add_product": {
         "httpMethod": "POST",
@@ -58,96 +115,39 @@ events = {
             # "updated_at": self.updated_at
         })
     },
-    "get_repairs": {
+    "get_products": {
         "httpMethod": "GET",
-        "path": "/repair",
-        "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
+        "path": "/products",
+        "queryStringParameters": {"page": "1", "limit": "10", "search": ""}
     },
-    "get_sales": {
+    "get_product_by_id": {
         "httpMethod": "GET",
-        "path": "/sales",
-        "queryStringParameters": {"page": "1", "limit": "5", "search": "", "recordType": "quote"}
+        "path": "/products/{id}",
+        "pathParameters": {"id": "b03196fd-a140-4781-a529-3862119f8b8c"}
     },
-    "add_sale": {
-        "httpMethod": "POST",
-        "path": "/sales",
-        "body": json.dumps(
-            {"id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7", "id_seller": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
-             "products": [
-                 {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 5, 'unit_price': 30.00,
-                  'stock': 100,
-                  'discount': 0.00},
-                 {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 3, 'unit_price': 15.00,
-                  'stock': 50,
-                  'discount': 0.00}, ],
-             "subtotal": 150.00, "total": 300.00})
+    "delete_product": {
+        "httpMethod": "DELETE",
+        "path": "/products/{id}",
+        "pathParameters": {
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
+        }
     },
-    "add_repair": {
-        "httpMethod": "POST",
-        "path": "/repair",
+    "update_product": {
+        "httpMethod": "PUT",
+        "path": "/products/{id}",
+        "pathParameters": {
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
+        },
         "body": json.dumps({
-            "vehicle": {
-                "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7",
-                "license_plate": "sdfsdfsd",
-                "brand": "sdfsdf",
-                "model": "sdfsdf",
-                "year": 56756,
-                "color": "sdfsdf",
-                "mileage": 56475675,
-                "active": True
-            },
-            "repair": {
-                "id_mechanic": "33c80fa0-f13e-4961-a9aa-ab21fb213c0c",
-                "fault_description": "Detalle del dano",
-                "diagnosis": "Algo se dano",
-                "status": "pending",
-                "priority": "high",
-                "entry_date": "2025-09-20T14:35:00",
-                "delivery_date": "2025-09-20T14:35:00",
-                "notes": "El carro esta danado",
-                "estimated_cost": 34343.44,
-                "final_cost": 34343.44,
-                "id_created_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
-
-            },
-            "labor": {
-                "id_service_type": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
-                "agreed_price": 33.33,
-                "actual_hours": 48,
-                "completed": False,
-                "start_date": "2025-09-23T14:35:00",
-                "completion_date": "2025-09-25T14:35:00",
-            },
-            "products": [
-                {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 6, 'unit_price': 30.00,
-                 'stock': 90,
-                 'discount': 0.00, "subtotal": 180.00, "type": "repair",
-                 "usage_date": "2025-09-24T14:35:00", },
-                {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 5, 'unit_price': 15.00,
-                 'stock': 44,
-                 'discount': 0.00, "subtotal": 75.00, "type": "repair", "usage_date": "2025-09-25T14:35:00", }, ],
-            "photos": [{}]
+            "name": "PRODUCTO ACTUALIZADO",
+            "description": "Descripción actualizada desde test",
+            "price": 45.99,
+            "stock": 25,
+            "min_stock": 10,
+            "max_stock": 50,
+            "discount": 15.5,
+            "active": True
         })
-    },
-    "get_suppliers": {
-        "httpMethod": "GET",
-        "path": "/orders",
-        "body": json.dumps({"order_id": "456", "product": "Zapatos"})
-    },
-    "add_supplier": {
-        "httpMethod": "POST",
-        "path": "/suppliers",
-        "body": json.dumps(
-            {
-                "name": "Prueba para eliminar",
-                "surname": "Leo te odio no haces bien",
-                "main_contact": "Luis Herrera",
-                "phone": "555-3344",
-                "email": "contacto@autorepuestos.com",
-                "address": "Zona Industrial, Edificio 5, Ciudad Norte",
-                "ruc": "SUPP789456123",
-                "active": True
-            })
     },
     "add_products": {
         "httpMethod": "POST",
@@ -197,24 +197,156 @@ events = {
             }
         ])
     },
-    "update_product": {
-        "httpMethod": "PUT",
-        "path": "/products/{id}",
-        "pathParameters": {
-            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
-        },
+    "add_repair": {
+        "httpMethod": "POST",
+        "path": "/repairs",
         "body": json.dumps({
-            "name": "PRODUCTO ACTUALIZADO",
-            "description": "Descripción actualizada desde test",
-            "price": 45.99,
-            "stock": 25,
-            "min_stock": 10,
-            "max_stock": 50,
-            "discount": 15.5,
-            "active": True
+            "vehicle": {
+                "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7",
+                "license_plate": "sdfsdfsd",
+                "brand": "sdfsdf",
+                "model": "sdfsdf",
+                "year": 56756,
+                "color": "sdfsdf",
+                "mileage": 56475675,
+                "active": True
+            },
+            "repair": {
+                "id_mechanic": "33c80fa0-f13e-4961-a9aa-ab21fb213c0c",
+                "fault_description": "Detalle del dano",
+                "diagnosis": "Algo se dano",
+                "status": "pending",
+                "priority": "high",
+                "entry_date": "2025-09-20T14:35:00",
+                "delivery_date": "2025-09-20T14:35:00",
+                "notes": "El carro esta danado",
+                "estimated_cost": 34343.44,
+                "final_cost": 34343.44,
+                "id_created_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+
+            },
+            "labor": {
+                "id_service_type": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+                "agreed_price": 33.33,
+                "actual_hours": 48,
+                "completed": False,
+                "start_date": "2025-09-23T14:35:00",
+                "completion_date": "2025-09-25T14:35:00",
+            },
+            "products": [
+                {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 6, 'unit_price': 30.00,
+                 'stock': 90,
+                 'discount': 0.00, "subtotal": 180.00, "type": "repair",
+                 "usage_date": "2025-09-24T14:35:00", },
+                {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 5, 'unit_price': 15.00,
+                 'stock': 44,
+                 'discount': 0.00, "subtotal": 75.00, "type": "repair", "usage_date": "2025-09-25T14:35:00", }, ],
+            "photos": [{}]
         })
     },
-
+    "get_repairs": {
+        "httpMethod": "GET",
+        "path": "/repairs",
+        "queryStringParameters": {"page": "1", "limit": "5", "search": ""}
+    },
+    "get_repair_by_id": {
+        "httpMethod": "GET",
+        "path": "/repairs/{id}",
+        "pathParameters": {"id": "752cd4bd-a61e-4000-b651-ab2d2ac14ae0"}
+    },
+    "delete_repair": {
+        "httpMethod": "DELETE",
+        "path": "/repairs/{id}",
+        "pathParameters": {
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
+        }
+    },
+    "add_sale": {
+        "httpMethod": "POST",
+        "path": "/sales",
+        "body": json.dumps(
+            {"id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7", "id_seller": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+             "products": [
+                 {'id_product': 'a9a57032-1bdc-4dc0-b8b2-b72317c0fff5', 'quantity': 5, 'unit_price': 30.00,
+                  'stock': 100,
+                  'discount': 0.00},
+                 {'id_product': 'b03196fd-a140-4781-a529-3862119f8b8c', 'quantity': 3, 'unit_price': 15.00,
+                  'stock': 50,
+                  'discount': 0.00}, ],
+             "subtotal": 150.00, "total": 300.00})
+    },
+    "get_sales": {
+        "httpMethod": "GET",
+        "path": "/sales",
+        "queryStringParameters": {"page": "1", "limit": "5", "search": "", "recordType": "quote"}
+    },
+    "get_sale_by_id": {
+        "httpMethod": "GET",
+        "path": "/sales/{id}",
+        "pathParameters": {"id": "b03196fd-a140-4781-a529-3862119f8b8c"}
+    },
+    "delete_sale": {
+        "httpMethod": "DELETE",
+        "path": "/sales/{id}",
+        "pathParameters": {
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
+        }
+    },
+    "update_sale": {
+        "httpMethod": "PUT",
+        "path": "/sales/{id}",
+        "pathParameters": {
+            "id": "2fcc9e4f-20bd-4b22-9c2a-6685840fefe8"
+        },
+        "body": json.dumps({
+            "status": "pending",
+        })
+    },
+    "add_supplier": {
+        "httpMethod": "POST",
+        "path": "/suppliers",
+        "body": json.dumps(
+            {
+                "name": "Prueba para eliminar",
+                "surname": "Leo te odio no haces bien",
+                "main_contact": "Luis Herrera",
+                "phone": "555-3344",
+                "email": "contacto@autorepuestos.com",
+                "address": "Zona Industrial, Edificio 5, Ciudad Norte",
+                "ruc": "SUPP789456123",
+                "active": True
+            })
+    },
+    "get_suppliers": {
+        "httpMethod": "GET",
+        "path": "/suppliers",
+        "body": json.dumps({"order_id": "456", "product": "Zapatos"})
+    },
+    "get_supplier_by_id": {
+        "httpMethod": "GET",
+        "path": "/suppliers/{id}",
+        "pathParameters": {"id": "9084837b-74bd-457d-ac6b-15bed6c441ff"}
+    },
+    "delete_supplier": {
+        "httpMethod": "DELETE",
+        "path": "/suppliers/{id}",
+        "pathParameters": {
+            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
+        }
+    },
+    "update_supplier": {
+        "httpMethod": "PUT",
+        "path": "/suppliers/{id}",
+        "pathParameters": {
+            "id": "e85d6c07-748e-46e1-ac51-50fd102aeb20"
+        },
+        "body": json.dumps({
+            "name": "PRUEBA PARA ACTUALIZAR",
+            "main_contact": "LEO ASCO",
+            "email": "prueba@autorepuestos.com",
+            "active": False
+        })
+    },
     "update_product_partial": {
         "httpMethod": "PUT",
         "path": "/products/{id}",
@@ -227,14 +359,6 @@ events = {
         })
     },
 
-    "delete_product": {
-        "httpMethod": "DELETE",
-        "path": "/products/{id}",
-        "pathParameters": {
-            "id": "b03196fd-a140-4781-a529-3862119f8b8c"
-        }
-    },
-
     "find_product_by_id": {
         "httpMethod": "GET",
         "path": "/products/{id}",
@@ -243,44 +367,11 @@ events = {
         }
     },
 
-    "add_customer": {
-        "httpMethod": "POST",
-        "path": "/customers",
-        "body": json.dumps({
-            "id_number": "0912345678",
-            "name": "Carlos",
-            "surname": "Rodríguez Pérez",
-            "address": "Av. Principal #123, Guayaquil",
-            "phone": "0987654321",
-            "email": "carlos.rodriguez@example.com",
-            "identification_type": "CEDULA",
-            "birth_date": "1985-03-15",
-            "gender": "M",
-            "active": True
-        })
-    },
-
-    "update_customer": {
+    "update_customer_partial": {
         "httpMethod": "PUT",
         "path": "/customers/{id}",
         "pathParameters": {
             "id": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
-        },
-        "body": json.dumps({
-            "name": "Carlos Alberto",
-            "surname": "Rodríguez García",
-            "address": "Av. Secundaria #456, Guayaquil",
-            "phone": "0991234567",
-            "email": "carlos.nuevo@example.com",
-            "active": True
-        })
-    },
-
-    "update_customer_partial": {
-        "httpMethod": "PUT",
-        "path": "/customers/{id_customer}",
-        "pathParameters": {
-            "id_customer": "136daed3-3b83-4733-9ea2-2f06bea74ff7"
         },
         "body": json.dumps({
             "phone": "0998877665",
@@ -297,21 +388,5 @@ events = {
         "body": json.dumps({
             "email": "actualizado@example.com"
         })
-    },
-
-    "delete_customer": {
-        "httpMethod": "DELETE",
-        "path": "/customers/{id}",
-        "pathParameters": {
-            "id": "2559987b-6a71-48ee-ac76-1919523c49e1"
-        }
-    },
-
-    "find_customer_by_id": {
-        "httpMethod": "GET",
-        "path": "/customers/{id}",
-        "pathParameters": {
-            "id": "2559987b-6a71-48ee-ac76-1919523c49e1"
-        }
     },
 }

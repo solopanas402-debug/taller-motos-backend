@@ -1,4 +1,3 @@
-import json
 from use_cases.customer_use_case import CustomerUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
@@ -39,9 +38,9 @@ def lambda_handler(event, context):
 
     except Exception as e:
         error_message = str(e)
-        
+
         # Manejo específico para cliente no encontrado
         if "No se encontró el cliente" in error_message:
             return ResponseUtils.not_found_response(error_message)
-        
+
         return ResponseUtils.internal_server_error_response(f"Error inesperado: {error_message}")
