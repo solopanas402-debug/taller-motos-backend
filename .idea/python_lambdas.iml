@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/shared_layer/python" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/layers/shared" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/layers/shared/python" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/domains/sales/lambdas/delete_sale" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/domains/sales/lambdas/get_sale_by_id" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

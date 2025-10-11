@@ -283,7 +283,7 @@ events = {
     "get_sale_by_id": {
         "httpMethod": "GET",
         "path": "/sales/{id}",
-        "pathParameters": {"id": "b03196fd-a140-4781-a529-3862119f8b8c"}
+        "pathParameters": {"id": "fdd33220-a805-44d2-b8a0-7a1cfde95d35"}
     },
     "delete_sale": {
         "httpMethod": "DELETE",

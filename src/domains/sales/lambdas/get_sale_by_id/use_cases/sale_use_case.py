@@ -14,6 +14,11 @@ class SaleUseCase:
             if result is None:
                 raise Exception(f'No se encontró la venta con ID {id_sale}')
 
+            # detail_result = self.repository.find_sale_detail_by_id(id_sale)
+            # if detail_result is None:
+            #     raise Exception(f'No se encontró el detalle de la venta con ID {id_sale}')
+
             return result
+
         except Exception as e:
             raise Exception(f'Error al buscar la venta: {str(e)}')
