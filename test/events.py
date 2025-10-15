@@ -389,4 +389,121 @@ events = {
             "email": "actualizado@example.com"
         })
     },
+    
+    # ============================================
+    # CASHBOX (Caja Chica) - Eventos de Prueba
+    # ============================================
+    
+    # 1. Abrir sesión de caja (se hace al inicio del día)
+    "open_cashbox": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/open",
+        "body": json.dumps({
+            "opening_amount": 100.00,
+            "opened_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+            "notes": "Apertura de caja del día de prueba"
+        })
+    },
+
+    # 2. Obtener sesión actual de caja
+    "get_current_session": {
+        "httpMethod": "GET",
+        "path": "/cashboxes/current-session"
+    },
+
+    # 3. Registrar movimiento de caja - INGRESO
+    "add_cashbox_income": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/movement",
+        "body": json.dumps({
+            "type": "INCOME",
+            "amount": 150.00,
+            "concept": "Pago en efectivo de cliente",
+            "id_user": "98abe20d-b97d-4b0f-8a50-386a6d75e47b"
+        })
+    },
+
+    # 4. Registrar movimiento de caja - EGRESO
+    "add_cashbox_expense": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/movement",
+        "body": json.dumps({
+            "type": "EXPENSE",
+            "amount": 50.00,
+            "concept": "Compra de suministros de oficina",
+            "id_user": "98abe20d-b97d-4b0f-8a50-386a6d75e47b"
+        })
+    },
+
+    # 5. Registrar movimiento de caja - AJUSTE
+    "add_cashbox_adjustment": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/movement",
+        "body": json.dumps({
+            "type": "ADJUSTMENT",
+            "amount": 25.00,
+            "concept": "Ajuste por error en conteo anterior",
+            "id_user": "98abe20d-b97d-4b0f-8a50-386a6d75e47b"
+        })
+    },
+
+    # 6. Registrar movimiento en español - INGRESO
+    "add_cashbox": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/movement",
+        "body": json.dumps({
+            "type": "INGRESO",
+            "amount": 200.00,
+            "concept": "Venta en efectivo",
+            "id_user": "98abe20d-b97d-4b0f-8a50-386a6d75e47b"
+        })
+    },
+
+    # 7. Obtener movimientos de caja con paginación
+    "get_cashbox": {
+        "httpMethod": "GET",
+        "path": "/cashboxes",
+        "queryStringParameters": {"page": "1", "limit": "10", "search": ""}
+    },
+
+    # 8. Obtener movimientos de caja filtrados por búsqueda
+    "get_cashbox_search": {
+        "httpMethod": "GET",
+        "path": "/cashboxes",
+        "queryStringParameters": {"page": "1", "limit": "10", "search": "efectivo"}
+    },
+
+    # 9. Cerrar sesión de caja (se hace al final del día)
+    "close_cashbox": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/close",
+        "body": json.dumps({
+            "actual_closing": 425.00,
+            "closed_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+            "notes": "Cierre de caja del día - Todo correcto"
+        })
+    },
+
+    # 10. Cerrar caja con diferencia (sobrante)
+    "close_cashbox_with_surplus": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/close",
+        "body": json.dumps({
+            "actual_closing": 450.00,
+            "closed_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+            "notes": "Cierre de caja - Sobrante de $25 encontrado"
+        })
+    },
+
+    # 11. Cerrar caja con diferencia (faltante)
+    "close_cashbox_with_shortage": {
+        "httpMethod": "POST",
+        "path": "/cashboxes/close",
+        "body": json.dumps({
+            "actual_closing": 400.00,
+            "closed_by": "98abe20d-b97d-4b0f-8a50-386a6d75e47b",
+            "notes": "Cierre de caja - Faltante de $25 - Verificar registros"
+        })
+    },
+
 }
