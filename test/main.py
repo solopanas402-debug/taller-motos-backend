@@ -35,7 +35,6 @@ if __name__ == "__main__":
     # Flujo completo de prueba de cashbox
     # 1. Abrir sesión de caja
     # run("open_cashbox", "open_cashbox")
-    
     # 2. Ver sesión actual
     # run("get_current_session", "get_current_session")
     
@@ -51,6 +50,6 @@ if __name__ == "__main__":
     # run("close_cashbox", "close_cashbox")
     
     # Ejecutar prueba individual
-    lambda_name = "get_current_session"
-    resource_name = "get_current_session"
+    lambda_name = "get_products"
+    resource_name = "get_products"
     run(lambda_name, resource_name)

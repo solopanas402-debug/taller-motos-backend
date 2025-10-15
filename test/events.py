@@ -506,4 +506,12 @@ events = {
         })
     },
 
+    # ============================================
+    # DASHBOARD - Obtener datos del dashboard
+    # ============================================
+    "get_dashboard": {
+        "httpMethod": "GET",
+        "path": "/dashboard"
+    },
+
 }

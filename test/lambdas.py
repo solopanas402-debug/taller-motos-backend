@@ -36,6 +36,8 @@ LAMBDA_MODULES = {
     "open_cashbox": "src.domains.cashboxes.lambdas.open_cashbox.main",
     "close_cashbox": "src.domains.cashboxes.lambdas.close_cashbox.main",
     "get_current_session": "src.domains.cashboxes.lambdas.get_current_session.main",
+    # Dashboard lambdas
+    "get_dashboard": "src.domains.dashboard_datas.lambdas.get_dashboard.main",
 }
 
 

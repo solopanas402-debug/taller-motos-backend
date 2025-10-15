@@ -1093,6 +1093,48 @@ Resources:
     DeletionPolicy: Retain
     DependsOn: CloseCashboxApiFunction
 
+  # ============================================
+  # === DASHBOARD ===
+  # ============================================
+  GetDashboardApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetDashboardApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/dashboard_datas/lambdas/get_dashboard
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /dashboard
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
+
+  GetDashboardApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/GetDashboardApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: GetDashboardApiFunction
 
   # ============================================
   # === BULK PRODUCTS ===
