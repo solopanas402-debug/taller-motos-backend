@@ -1,4 +1,3 @@
-from layers.shared.entities.customer import Customer
 from repositories.customer_repository import CustomerRepository
 
 
