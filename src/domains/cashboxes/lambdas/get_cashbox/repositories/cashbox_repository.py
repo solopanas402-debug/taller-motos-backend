@@ -11,9 +11,6 @@ class CashboxRepository:
                  date_to: str = None) -> Tuple[list[dict], int]:
         """
         Obtiene movimientos de caja usando el stored procedure get_cashboxes_cpr
-        
-        Este procedimiento incluye joins con users, cashbox_sessions y sales
-        para traer información completa.
         """
         offset = (page - 1) * limit
         
@@ -34,20 +31,48 @@ class CashboxRepository:
             if date_to:
                 params["p_date_to"] = date_to
             
-            # Llamar al stored procedure
+            # Llamar al stored procedure para obtener los datos
             response = self.db_client.rpc("get_cashboxes_cpr", params).execute()
             
             if not response.data:
                 return [], 0
             
-            # El stored procedure retorna el count en cada fila
-            total = response.data[0].get('count', 0) if response.data else 0
+            # Obtener el total con una consulta de conteo
+            total = self._get_total_count(search, session_id, date_from, date_to)
             
             return response.data, total
             
         except Exception as e:
             print(f"Error al obtener movimientos de caja: {str(e)}")
             raise Exception(f"Error al consultar movimientos de caja: {str(e)}")
+    
+    def _get_total_count(self, search: str = None, session_id: str = None, 
+                         date_from: str = None, date_to: str = None) -> int:
+        """
+        Obtiene el conteo total de registros aplicando los mismos filtros
+        """
+        try:
+            query = self.db_client.table('cashbox').select('id_cashbox', count='exact')
+            
+            # Aplicar los mismos filtros que en la función principal
+            if session_id:
+                query = query.eq('id_session', session_id)
+            
+            if search:
+                query = query.or_(f"concept.ilike.%{search}%,type.ilike.%{search}%")
+            
+            if date_from:
+                query = query.gte('created_at', date_from)
+            
+            if date_to:
+                query = query.lte('created_at', date_to)
+            
+            response = query.execute()
+            return response.count if response.count is not None else 0
+            
+        except Exception as e:
+            print(f"Error al contar registros: {str(e)}")
+            return 0
 
     def get_current_session(self) -> Optional[Dict[str, Any]]:
         """

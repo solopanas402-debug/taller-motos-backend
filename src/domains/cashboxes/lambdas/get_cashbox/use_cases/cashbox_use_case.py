@@ -10,17 +10,6 @@ class CashboxUseCase:
                           date_from=None, date_to=None):
         """
         Obtiene todos los movimientos de caja con paginación y filtros
-        
-        Args:
-            page: Número de página (inicia en 1)
-            limit: Cantidad de registros por página
-            search: Texto para buscar en concept o type
-            session_id: Filtrar por sesión específica
-            date_from: Fecha desde (formato ISO)
-            date_to: Fecha hasta (formato ISO)
-            
-        Returns:
-            dict con data (movimientos) y pagination (info de paginación)
         """
         data, total = self.repository.find_all(
             page=page, 
@@ -30,25 +19,6 @@ class CashboxUseCase:
             date_from=date_from,
             date_to=date_to
         )
-
-        # Si hay datos, extraer total_count del primer registro
-        if data and "total_count" in data[0]:
-            total = data[0]["total_count"]
-        else:
-            # Si no hay datos en la página, hacer consulta extra para obtener el total
-            # Pedimos la primera página con limit=1 y extraemos el total_count si existe
-            alt_data, _ = self.repository.find_all(
-                page=1,
-                limit=1,
-                search=search,
-                session_id=session_id,
-                date_from=date_from,
-                date_to=date_to
-            )
-            if alt_data and "total_count" in alt_data[0]:
-                total = alt_data[0]["total_count"]
-            else:
-                total = 0
 
         total_pages = math.ceil(total / limit) if limit > 0 and total > 0 else 0
 
@@ -61,6 +31,7 @@ class CashboxUseCase:
                 "totalPages": total_pages
             }
         }
+        
     
     def get_current_session(self) -> Optional[Dict[str, Any]]:
         """
