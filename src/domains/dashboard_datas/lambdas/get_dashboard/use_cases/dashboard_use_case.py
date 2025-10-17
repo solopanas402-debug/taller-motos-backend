@@ -26,5 +26,7 @@ class DashboardUseCase:
             "pending_repairs": int(summary.get("pending_repairs", 0)),
             "monthly_sales": float(summary.get("monthly_sales", 0.0)),
             "low_stock": int(summary.get("low_stock", 0))
+            "lowest_stock_product_name": summary.get("lowest_stock_product_name", ""),
+            "lowest_stock_product_quantity": int(summary.get("lowest_stock_product_quantity", 0))
         }
 

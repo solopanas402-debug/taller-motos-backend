@@ -28,7 +28,9 @@ class DashboardRepository:
                     "total_products": 0,
                     "pending_repairs": 0,
                     "monthly_sales": 0.0,
-                    "low_stock": 0
+                    "low_stock": 0,
+                    "lowest_stock_product_name": "" ,
+                    "lowest_stock_product_quantity": 0
                 }
             
             return response.data
