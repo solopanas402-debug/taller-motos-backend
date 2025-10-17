@@ -30,9 +30,28 @@ class CashboxUseCase:
             date_from=date_from,
             date_to=date_to
         )
-        
-        total_pages = math.ceil(total / limit) if limit > 0 else 0
-        
+
+        # Si hay datos, extraer total_count del primer registro
+        if data and "total_count" in data[0]:
+            total = data[0]["total_count"]
+        else:
+            # Si no hay datos en la página, hacer consulta extra para obtener el total
+            # Pedimos la primera página con limit=1 y extraemos el total_count si existe
+            alt_data, _ = self.repository.find_all(
+                page=1,
+                limit=1,
+                search=search,
+                session_id=session_id,
+                date_from=date_from,
+                date_to=date_to
+            )
+            if alt_data and "total_count" in alt_data[0]:
+                total = alt_data[0]["total_count"]
+            else:
+                total = 0
+
+        total_pages = math.ceil(total / limit) if limit > 0 and total > 0 else 0
+
         return {
             "data": data,
             "pagination": {
