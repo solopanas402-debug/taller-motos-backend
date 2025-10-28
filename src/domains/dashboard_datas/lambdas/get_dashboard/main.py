@@ -14,21 +14,19 @@ use_case = DashboardUseCase(repository)
 @debug_event
 #@cognito_auth_required
 def lambda_handler(event, context):
-    """
-    Lambda para obtener datos del dashboard
-    
-    Retorna:
-    - total_products: Total de productos activos
-    - pending_repairs: Reparaciones pendientes
-    - monthly_sales: Ventas del mes actual (solo pagadas)
-    - low_stock: Productos con stock bajo (< 10 unidades)
-    """
+
     print(f'event: {event}')
     print(f'context: {context}')
     
     try:
-        # Obtener datos del dashboard
-        result = use_case.get_dashboard_data()
+        # Obtener el query parameter 'code'
+        query_params = event.get('queryStringParameters') or {}
+        code = query_params.get('code', None)
+        
+        print(f'Dashboard code solicitado: {code}')
+        
+        # Obtener datos del dashboard según el código
+        result = use_case.get_dashboard_data(code=code)
         
         return ResponseUtils.success_response({
             "message": "Datos del dashboard obtenidos correctamente",
@@ -39,4 +37,3 @@ def lambda_handler(event, context):
         error_msg = str(e)
         print(f'Error al obtener datos del dashboard: {error_msg}')
         return ResponseUtils.internal_server_error_response(f"Error inesperado: {error_msg}")
-

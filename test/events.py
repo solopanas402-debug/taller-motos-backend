@@ -513,5 +513,11 @@ events = {
         "httpMethod": "GET",
         "path": "/dashboard"
     },
+        "get_dashboard": {
+        "httpMethod": "GET",
+        "path":"/dashboard"
+        "queryStringParameters": {"code": "SELLER",}
+    },
+
 
 }

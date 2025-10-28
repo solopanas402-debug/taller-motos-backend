@@ -8,10 +8,8 @@ class CashboxRepository:
 
     def find_all(self, page: int = 1, limit: int = 10, search: str = None, 
                  session_id: str = None, date_from: str = None, 
-                 date_to: str = None) -> Tuple[list[dict], int]:
-        """
-        Obtiene movimientos de caja usando el stored procedure get_cashboxes_cpr
-        """
+                 date_to: str = None, user_id: str = None) -> Tuple[list[dict], int]:
+        
         offset = (page - 1) * limit
         
         try:
@@ -30,6 +28,8 @@ class CashboxRepository:
                 params["p_date_from"] = date_from
             if date_to:
                 params["p_date_to"] = date_to
+            if user_id:
+                params["p_user_id"] = user_id
             
             # Llamar al stored procedure para obtener los datos
             response = self.db_client.rpc("get_cashboxes_cpr", params).execute()
@@ -37,29 +37,90 @@ class CashboxRepository:
             if not response.data:
                 return [], 0
             
-            # Obtener el total con una consulta de conteo
-            total = self._get_total_count(search, session_id, date_from, date_to)
+            # Enriquecer datos con información de usuarios
+            enriched_data = self._enrich_with_user_data(response.data)
             
-            return response.data, total
+            # Obtener el total con una consulta de conteo
+            total = self._get_total_count(search, session_id, date_from, date_to, user_id)
+            
+            return enriched_data, total
             
         except Exception as e:
             print(f"Error al obtener movimientos de caja: {str(e)}")
             raise Exception(f"Error al consultar movimientos de caja: {str(e)}")
     
+    def _enrich_with_user_data(self, cashbox_data: list[dict]) -> list[dict]:
+        """
+        Enriquece los datos de cashbox con información de usuarios
+        """
+        if not cashbox_data:
+            return []
+        
+        try:
+            # Obtener todos los user_ids únicos
+            user_ids = list(set(
+                item.get('id_user') 
+                for item in cashbox_data 
+                if item.get('id_user')
+            ))
+            
+            if not user_ids:
+                return cashbox_data
+            
+            # Consultar usuarios en un solo query
+            users_response = self.db_client.table('users').select(
+                'id_user, username, name, surname, email'
+            ).in_('id_user', user_ids).execute()
+            
+            # Crear diccionario de usuarios para lookup rápido
+            users_dict = {
+                user['id_user']: user 
+                for user in users_response.data
+            }
+            
+            # Enriquecer cada registro de cashbox
+            for item in cashbox_data:
+                user_id = item.get('id_user')
+                if user_id and user_id in users_dict:
+                    user = users_dict[user_id]
+                    item['user_name'] = user.get('username')
+                    item['user_full_name'] = user.get('name')
+                    item['user_surname'] = user.get('surname')
+                    item['user_email'] = user.get('email')
+                else:
+                    item['user_name'] = None
+                    item['user_full_name'] = None
+                    item['user_surname'] = None
+                    item['user_email'] = None
+            
+            return cashbox_data
+            
+        except Exception as e:
+            print(f"Error al enriquecer datos de usuario: {str(e)}")
+            # Si falla, retornar datos sin enriquecer
+            return cashbox_data
+    
     def _get_total_count(self, search: str = None, session_id: str = None, 
-                         date_from: str = None, date_to: str = None) -> int:
+                         date_from: str = None, date_to: str = None,
+                         user_id: str = None) -> int:
         """
         Obtiene el conteo total de registros aplicando los mismos filtros
         """
         try:
             query = self.db_client.table('cashbox').select('id_cashbox', count='exact')
             
-            # Aplicar los mismos filtros que en la función principal
+            # JOIN con users si hay búsqueda (para buscar en name, surname, email)
+            if search:
+                # Construir condiciones de búsqueda
+                search_conditions = f"concept.ilike.%{search}%,type.ilike.%{search}%"
+                query = query.or_(search_conditions)
+            
+            # Aplicar filtros
             if session_id:
                 query = query.eq('id_session', session_id)
             
-            if search:
-                query = query.or_(f"concept.ilike.%{search}%,type.ilike.%{search}%")
+            if user_id:
+                query = query.eq('id_user', user_id)
             
             if date_from:
                 query = query.gte('created_at', date_from)
@@ -73,48 +134,3 @@ class CashboxRepository:
         except Exception as e:
             print(f"Error al contar registros: {str(e)}")
             return 0
-
-    def get_current_session(self) -> Optional[Dict[str, Any]]:
-        """
-        Obtiene la sesión de caja abierta actual
-        """
-        try:
-            response = self.db_client.rpc("fn_get_open_session").execute()
-            
-            if not response.data:
-                return None
-
-            session_id = response.data
-            if not session_id:
-                return None
-
-            # Obtener detalles de la sesión con información de usuarios
-            session_response = self.db_client.table("cashbox_sessions").select("""
-                *,
-                opened_user:users!cashbox_sessions_opened_by_fkey(username, email),
-                closed_user:users!cashbox_sessions_closed_by_fkey(username, email)
-            """).eq("id_session", session_id).single().execute()
-            
-            return session_response.data if session_response.data else None
-            
-        except Exception as e:
-            print(f"Error al obtener sesión actual: {str(e)}")
-            return None
-
-    def get_session_details(self, session_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Obtiene los detalles de una sesión específica con información de usuarios
-        """
-        try:
-            response = self.db_client.table("cashbox_sessions").select("""
-                *,
-                opened_user:users!cashbox_sessions_opened_by_fkey(username, email),
-                closed_user:users!cashbox_sessions_closed_by_fkey(username, email)
-            """).eq("id_session", session_id).single().execute()
-            
-            return response.data if response.data else None
-            
-        except Exception as e:
-            print(f"Error al obtener detalles de sesión: {str(e)}")
-            return None
-

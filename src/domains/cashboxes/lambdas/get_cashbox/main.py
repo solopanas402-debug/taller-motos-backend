@@ -22,10 +22,11 @@ def lambda_handler(event, context):
     Query params:
     - page: número de página (default: 1)
     - limit: registros por página (default: 10, max: 50)
-    - search: buscar en concept o type
+    - search: buscar en concept, type, name, surname, email
     - session_id: filtrar por sesión específica
     - date_from: filtrar desde fecha (ISO format)
     - date_to: filtrar hasta fecha (ISO format)
+    - user_id: filtrar por usuario específico (UUID)
     """
     print(f'event: {event}')
     print(f'context: {context}')
@@ -55,6 +56,7 @@ def lambda_handler(event, context):
         session_id = query_params.get("session_id")
         date_from = query_params.get("date_from")
         date_to = query_params.get("date_to")
+        user_id = query_params.get("user_id")  # Nuevo filtro
         
         # Llamar al use case con todos los parámetros
         result = use_case.get_all_cashboxes(
@@ -63,7 +65,8 @@ def lambda_handler(event, context):
             search=search,
             session_id=session_id,
             date_from=date_from,
-            date_to=date_to
+            date_to=date_to,
+            user_id=user_id
         )
 
         return ResponseUtils.success_response(result)
