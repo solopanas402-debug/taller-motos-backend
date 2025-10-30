@@ -21,6 +21,7 @@ dist/
 
 # AWS SAM build artifacts
 .sam/
+.aws-sam
 
 # Python pip cache
 pip-log.txt
