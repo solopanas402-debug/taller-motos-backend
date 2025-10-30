@@ -17,4 +17,7 @@ class SaleRepository:
             "p_record_type": record_type
         }).execute()
 
-        return response.data or [], response.count or 0
+        data = response.data.get("data", [])
+        total = response.data.get("total", 0)
+
+        return data, total

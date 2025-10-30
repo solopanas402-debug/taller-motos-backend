@@ -30,6 +30,14 @@ LAMBDA_MODULES = {
     "get_supplier_by_id": "src.domains.suppliers.lambdas.get_supplier_by_id.main",
     "delete_supplier": "src.domains.suppliers.lambdas.delete_supplier.main",
     "update_supplier": "src.domains.suppliers.lambdas.update_supplier.main",
+    # Cashbox lambdas
+    "get_cashbox": "src.domains.cashboxes.lambdas.get_cashbox.main",
+    "add_cashbox": "src.domains.cashboxes.lambdas.add_cashbox.main",
+    "open_cashbox": "src.domains.cashboxes.lambdas.open_cashbox.main",
+    "close_cashbox": "src.domains.cashboxes.lambdas.close_cashbox.main",
+    "get_current_session": "src.domains.cashboxes.lambdas.get_current_session.main",
+    # Dashboard lambdas
+    "get_dashboard": "src.domains.dashboard_datas.lambdas.get_dashboard.main",
 }
 
 

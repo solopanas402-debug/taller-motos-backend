@@ -9,7 +9,7 @@ Globals:
     MemorySize: 256
     Environment:
       Variables:
-        CORS_ORIGIN: '*'
+        CORS_ORIGIN: "*"
   Api:
     Cors:
       AllowMethods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
@@ -196,10 +196,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   GetCustomersApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -236,10 +236,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   AddCustomerApiFunction:
     Type: AWS::Serverless::Function
@@ -268,10 +268,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,POST'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
 
   AddCustomerApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -308,10 +308,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/update
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,PUT'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,PUT'"
 
   DeleteCustomerApiFunction:
     Type: AWS::Serverless::Function
@@ -340,10 +340,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/delete
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,DELETE'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,DELETE'"
 
   # ============================================
   # === REPAIRS CRUD ===
@@ -375,10 +375,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   GetRepairsApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -415,10 +415,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   AddRepairApiFunction:
     Type: AWS::Serverless::Function
@@ -447,10 +447,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,POST'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
 
   AddRepairApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -487,10 +487,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/update
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,PUT'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,PUT'"
 
   DeleteRepairApiFunction:
     Type: AWS::Serverless::Function
@@ -519,10 +519,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/delete
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,DELETE'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,DELETE'"
 
   # ============================================
   # === MECHANICS CRUD ===
@@ -554,10 +554,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   GetMechanicsApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -594,10 +594,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   AddMechanicApiFunction:
     Type: AWS::Serverless::Function
@@ -626,10 +626,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,POST'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
 
   AddMechanicApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -666,10 +666,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/update
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,PUT'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,PUT'"
 
   DeleteMechanicApiFunction:
     Type: AWS::Serverless::Function
@@ -698,10 +698,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/delete
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,DELETE'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,DELETE'"
 
   # ============================================
   # === PRODUCTS CRUD ===
@@ -733,10 +733,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   GetProductsApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -773,10 +773,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   GetProductByIdApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -813,10 +813,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,POST'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
 
   AddProductApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -853,10 +853,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/update
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,PUT'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,PUT'"
 
   DeleteProductApiFunction:
     Type: AWS::Serverless::Function
@@ -885,10 +885,256 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/delete
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,DELETE'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,DELETE'"
+  
+  # ============================================
+  # === CASHBOX (CAJA CHICA) CRUD ===
+  # ============================================
+  GetCashboxApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetCashboxApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/cashboxes/lambdas/get_cashbox
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /cashboxes
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
+
+  GetCashboxApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/GetCashboxApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: GetCashboxApiFunction
+
+  GetCurrentSessionApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetCurrentSessionApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/cashboxes/lambdas/get_current_session
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /cashboxes/current-session
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
+
+  GetCurrentSessionApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/GetCurrentSessionApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: GetCurrentSessionApiFunction
+
+  AddCashboxApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "AddCashboxApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/cashboxes/lambdas/add_cashbox
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /cashboxes/movement
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
+
+  AddCashboxApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/AddCashboxApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: AddCashboxApiFunction
+
+  OpenCashboxApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "OpenCashboxApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/cashboxes/lambdas/open_cashbox
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /cashboxes/open
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
+
+  OpenCashboxApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/OpenCashboxApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: OpenCashboxApiFunction
+
+  CloseCashboxApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "CloseCashboxApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/cashboxes/lambdas/close_cashbox
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /cashboxes/close
+            Method: post
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/create
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
+
+  CloseCashboxApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/CloseCashboxApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: CloseCashboxApiFunction
+
+  # ============================================
+  # === DASHBOARD ===
+  # ============================================
+  GetDashboardApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetDashboardApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/dashboard_datas/lambdas/get_dashboard
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /dashboard
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
+
+  GetDashboardApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/GetDashboardApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: GetDashboardApiFunction
 
   # ============================================
   # === BULK PRODUCTS ===
@@ -920,10 +1166,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,POST'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
 
   # ============================================
   # === SUPPLIERS CRUD ===
@@ -955,10 +1201,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   GetSuppliersApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -995,10 +1241,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   AddSupplierApiFunction:
     Type: AWS::Serverless::Function
@@ -1027,10 +1273,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,POST'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
 
   AddSupplierApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -1067,10 +1313,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/update
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,PUT'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,PUT'"
 
   DeleteSupplierApiFunction:
     Type: AWS::Serverless::Function
@@ -1099,10 +1345,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/delete
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,DELETE'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,DELETE'"
 
   # ============================================
   # === SALES CRUD ===
@@ -1134,10 +1380,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   GetSalesApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -1174,10 +1420,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/read
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,GET'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
 
   AddSaleApiFunction:
     Type: AWS::Serverless::Function
@@ -1206,10 +1452,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/create
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,POST'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,POST'"
 
   AddSaleApiLogGroup:
     Type: AWS::Logs::LogGroup
@@ -1246,10 +1492,10 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/update
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,PUT'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,PUT'"
 
   DeleteSaleApiFunction:
     Type: AWS::Serverless::Function

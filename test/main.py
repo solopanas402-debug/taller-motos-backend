@@ -32,7 +32,24 @@ def run(lambda_name, event_name):
 
 
 if __name__ == "__main__":
-    # lambda_name = "add_product"
-    resource_name = "get_sale_by_id"
-    run(resource_name, resource_name)
-    # run("orders_post", "orders_post")
+    # Flujo completo de prueba de cashbox
+    # 1. Abrir sesión de caja
+    # run("open_cashbox", "open_cashbox")
+    # 2. Ver sesión actual
+    # run("get_current_session", "get_current_session")
+    
+    # 3. Agregar movimientos
+    # run("add_cashbox", "add_cashbox_income")
+    # run("add_cashbox", "add_cashbox_expense")
+    # run("add_cashbox", "add_cashbox_adjustment")
+    
+    # 4. Ver movimientos
+    # run("get_cashbox", "get_cashbox")
+    
+    # 5. Cerrar sesión
+    # run("close_cashbox", "close_cashbox")
+    
+    # Ejecutar prueba individual
+    lambda_name = "get_products"
+    resource_name = "get_products"
+    run(lambda_name, resource_name)
