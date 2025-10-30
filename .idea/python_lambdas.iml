@@ -6,8 +6,10 @@
       <sourceFolder url="file://$MODULE_DIR$/layers/shared" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/layers/shared/python" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/domains/sales/lambdas/get_sale_by_id" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/domains/cashboxes/lambdas/get_cashbox" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.14 (taller-motos-backend)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

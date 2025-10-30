@@ -389,11 +389,11 @@ events = {
             "email": "actualizado@example.com"
         })
     },
-    
+
     # ============================================
     # CASHBOX (Caja Chica) - Eventos de Prueba
     # ============================================
-    
+
     # 1. Abrir sesión de caja (se hace al inicio del día)
     "open_cashbox": {
         "httpMethod": "POST",
@@ -511,13 +511,8 @@ events = {
     # ============================================
     "get_dashboard": {
         "httpMethod": "GET",
-        "path": "/dashboard"
+        "path": "/dashboard",
+        "queryStringParameters": {"code": "SELLER", }
     },
-        "get_dashboard": {
-        "httpMethod": "GET",
-        "path":"/dashboard"
-        "queryStringParameters": {"code": "SELLER",}
-    },
-
 
 }
