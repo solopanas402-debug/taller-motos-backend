@@ -112,8 +112,9 @@ Resources:
   MyUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      Domain: motorcycle-repair-shop-user-pool
+      Domain: motorcycle-repair-auth
       UserPoolId: !Ref MotorcycleRepairShopUserPool
+    DependsOn: MotorcycleRepairShopUserPool
 
   # === RESOURCE SERVER ===
   MotorcycleRepairShopResourceServer:
@@ -151,6 +152,7 @@ Resources:
     DependsOn:
       - MotorcycleRepairShopUserPool
       - MotorcycleRepairShopResourceServer
+      - MyUserPoolDomain
 
   # === LAYERS ===
   SharedLayer:
