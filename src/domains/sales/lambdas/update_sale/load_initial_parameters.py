@@ -48,13 +48,24 @@ def load_initial_parameters(event):
 
     # Prepare update data with only allowed fields
     allowed_fields = [
-        "status"
+        "status",
+        "payment_method"
     ]
 
     update_data = {}
     for field in allowed_fields:
         if field in data:
-            update_data[field] = data[field]
+            # Validar payment_method si está presente
+            if field == "payment_method":
+                valid_payment_methods = ['cash', 'transfer', 'debit_card', 'credit_card']
+                payment_method = data[field].lower() if isinstance(data[field], str) else data[field]
+                if payment_method not in valid_payment_methods:
+                    return ResponseUtils.bad_request_response(
+                        f"El campo 'payment_method' debe ser uno de: {', '.join(valid_payment_methods)}"
+                    )
+                update_data[field] = payment_method
+            else:
+                update_data[field] = data[field]
 
     # If no valid fields were provided
     if not update_data:

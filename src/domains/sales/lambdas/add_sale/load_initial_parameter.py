@@ -29,13 +29,13 @@ def validate_fields(request_body: dict):
     print("Begin validate_fields")
 
     required_fields = {
-        str: ['id_customer', 'id_seller'],
+        str: ['id_customer', 'id_seller', 'payment_method'],
         list: ['products'],
         float: ['subtotal', 'total'],
     }
 
     validation_exception.validate_fields(request_body, required_fields,
-                                         extra_validations=[total_greater_equal_subtotal])
+                                         extra_validations=[total_greater_equal_subtotal, validate_payment_method])
 
     product_fields = {
         str: ['id_product'],
@@ -61,6 +61,17 @@ def total_greater_equal_subtotal(data):
         raise ValidationException("El campo 'total' no puede ser menor que 'subtotal'")
 
 
+def validate_payment_method(data):
+    """Valida que el método de pago sea uno de los permitidos"""
+    valid_payment_methods = ['cash', 'transfer', 'debit_card', 'credit_card']
+    payment_method = data.get("payment_method", "").lower()
+    
+    if payment_method not in valid_payment_methods:
+        raise ValidationException(
+            f"El campo 'payment_method' debe ser uno de: {', '.join(valid_payment_methods)}"
+        )
+
+
 def generate_sale_data(request_body: dict) -> dict:
     print(f"Begin generate_sale_data")
     id_sale = generate_uuid_hex()
@@ -68,6 +79,7 @@ def generate_sale_data(request_body: dict) -> dict:
     total = float(request_body["total"])
     status = request_body["status"] if "status" in request_body else "pending"
     notes = request_body["notes"] if "notes" in request_body else None
+    payment_method = request_body["payment_method"].lower()
 
     sale = {
         "id_sale": id_sale,
@@ -78,7 +90,8 @@ def generate_sale_data(request_body: dict) -> dict:
         "subtotal": subtotal,
         "total": total,
         "status": status,
-        "notes": notes
+        "notes": notes,
+        "payment_method": payment_method
     }
 
     details = []

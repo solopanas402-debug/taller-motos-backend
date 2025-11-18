@@ -22,8 +22,9 @@ def lambda_handler(event, context):
     # Obtener los parámetros de la query string
     query_params = event.get("queryStringParameters", {}) or {}
     
-    # Obtener el recordType
+    # Obtener el recordType y payment_method
     record_type = query_params.get("recordType", None)
+    payment_method = query_params.get("payment_method", None)
     
     # Obtener parámetros validados o usar los de la query string como respaldo
     validated_params = event.get("validated_params", {})
@@ -36,7 +37,7 @@ def lambda_handler(event, context):
     limit = max(1, min(50, limit))
 
     # 1. Llamas al use case
-    result = use_case.get_sales(page, limit, search, record_type)
+    result = use_case.get_sales(page, limit, search, record_type, payment_method)
 
     # 2. Envuelves el resultado
     return ResponseUtils.success_response(result)

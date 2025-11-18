@@ -20,7 +20,8 @@ class SaleRepository:
                 "p_search": None,
                 "p_limit": None,
                 "p_offset": None,
-                "p_record_type": None
+                "p_record_type": None,
+                "p_payment_method": None
             }).execute()
 
             if not response.data:
