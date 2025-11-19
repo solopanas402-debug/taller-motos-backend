@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timezone
 from utils.response_utils import ResponseUtils
+from entities.payment_method import PaymentMethod
 
 
 def load_initial_parameters(event):
@@ -57,11 +58,11 @@ def load_initial_parameters(event):
         if field in data:
             # Validar payment_method si está presente
             if field == "payment_method":
-                valid_payment_methods = ['cash', 'transfer', 'debit_card', 'credit_card']
                 payment_method = data[field].lower() if isinstance(data[field], str) else data[field]
-                if payment_method not in valid_payment_methods:
+                if not PaymentMethod.is_valid(payment_method):
+                    valid_methods = ', '.join(PaymentMethod.get_values())
                     return ResponseUtils.bad_request_response(
-                        f"El campo 'payment_method' debe ser uno de: {', '.join(valid_payment_methods)}"
+                        f"El campo 'payment_method' debe ser uno de: {valid_methods}"
                     )
                 update_data[field] = payment_method
             else:

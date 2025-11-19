@@ -69,27 +69,26 @@ Resources:
         AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
 
-
-#  # === LAMBDA ÚNICA PARA TODOS LOS OPTIONS PARA PREFLIGHT CORS ===
-#  GlobalOptionsFunction:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      FunctionName: !Sub "GlobalOptions-${Environment}"
-#      CodeUri: layers/shared/lambdas/cors_preflight
-#      Handler: main.lambda_handler
-#      Timeout: 3
-#      MemorySize: 128
-#      Layers:
-#        - !Ref SharedLayer  # ✅ AGREGAR ESTO (para ResponseUtils)
-#      Events:
-#        CatchAllOptions:
-#          Type: Api
-#          Properties:
-#            # O si tienes MyApi explícito: RestApiId: !Ref MyApi
-#            Path: /{proxy+}
-#            Method: options
-#            Auth:
-#              Authorizer: NONE
+  #  # === LAMBDA ÚNICA PARA TODOS LOS OPTIONS PARA PREFLIGHT CORS ===
+  #  GlobalOptionsFunction:
+  #    Type: AWS::Serverless::Function
+  #    Properties:
+  #      FunctionName: !Sub "GlobalOptions-${Environment}"
+  #      CodeUri: layers/shared/lambdas/cors_preflight
+  #      Handler: main.lambda_handler
+  #      Timeout: 3
+  #      MemorySize: 128
+  #      Layers:
+  #        - !Ref SharedLayer  # ✅ AGREGAR ESTO (para ResponseUtils)
+  #      Events:
+  #        CatchAllOptions:
+  #          Type: Api
+  #          Properties:
+  #            # O si tienes MyApi explícito: RestApiId: !Ref MyApi
+  #            Path: /{proxy+}
+  #            Method: options
+  #            Auth:
+  #              Authorizer: NONE
 
   # === USER POOL ===
   MotorcycleRepairShopUserPool:
@@ -891,7 +890,7 @@ Resources:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
   #              AllowMethods: "'OPTIONS,DELETE'"
-  
+
   # ============================================
   # === CASHBOX (CAJA CHICA) CRUD ===
   # ============================================
@@ -1526,7 +1525,46 @@ Resources:
               Authorizer: CognitoAuthorizer
               AuthorizationScopes:
                 - motorcycerepairshop-api/delete
-#            Cors:
-#              AllowOrigin: "'*'"
-#              AllowHeaders: "'Content-Type,Authorization'"
-#              AllowMethods: "'OPTIONS,DELETE'"
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,DELETE'"
+
+  GetPaymentMethodsApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "GetPaymentMethodsApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/sales/lambdas/get_payment_methods
+      Handler: main.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          CORS_ORIGIN: "*"
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_APP_CLIENT_ID: !Ref MotorcycleRepairShopUserPoolClient
+          COGNITO_DOMAIN: motorcycle-repair-shop-user-pool
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /payment-methods
+            Method: get
+            Auth:
+              Authorizer: CognitoAuthorizer
+              AuthorizationScopes:
+                - motorcycerepairshop-api/read
+  #            Cors:
+  #              AllowOrigin: "'*'"
+  #              AllowHeaders: "'Content-Type,Authorization'"
+  #              AllowMethods: "'OPTIONS,GET'"
+
+  GetPaymentMethodsApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/GetPaymentMethodsApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: GetPaymentMethodsApiFunction

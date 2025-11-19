@@ -3,6 +3,7 @@ import json
 from exceptions import validation_exception
 from exceptions.validation_exception import ValidationException
 from utils.uuid_generator import generate_uuid_hex, generate_short_numeric
+from entities.payment_method import PaymentMethod
 
 
 def load_initial_parameters(event):
@@ -63,12 +64,12 @@ def total_greater_equal_subtotal(data):
 
 def validate_payment_method(data):
     """Valida que el método de pago sea uno de los permitidos"""
-    valid_payment_methods = ['cash', 'transfer', 'debit_card', 'credit_card']
     payment_method = data.get("payment_method", "").lower()
     
-    if payment_method not in valid_payment_methods:
+    if not PaymentMethod.is_valid(payment_method):
+        valid_methods = ', '.join(PaymentMethod.get_values())
         raise ValidationException(
-            f"El campo 'payment_method' debe ser uno de: {', '.join(valid_payment_methods)}"
+            f"El campo 'payment_method' debe ser uno de: {valid_methods}"
         )
 
 
