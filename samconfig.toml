@@ -9,7 +9,7 @@ confirm_changeset = true
 capabilities = "CAPABILITY_NAMED_IAM"
 disable_rollback = true
 image_repositories = []
-parameter_overrides = "Environment=\"dev\" DBUrl=\"https://ygmozqwtzcvyqiekhqce.supabase.co\" DBKey=\"sb_publishable_pa3AhahiiA4VyvWIk-lGnw_tHocqZRl\" LogRetentionDays=\"14\""
+parameter_overrides = "Environment=\"dev\" DBUrl=\"https://toklwbqrgqsgaovzleev.supabase.co\" DBKey=\"sb_publishable_9ToFd0mY6_QhXaGecuwxQA_ixnC9hQ0\" LogRetentionDays=\"14\""
 
 [default.global.parameters]
 region = "us-east-1"

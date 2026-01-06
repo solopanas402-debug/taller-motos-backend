@@ -32,10 +32,10 @@ Parameters:
       - prod
   DBUrl:
     Type: String
-    Default: https://ygmozqwtzcvyqiekhqce.supabase.co
+    Default: https://toklwbqrgqsgaovzleev.supabase.co
   DBKey:
     Type: String
-    Default: sb_publishable_pa3AhahiiA4VyvWIk-lGnw_tHocqZRl
+    Default: sb_publishable_9ToFd0mY6_QhXaGecuwxQA_ixnC9hQ0
   LogRetentionDays:
     Type: Number
     Default: 14
