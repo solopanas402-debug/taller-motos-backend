@@ -25,7 +25,7 @@ Globals:
 Parameters:
   Environment:
     Type: String
-    Default: dev
+    Default: prod
     AllowedValues:
       - dev
       - stage
@@ -45,7 +45,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "LambdaExecutionRole-${Environment}"
+      # RoleName: !Sub "LambdaExecutionRole-${Environment}"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
