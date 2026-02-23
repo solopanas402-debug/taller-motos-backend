@@ -17,7 +17,7 @@ repository = SaleRepository(db_client)
 use_case = SaleUseCase(repository)
 
 @cors_enabled
-# @cognito_auth_required
+@cognito_auth_required
 @debug_event
 # @validate_pagination_and_search()
 def lambda_handler(event, context):

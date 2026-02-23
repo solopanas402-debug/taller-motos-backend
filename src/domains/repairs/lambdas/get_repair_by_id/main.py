@@ -13,7 +13,7 @@ use_case = RepairUseCase(repository)
 
 
 @cors_enabled  # Habilitar CORS para este endpoint
-# @cognito_auth_required  # Asegura que el proveedor esté autenticado
+@cognito_auth_required  # Asegura que el proveedor esté autenticado
 def lambda_handler(event, context):
     print(f'event: {event}')
     print(f'context: {context}')

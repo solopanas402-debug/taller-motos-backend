@@ -12,7 +12,7 @@ use_case = DashboardUseCase(repository)
 
 @cors_enabled
 @debug_event
-#@cognito_auth_required
+@cognito_auth_required
 def lambda_handler(event, context):
 
     print(f'event: {event}')
