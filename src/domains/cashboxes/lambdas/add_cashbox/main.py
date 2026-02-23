@@ -1,32 +1,32 @@
-from entities.cashbox import Cashbox
+import json
+from use_cases.cashbox_use_case import CashboxUseCase
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
 from repositories.cashbox_repository import CashboxRepository
+from db.db_client import DBClient
+from utils.response_utils import ResponseUtils
+from load_initial_parameters import load_initial_parameters
 
+db_client = DBClient.get_client()
+repository = CashboxRepository(db_client)
+use_case = CashboxUseCase(repository)
 
-class CashboxUseCase:
-    def __init__(self, repository: CashboxRepository):
-        self.repository = repository
+@cors_enabled
+@debug_event
+@cognito_auth_required
+def lambda_handler(event, context):
+    print(f'event: {event}')
+    print(f'context: {context}')
 
-    def add_movement(self, cashbox: Cashbox):
-        """
-        Registra un movimiento manual en la caja chica
+    try:
+        cashbox_result = load_initial_parameters(event)
 
-        Args:
-            cashbox: Objeto Cashbox con los datos del movimiento
+        if isinstance(cashbox_result, dict) and "statusCode" in cashbox_result:
+            return cashbox_result
 
-        Returns:
-            dict: Datos del movimiento guardado
+        result = use_case.add_movement(cashbox_result)
+        
+        return ResponseUtils.created_response({"data": result, "message": "Movimiento registrado correctamente"})
 
-        Raises:
-            Exception: Si no hay sesión abierta o si falla el guardado
-        """
-        # Verificar que haya una sesión abierta
-        session_id = self.repository.get_open_session_id(cashbox.id_user)
-        if not session_id:
-            raise Exception("No hay una sesión de caja abierta. Debe abrir la caja antes de registrar movimientos.")
-
-        # Asignar la sesión al movimiento si no la tiene
-        if not cashbox.id_session:
-            cashbox.id_session = session_id
-
-        # Guardar el movimiento (los triggers de BD calcularán el balance)
-        return self.repository.save(cashbox)
+    except Exception as e:
+        error_msg = str(e)
+        return ResponseUtils.internal_server_error_response(f"Error inesperado: {error_msg}")
