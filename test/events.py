@@ -514,5 +514,20 @@ events = {
         "path": "/dashboard",
         "queryStringParameters": {"code": "SELLER", }
     },
-
+    # ============================================
+    # BRANDS - Obtener datos de marcas
+    # ============================================
+    "get_brands": {
+        "httpMethod": "GET",
+        "path": "/brands",
+        "queryStringParameters": {"page": "1", "limit": "10", "search": "", "type_brand": "product"}
+    },
+    # ============================================
+    # CATEGORIES - Obtener datos de categorias
+    # ============================================
+    "get_categories": {
+        "httpMethod": "GET",
+        "path": "/categories",
+        "queryStringParameters": {"page": "1", "limit": "10", "search": "",}
+    },
 }
