@@ -15,7 +15,8 @@ def load_initial_parameters(event):
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "Se debe proporcinar el cuerpo de la peticion"
+                "message": "Se debe proporcionar el cuerpo de la peticion"
+
             })
         }
 
@@ -30,7 +31,8 @@ def load_initial_parameters(event):
     return products
 
 
-def validate_product_fields(products: dict):
+def validate_product_fields(products: list):
+
     if len(products) == 0:
         raise ValueError(f"Se debe proporcionar al menos un producto")
 
@@ -44,10 +46,9 @@ def validate_product_fields(products: dict):
     for idx, product in enumerate(products, start=1):
 
         if not isinstance(product, dict):
-            raise ValueError(f"Cada producto debe ser un objeto válido (error en producto
+            raise ValueError(f"Cada producto debe ser un objeto válido (error en producto {idx})")
 
-        validation_exception.validate_fields(product, required_fields, context="products")
-
+        validation_exception.validate_fields(product, required_fields, context=f"el producto {idx}")
 
 def formatted_products(request_body):
     products = []

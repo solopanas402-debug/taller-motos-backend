@@ -52,9 +52,10 @@ def validate_fields(request_body: dict):
     for idx, product in enumerate(products, start=1):
 
         if not isinstance(product, dict):
-            raise ValueError(f"Cada producto debe ser un objeto válido (error en producto
+            raise ValueError(f"Cada producto debe ser un objeto válido (error en producto {idx})")
 
-        validation_exception.validate_fields(product, product_fields, context="products", field_rules=field_rules)
+        validation_exception.validate_fields(product, product_fields, context=f"el producto {idx}", field_rules=field_rules)
+
 
 
 def total_greater_equal_subtotal(data):
