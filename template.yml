@@ -5,7 +5,7 @@ Description: Backend en Python con Lambdas y API Gateway
 Globals:
   Function:
     Timeout: 10
-    Runtime: python3.12
+    Runtime: python3.11
     MemorySize: 256
     Environment:
       Variables:
@@ -161,9 +161,9 @@ Resources:
       Description: "Shared utilities for Lambdas"
       ContentUri: layers/shared
       CompatibleRuntimes:
-        - python3.12
+        - python3.11
     Metadata:
-      BuildMethod: python3.12
+      BuildMethod: python3.11
       BuildProperties:
         PIP_REQUIREMENTS: requirements.txt
 

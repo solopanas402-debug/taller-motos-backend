@@ -35,7 +35,12 @@ def validate_fields(
                 continue
 
             if isinstance(expected_type, tuple):
-                if not isinstance(value, expected_type):
+                check_type = expected_type
+                if float in expected_type and int not in expected_type:
+                    check_type = expected_type + (int,)
+
+                if not isinstance(value, check_type):
+
                     type_names = " o ".join([t.__name__ for t in expected_type])
                     raise ValidationException(
                         f"El campo '{field}' {f'en {context}' if context else ''} debe ser de tipo {type_names}"
@@ -53,7 +58,14 @@ def validate_fields(
                         )
                 continue
 
-            # Handle datetime validation
+            # Si se espera float, también permitimos int (ej: 100 en lugar de 100.0)
+            check_type = (int, float) if expected_type is float else expected_type
+
+            if not isinstance(value, check_type):
+                raise ValidationException(
+                    f"El campo '{field}' {f'en {context}' if context else ''} debe ser de tipo {expected_type.__name__}"
+                )
+
 
             if expected_type in (int, float):
                 allow_zero = rules.get("allow_zero", False)
@@ -71,13 +83,6 @@ def validate_fields(
                     raise ValidationException(
                         f"El campo '{field}' {f'en {context}' if context else ''} debe tener entre 1 y 255 caracteres")
 
-            # if expected_type is str:
-            #     min_len = rules.get("min_len", 1)
-            #     max_len = rules.get("max_len", 255)
-            #     if not (min_len <= len(value) <= max_len):
-            #         raise ValidationException(
-            #             f"El campo '{field}' {f'en {context}' if context else ''} debe tener entre {min_len} y {max_len} caracteres"
-            #         )
 
     if extra_validations:
         for validation_func in extra_validations:
