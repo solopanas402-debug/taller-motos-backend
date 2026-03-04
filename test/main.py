@@ -50,6 +50,6 @@ if __name__ == "__main__":
     # run("close_cashbox", "close_cashbox")
     
     # Ejecutar prueba individual
-    lambda_name = "get_cashbox"
-    resource_name = "get_cashbox"
+    lambda_name = "get_brands"
+    resource_name = "get_brands"
     run(lambda_name, resource_name)

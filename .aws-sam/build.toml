@@ -342,25 +342,25 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["GetPaymentMethodsApiFunction"]
 
-[function_build_definitions.d69a56ce-937e-4fff-9ac0-3cc7a6a16f40]
-codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\products\\lambdas\\get_categories"
-runtime = "python3.11"
-architecture = "x86_64"
-handler = "main.lambda_handler"
-manifest_hash = ""
-packagetype = "Zip"
-functions = ["GetCategoriesApiFunction"]
-
-[function_build_definitions.72554e2b-8ae7-43b5-97ef-5e6bae846e26]
-codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\products\\lambdas\\get_brands"
-runtime = "python3.11"
+[function_build_definitions.05d5a356-c980-40f7-995b-2e30e908cea7]
+codeuri = "D:\\Proyectos\\taller-motos-backend\\src\\domains\\brands\\lambdas\\get_brands"
+runtime = "python3.12"
 architecture = "x86_64"
 handler = "main.lambda_handler"
 manifest_hash = ""
 packagetype = "Zip"
 functions = ["GetBrandsApiFunction"]
 
-[layer_build_definitions.f212805b-0373-40d1-9be5-3a697d14c387]
+[function_build_definitions.27048b71-ea42-4512-a08b-163bba0d96fb]
+codeuri = "D:\\Proyectos\\taller-motos-backend\\src\\domains\\categories\\lambdas\\get_categories"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["GetCategoriesApiFunction"]
+
+[layer_build_definitions.ad03c664-a4da-4772-9a55-63379f75066e]
 layer_name = "SharedLayer"
 codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\layers\\shared"
 build_method = "python3.11"

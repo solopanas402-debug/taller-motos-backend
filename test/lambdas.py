@@ -38,6 +38,10 @@ LAMBDA_MODULES = {
     "get_current_session": "src.domains.cashboxes.lambdas.get_current_session.main",
     # Dashboard lambdas
     "get_dashboard": "src.domains.dashboard_datas.lambdas.get_dashboard.main",
+    # Brand lambdas
+    "get_brands": "src.domains.brands.lambdas.get_brands.main",
+    # Categories lambdas
+    "get_categories": "src.domains.categories.lambdas.get_categories.main",
 }
 
 
