@@ -12,7 +12,7 @@ import logging
 
 logging.basicConfig(filename='event.log', level=logging.DEBUG)
 
-
+# TODO: Implementar validación de fechas
 def load_initial_parameters(event) -> dict:
     print("Begin loading_initial_parameters")
 
