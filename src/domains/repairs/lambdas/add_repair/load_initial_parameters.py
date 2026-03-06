@@ -103,8 +103,7 @@ def validate_fields(request_body: dict):
     validation_exception.validate_fields(vehicle, vehicle_fields)
 
     repair_fields = {
-        str: ["id_mechanic", "fault_description", "diagnosis", "status", "priority", "notes", "id_created_by"],
-        datetime: ["entry_date", "delivery_date"],
+        str: ["id_mechanic", "fault_description", "diagnosis", "status", "priority", "notes", "id_created_by", "entry_date", "delivery_date"],
         float: ["estimated_cost", "final_cost"]
     }
 
@@ -112,8 +111,7 @@ def validate_fields(request_body: dict):
     validation_exception.validate_fields(repair, repair_fields)
 
     labor_fields = {
-        str: ["id_service_type"],
-        datetime: ["start_date", "completion_date"],
+        str: ["id_service_type", "start_date", "completion_date"],
         int: ["actual_hours"],
         float: ["agreed_price"],
         bool: ["completed"]
