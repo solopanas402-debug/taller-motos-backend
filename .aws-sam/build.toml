@@ -342,18 +342,18 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["GetPaymentMethodsApiFunction"]
 
-[function_build_definitions.05d5a356-c980-40f7-995b-2e30e908cea7]
-codeuri = "D:\\Proyectos\\taller-motos-backend\\src\\domains\\brands\\lambdas\\get_brands"
-runtime = "python3.12"
+[function_build_definitions.b35f1ea1-1bad-4e4b-bf52-afba92063e30]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\brands\\lambdas\\get_brands"
+runtime = "python3.11"
 architecture = "x86_64"
 handler = "main.lambda_handler"
 manifest_hash = ""
 packagetype = "Zip"
 functions = ["GetBrandsApiFunction"]
 
-[function_build_definitions.27048b71-ea42-4512-a08b-163bba0d96fb]
-codeuri = "D:\\Proyectos\\taller-motos-backend\\src\\domains\\categories\\lambdas\\get_categories"
-runtime = "python3.12"
+[function_build_definitions.dd9ee984-39da-4e7a-a16b-9eb0f516f23f]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\categories\\lambdas\\get_categories"
+runtime = "python3.11"
 architecture = "x86_64"
 handler = "main.lambda_handler"
 manifest_hash = ""
