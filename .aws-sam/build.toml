@@ -360,6 +360,42 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["GetCategoriesApiFunction"]
 
+[function_build_definitions.590dd326-8658-428e-a4f4-7e3d45236ef8]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\login"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["LoginApiFunction"]
+
+[function_build_definitions.6ab68829-f01c-4159-93f5-62ba87cbb714]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\refresh_token"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["RefreshTokenApiFunction"]
+
+[function_build_definitions.9c89b4be-b98c-4031-bae1-2dfc6881898a]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\logout"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["LogoutApiFunction"]
+
+[function_build_definitions.dfad9b91-ef87-45d3-b3db-e892ce9e1658]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\register"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["RegisterApiFunction"]
+
 [layer_build_definitions.ad03c664-a4da-4772-9a55-63379f75066e]
 layer_name = "SharedLayer"
 codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\layers\\shared"

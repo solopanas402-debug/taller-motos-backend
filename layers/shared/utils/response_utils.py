@@ -5,7 +5,7 @@ class ResponseUtils:
     """Utilidad para manejar respuestas estandarizadas con headers CORS"""
     
     @staticmethod
-    def get_cors_headers(origin: str = None) -> Dict[str, str]:
+    def get_cors_headers(origin: Optional[str] = None) -> Dict[str, str]:
         """Obtiene los headers CORS básicos"""
 
 
@@ -18,31 +18,39 @@ class ResponseUtils:
         }
     
     @staticmethod
-    def success_response(data: Any, status_code: int = 200, additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
-        """Crea una respuesta de éxito con headers CORS"""
+    def success_response(data: Any, status_code: int = 200, message: str = "Operation successful", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+        """Crea una respuesta de éxito con el formato estándar: status, statusCode, message, data"""
         headers = ResponseUtils.get_cors_headers()
         
         if additional_headers:
             headers.update(additional_headers)
         
+        response_body = {
+            "status": "success",
+            "statusCode": status_code,
+            "message": message,
+            "data": data
+        }
+        
         return {
             "statusCode": status_code,
             "headers": headers,
-            "body": json.dumps(data, ensure_ascii=False, default=str)
+            "body": json.dumps(response_body, ensure_ascii=False, default=str)
         }
     
     @staticmethod
     def error_response(message: str, status_code: int = 500, additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
-        """Crea una respuesta de error con headers CORS"""
+        """Crea una respuesta de error con el formato estándar: status, statusCode, message, data"""
         headers = ResponseUtils.get_cors_headers()
         
         if additional_headers:
             headers.update(additional_headers)
         
         error_data = {
-            "error": True,
+            "status": "error",
+            "statusCode": status_code,
             "message": message,
-            "statusCode": status_code
+            "data": None
         }
         
         return {
@@ -61,44 +69,44 @@ class ResponseUtils:
         }
     
     @staticmethod
-    def not_found_response(message: str = "Recurso no encontrado", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def not_found_response(message: str = "Resource not found", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 404 Not Found"""
         return ResponseUtils.error_response(message, 404, additional_headers)
     
     @staticmethod
-    def conflict_response(message: str = "Conflicto en la solicitud", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def conflict_response(message: str = "Conflict in request", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 409 Conflict"""
         return ResponseUtils.error_response(message, 409, additional_headers)
     
     @staticmethod
-    def bad_request_response(message: str = "Solicitud incorrecta", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def bad_request_response(message: str = "Bad request", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 400 Bad Request"""
         return ResponseUtils.error_response(message, 400, additional_headers)
     
     @staticmethod
-    def unauthorized_response(message: str = "No autorizado", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def unauthorized_response(message: str = "Unauthorized", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 401 Unauthorized"""
         return ResponseUtils.error_response(message, 401, additional_headers)
     
     @staticmethod
-    def forbidden_response(message: str = "Acceso prohibido", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def forbidden_response(message: str = "Forbidden access", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 403 Forbidden"""
         return ResponseUtils.error_response(message, 403, additional_headers)
     
     @staticmethod
-    def unprocessable_entity_response(message: str = "Entidad no procesable", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def unprocessable_entity_response(message: str = "Unprocessable entity", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 422 Unprocessable Entity"""
         return ResponseUtils.error_response(message, 422, additional_headers)
     
     @staticmethod
-    def internal_server_error_response(message: str = "Error interno del servidor", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def internal_server_error_response(message: str = "Internal server error", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 500 Internal Server Error"""
         return ResponseUtils.error_response(message, 500, additional_headers)
     
     @staticmethod
-    def created_response(data: Any, additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def created_response(data: Any, message: str = "Resource created successfully", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 201 Created"""
-        return ResponseUtils.success_response(data, 201, additional_headers)
+        return ResponseUtils.success_response(data=data, status_code=201, message=message, additional_headers=additional_headers)
     
     @staticmethod
     def no_content_response(additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
@@ -115,6 +123,6 @@ class ResponseUtils:
         }
     
     @staticmethod
-    def too_many_requests_response(message: str = "Demasiadas solicitudes", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    def too_many_requests_response(message: str = "Too many requests", additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
         """Crea una respuesta 429 Too Many Requests"""
         return ResponseUtils.error_response(message, 429, additional_headers)

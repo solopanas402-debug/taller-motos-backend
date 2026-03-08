@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+﻿AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Backend en Python con Lambdas y API Gateway
 
@@ -41,7 +41,7 @@ Parameters:
     Default: 14
 
 Resources:
-  # === IAM ROLE ===
+  # === IAM ROLE (general) ===
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -60,10 +60,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Environment
-      Auth:
-        Authorizers:
-          CognitoAuthorizer:
-            UserPoolArn: !GetAtt MotorcycleRepairShopUserPool.Arn
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
         AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Amz-Security-Token,x-tenant-id'"
@@ -153,6 +149,52 @@ Resources:
       - MotorcycleRepairShopResourceServer
       - MyUserPoolDomain
 
+
+  # === IAM ROLE (auth Lambdas) - acceso a cognito-idp ===
+  AuthLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: CognitoAuthPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:InitiateAuth
+                  - cognito-idp:GlobalSignOut
+                  - cognito-idp:AdminCreateUser
+                  - cognito-idp:AdminSetUserPassword
+                  - cognito-idp:AdminDeleteUser
+                Resource: !GetAtt MotorcycleRepairShopUserPool.Arn
+
+  # === APP CLIENT (usuarios humanos - USER_PASSWORD_AUTH) ===
+  UserAppClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: motorcycle-repair-shop-user-client
+      UserPoolId: !Ref MotorcycleRepairShopUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+      AccessTokenValidity: 1
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        RefreshToken: days
+    DependsOn:
+      - MotorcycleRepairShopUserPool
   # === LAYERS ===
   SharedLayer:
     Type: AWS::Serverless::LayerVersion
@@ -168,7 +210,129 @@ Resources:
         PIP_REQUIREMENTS: requirements.txt
 
   # ============================================
-  # === CUSTOMERS CRUD ===
+  # === AUTH ===
+  # ============================================
+  LoginApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LoginApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/login
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/login
+            Method: post
+
+  LoginApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/LoginApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: LoginApiFunction
+
+  RefreshTokenApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "RefreshTokenApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/refresh_token
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/refresh
+            Method: post
+
+  RefreshTokenApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/RefreshTokenApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: RefreshTokenApiFunction
+
+  LogoutApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LogoutApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/logout
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/logout
+            Method: post
+
+  LogoutApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/LogoutApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: LogoutApiFunction
+
+  RegisterApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "RegisterApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/register
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/register
+            Method: post
+
+  RegisterApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/RegisterApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: RegisterApiFunction
+
+  # ============================================  # === CUSTOMERS CRUD ===
   # ============================================
   GetCustomersApiFunction:
     Type: AWS::Serverless::Function
@@ -193,10 +357,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /customers
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -233,10 +393,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /customers/{id}
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -265,10 +421,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /customers
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -305,10 +457,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /customers/{id}
             Method: put
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/update
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -337,10 +485,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /customers/{id}
             Method: delete
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/delete
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -372,10 +516,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /repairs
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -412,10 +552,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /repairs/{id}
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -444,10 +580,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /repairs
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -484,10 +616,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /repairs/{id}
             Method: put
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/update
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -516,10 +644,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /repairs/{id}
             Method: delete
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/delete
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -551,10 +675,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /mechanics
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -591,10 +711,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /mechanics/{id}
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -623,10 +739,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /mechanics
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -663,10 +775,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /mechanics/{id}
             Method: put
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/update
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -695,10 +803,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /mechanics/{id}
             Method: delete
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/delete
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -730,10 +834,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /products
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -770,10 +870,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /products/{id}
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -810,10 +906,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /products
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -850,10 +942,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /products/{id}
             Method: put
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/update
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -882,10 +970,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /products/{id}
             Method: delete
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/delete
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -917,10 +1001,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /cashboxes
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -957,10 +1037,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /cashboxes/current-session
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -997,10 +1073,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /cashboxes/movement
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1037,10 +1109,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /cashboxes/open
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1077,10 +1145,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /cashboxes/close
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1120,10 +1184,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /dashboard
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1163,10 +1223,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /bulk_products
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1198,10 +1254,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /suppliers
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1238,10 +1290,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /suppliers/{id}
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1270,10 +1318,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /suppliers
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1310,10 +1354,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /suppliers/{id}
             Method: put
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/update
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1342,10 +1382,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /suppliers/{id}
             Method: delete
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/delete
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1377,10 +1413,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /sales
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1417,10 +1449,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /sales/{id}
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1449,10 +1477,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /sales
             Method: post
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/create
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1489,10 +1513,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /sales/{id}
             Method: put
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/update
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1521,10 +1541,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /sales/{id}
             Method: delete
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/delete
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1552,10 +1568,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /payment-methods
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1596,10 +1608,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /brands
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
@@ -1640,10 +1648,6 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /categories
             Method: get
-            Auth:
-              Authorizer: CognitoAuthorizer
-              AuthorizationScopes:
-                - motorcycerepairshop-api/read
   #            Cors:
   #              AllowOrigin: "'*'"
   #              AllowHeaders: "'Content-Type,Authorization'"
