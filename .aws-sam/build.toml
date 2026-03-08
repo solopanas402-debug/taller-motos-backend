@@ -396,6 +396,42 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["RegisterApiFunction"]
 
+[function_build_definitions.2bb579a4-e7f2-4d15-8aa9-8d05887ec347]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\forgot_password"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["ForgotPasswordApiFunction"]
+
+[function_build_definitions.06ccb1ef-ffd5-4a38-a6f5-6dfe71146c98]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\reset_password"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["ResetPasswordApiFunction"]
+
+[function_build_definitions.5a4b327a-2728-4ac1-a98b-82e188b74f8d]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\change_password"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["ChangePasswordApiFunction"]
+
+[function_build_definitions.932ab48f-1372-472e-b1d4-d573a2cd0ddf]
+codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\src\\domains\\auth\\lambdas\\me"
+runtime = "python3.11"
+architecture = "x86_64"
+handler = "main.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["MeApiFunction"]
+
 [layer_build_definitions.ad03c664-a4da-4772-9a55-63379f75066e]
 layer_name = "SharedLayer"
 codeuri = "C:\\Users\\Edwin Alomoto\\Documents\\GitHub\\taller-motos-backend\\layers\\shared"

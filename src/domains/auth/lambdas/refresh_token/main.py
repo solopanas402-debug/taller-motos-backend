@@ -63,7 +63,13 @@ def lambda_handler(event, context):
         
         # We need the user data for the standardized response
         user_info = cognito_client.get_user(AccessToken=new_access_token)
-        email = next(attr["Value"] for attr in user_info["UserAttributes"] if attr["Name"] == "email")
+        user_attributes = user_info.get("UserAttributes", [])
+        email = next((attr["Value"] for attr in user_attributes if attr["Name"] == "email"), None)
+        
+        if not email:
+            print("[refresh_token] ERROR: Email not found in Cognito attributes")
+            return ResponseUtils.internal_server_error_response("Internal server error")
+
         user_data = _get_user_from_db(email)
         
         if not user_data:

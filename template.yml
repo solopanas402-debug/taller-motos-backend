@@ -256,6 +256,8 @@ Resources:
         Variables:
           COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
           COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
       Events:
         ApiEvent:
           Type: Api
@@ -331,6 +333,116 @@ Resources:
       RetentionInDays: !Ref LogRetentionDays
     DeletionPolicy: Retain
     DependsOn: RegisterApiFunction
+
+  ForgotPasswordApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "ForgotPasswordApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/forgot_password
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/forgot-password
+            Method: post
+
+  ForgotPasswordApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ForgotPasswordApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: ForgotPasswordApiFunction
+
+  ResetPasswordApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "ResetPasswordApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/reset_password
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/reset-password
+            Method: post
+
+  ResetPasswordApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ResetPasswordApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: ResetPasswordApiFunction
+
+  ChangePasswordApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "ChangePasswordApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/change_password
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/change-password
+            Method: post
+
+  ChangePasswordApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/ChangePasswordApi-${Environment}"
+      RetentionInDays: !Ref LogRetentionDays
+    DeletionPolicy: Retain
+    DependsOn: ChangePasswordApiFunction
+
+  MeApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "MeApi-${Environment}"
+      Layers:
+        - !Ref SharedLayer
+      CodeUri: src/domains/auth/lambdas/me
+      Handler: main.lambda_handler
+      Role: !GetAtt AuthLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref MotorcycleRepairShopUserPool
+          COGNITO_USER_APP_CLIENT_ID: !Ref UserAppClient
+          DB_URL: !Ref DBUrl
+          DB_KEY: !Ref DBKey
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /auth/me
+            Method: get
 
   # ============================================  # === CUSTOMERS CRUD ===
   # ============================================
