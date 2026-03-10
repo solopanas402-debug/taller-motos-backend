@@ -14,14 +14,12 @@ cognito_client = boto3.client("cognito-idp", region_name=os.getenv("AWS_REGION",
 def _get_user_from_db(email: str):
     """
     Consulta Supabase verificando que el usuario exista y esté activo.
-    Columnas reales de la tabla 'users':
-      id_user, id_role, username, name, surname, email, active
     """
     try:
         result = (
             db_client
             .table("users")
-            .select("id_user, id_role, username, name, surname, email, active")
+            .select("id_user, id_role, username, name, surname, email, active, roles(name)")
             .eq("email", email)
             .maybe_single()
             .execute()
@@ -88,6 +86,14 @@ def lambda_handler(event, context):
         print(f"[login] Disabled user attempting login: {email}")
         return ResponseUtils.forbidden_response("Your account is disabled. Contact the administrator.")
 
+    # Extract role name
+    role_name = ""
+    roles_info = user_data.get("roles")
+    if isinstance(roles_info, dict):
+        role_name = roles_info.get("name", "")
+    elif isinstance(roles_info, list) and roles_info:
+        role_name = roles_info[0].get("name", "")
+
     # Format specified: user first, then tokens
     return ResponseUtils.success_response(
         data={
@@ -97,6 +103,7 @@ def lambda_handler(event, context):
                 "name":     user_data.get("name"),
                 "surname":  user_data.get("surname"),
                 "email":    user_data.get("email"),
+                "role":     role_name,
                 "id_role":  user_data.get("id_role"),
             },
             "tokens": {
