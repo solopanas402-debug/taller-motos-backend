@@ -87,55 +87,81 @@ def format_data(event) -> dict:
 
 def validate_fields(request_body: dict):
     print("Begin validate_fields")
+    
+    # Define optional rules
+    optional_rule = {"required": False}
+    allow_zero_rule = {"allow_zero": True, "required": False}
+    
+    # 1. Root level requirements
+    # 'labor' and 'products' are now optional from frontend perspective
     required_fields = {
-        dict: ["repair", "vehicle", "labor"],
-        list: ["products"]
+        dict: ["repair", "vehicle"]
     }
-
     validation_exception.validate_fields(request_body, required_fields)
 
+    # ... (vehicle validations were here)
     vehicle = request_body["vehicle"]
-    vehicle_fields = {
+    vehicle_schema = {
         str: ["id_customer", "license_plate", "brand", "model", "color"],
         int: ["year", "mileage"]
     }
-
-    validation_exception.validate_fields(vehicle, vehicle_fields)
-
-    repair_fields = {
-        str: ["id_mechanic", "fault_description", "diagnosis", "status", "priority", "notes", "id_created_by", "entry_date", "delivery_date"],
-        float: ["estimated_cost", "final_cost"]
+    vehicle_rules = {
+        "color": optional_rule,
+        "year": optional_rule,
+        "mileage": allow_zero_rule
     }
+    validation_exception.validate_fields(vehicle, vehicle_schema, context="vehículo", field_rules=vehicle_rules)
 
+    # 3. Repair validations
     repair = request_body["repair"]
-    validation_exception.validate_fields(repair, repair_fields)
-
-    labor_fields = {
-        str: ["id_service_type", "start_date", "completion_date"],
-        int: ["actual_hours"],
-        float: ["agreed_price"],
-        bool: ["completed"]
+    repair_schema = {
+        str: ["id_mechanic", "fault_description", "diagnosis", "status", "priority", "notes", "id_created_by", "entry_date", "delivery_date"],
+        (float, int): ["estimated_cost", "final_cost"]
     }
-    labor = request_body["labor"]
-    validation_exception.validate_fields(labor, labor_fields)
-
-    product_fields = {
-        str: ['id_product'],
-        int: ['quantity', 'stock'],
-        float: ['unit_price', 'discount']
+    repair_rules = {
+        "diagnosis": optional_rule,
+        "delivery_date": optional_rule,
+        "final_cost": allow_zero_rule,
+        "notes": optional_rule,
+        "estimated_cost": allow_zero_rule,
+        "priority": optional_rule
     }
+    validation_exception.validate_fields(repair, repair_schema, context="reparación", field_rules=repair_rules)
 
-    field_rules = {
-        "discount": {"allow_zero": True},
-    }
-    products = request_body["products"]
-    for idx, product in enumerate(products, start=1):
+    # 4. Labor validations (Optional section)
+    labor = request_body.get("labor")
+    if labor:
+        labor_schema = {
+            str: ["id_service_type", "start_date", "completion_date"],
+            int: ["actual_hours"],
+            (float, int): ["agreed_price"],
+            bool: ["completed"]
+        }
+        labor_rules = {
+            "id_service_type": optional_rule,
+            "start_date": optional_rule,
+            "completion_date": optional_rule,
+            "actual_hours": allow_zero_rule,
+            "agreed_price": allow_zero_rule,
+            "completed": optional_rule
+        }
+        validation_exception.validate_fields(labor, labor_schema, context="mano de obra", field_rules=labor_rules)
 
-        if not isinstance(product, dict):
-            raise ValueError(f"Cada producto debe ser un objeto válido (error en producto {idx})")
-
-        validation_exception.validate_fields(product, product_fields, context=f"el producto {idx}", field_rules=field_rules)
-
+    # 5. Products validation (Optional)
+    products = request_body.get("products")
+    if products:
+        product_fields = {
+            str: ['id_product'],
+            int: ['quantity', 'stock'],
+            (float, int): ['unit_price', 'discount']
+        }
+        field_rules_products = {
+            "discount": {"allow_zero": True},
+        }
+        for idx, product in enumerate(products, start=1):
+            if not isinstance(product, dict):
+                raise ValueError(f"Cada producto debe ser un objeto válido (error en producto {idx})")
+            validation_exception.validate_fields(product, product_fields, context=f"el producto {idx}", field_rules=field_rules_products)
 
 
 def generate_repair_data(request_body: dict) -> dict:
@@ -143,46 +169,56 @@ def generate_repair_data(request_body: dict) -> dict:
 
     id_vehicle = request_body["vehicle"].get("id_vehicle", generate_uuid_hex())
     id_repair = generate_uuid_hex()
+    
+    vehicle_req = request_body["vehicle"]
     vehicle = {
         "id_vehicle": id_vehicle,
-        "id_customer": request_body["vehicle"]["id_customer"],
-        "license_plate": request_body["vehicle"]["license_plate"],
-        "brand": request_body["vehicle"]["brand"],
-        "model": request_body["vehicle"]["model"],
-        "year": request_body["vehicle"]["year"],
-        "color": request_body["vehicle"]["color"],
-        "mileage": request_body["vehicle"]["mileage"],
+        "id_customer": vehicle_req["id_customer"],
+        "license_plate": vehicle_req["license_plate"],
+        "brand": vehicle_req["brand"],
+        "model": vehicle_req["model"],
+        "year": vehicle_req.get("year"),
+        "color": vehicle_req.get("color", ""),
+        "mileage": vehicle_req.get("mileage", 0),
         "active": True
     }
 
+    repair_req = request_body["repair"]
+    labor_req = request_body.get("labor", {})
+    
     repair = {
         "id_repair": id_repair,
         "order_number": generate_short_numeric(),
         "id_vehicle": vehicle["id_vehicle"],
-        "id_mechanic": request_body["repair"]["id_mechanic"],
-        "fault_description": request_body["repair"]["fault_description"],
-        "diagnosis": request_body["repair"]["diagnosis"],
-        "status": request_body["repair"]["status"],
-        "priority": request_body["repair"]["priority"],
-        "entry_date": request_body["repair"]["entry_date"],
-        "start_date": request_body["labor"]["start_date"],
-        "completion_date": request_body["labor"]["completion_date"],
-        "delivery_date": request_body["repair"]["delivery_date"],
-        "notes": request_body["repair"]["notes"],
-        "estimated_cost": request_body["repair"]["estimated_cost"],
-        "final_cost": request_body["repair"]["final_cost"],
-        "id_created_by": request_body["repair"]["id_created_by"],
+        "id_mechanic": repair_req["id_mechanic"],
+        "fault_description": repair_req["fault_description"],
+        "diagnosis": repair_req.get("diagnosis", ""),
+        "status": repair_req["status"],
+        "priority": repair_req.get("priority", "medium"),
+        "entry_date": repair_req["entry_date"],
+        "start_date": labor_req.get("start_date"),
+        "completion_date": labor_req.get("completion_date"),
+        "delivery_date": repair_req.get("delivery_date"),
+        "notes": repair_req.get("notes", ""),
+        "estimated_cost": repair_req.get("estimated_cost", 0.0),
+        "final_cost": repair_req.get("final_cost", 0.0),
+        "id_created_by": repair_req["id_created_by"],
     }
 
     labor = {
         "id_repair_service": generate_uuid_hex(),
         "id_repair": id_repair,
-        **request_body["labor"]
+        "id_service_type": labor_req.get("id_service_type", "53ec546e-c0c8-4b37-b554-0eefab310602"),
+        "start_date": labor_req.get("start_date"),
+        "completion_date": labor_req.get("completion_date"),
+        "actual_hours": labor_req.get("actual_hours", 0),
+        "agreed_price": labor_req.get("agreed_price", 0.0),
+        "completed": labor_req.get("completed", False)
     }
 
     materials = []
-
-    for product in request_body["products"]:
+    products_req = request_body.get("products", [])
+    for product in products_req:
         material = {
             "id_repair_material": generate_uuid_hex(),
             "id_vehicle": id_vehicle,
@@ -197,7 +233,7 @@ def generate_repair_data(request_body: dict) -> dict:
         "materials": materials,
     }
 
-    if request_body.get("photos", None):
+    if request_body.get("photos"):
         repair_data["photos"] = request_body["photos"]
 
     return repair_data

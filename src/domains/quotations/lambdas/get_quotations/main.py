@@ -1,9 +1,9 @@
 import json
 import logging
-from use_cases.sale_use_case import SaleUseCase
+from use_cases.quotation_use_case import QuotationUseCase
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
 from decorators.validate_pagination_and_search import validate_pagination_and_search
-from repositories.sale_repository import SaleRepository
+from repositories.quotation_repository import QuotationRepository
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils
 
@@ -11,14 +11,14 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 db_client = DBClient.get_client()
-repository = SaleRepository(db_client)
-use_case = SaleUseCase(repository)
+repository = QuotationRepository(db_client)
+use_case = QuotationUseCase(repository)
 
 @cors_enabled
 @cognito_auth_required
 @debug_event
 def lambda_handler(event, context):
-    logger.info(f'=== GET SALES HANDLER STARTED ===')
+    logger.info(f'=== GET QUOTATIONS HANDLER STARTED ===')
     logger.info(f'Event received: {event}')
     logger.info(f'Context: {context.function_name}, Request ID: {context.aws_request_id}')
 
@@ -26,8 +26,8 @@ def lambda_handler(event, context):
         query_params = event.get("queryStringParameters", {}) or {}
         logger.info(f'Query string parameters: {query_params}')
         
-        # Force recordType to sale
-        record_type = "sale"
+        # Force recordType to quotation
+        record_type = "quotation"
         payment_method = query_params.get("payment_method", None)
         logger.info(f'Forced record_type: {record_type}, payment_method: {payment_method}')
         
@@ -41,12 +41,12 @@ def lambda_handler(event, context):
         limit = max(1, min(50, limit))
         logger.info(f'Validated pagination - page: {page}, limit: {limit}')
 
-        logger.info(f'Calling use_case.get_sales with parameters: page={page}, limit={limit}, search={search}, record_type={record_type}, payment_method={payment_method}')
-        result = use_case.get_sales(page, limit, search, record_type, payment_method)
+        logger.info(f'Calling use_case.get_quotations with parameters: page={page}, limit={limit}, search={search}, payment_method={payment_method}')
+        result = use_case.get_quotations(page, limit, search, record_type, payment_method)
         logger.info(f'Use case returned successfully. Result keys: {result.keys()}')
 
         response = ResponseUtils.success_response(result)
-        logger.info(f'=== GET SALES HANDLER COMPLETED SUCCESSFULLY ===')
+        logger.info(f'=== GET QUOTATIONS HANDLER COMPLETED SUCCESSFULLY ===')
         return response
     
     except Exception as e:

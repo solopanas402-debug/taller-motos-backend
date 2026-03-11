@@ -1,19 +1,19 @@
 import math
 import logging
 
-from repositories.sale_repository import SaleRepository
+from repositories.quotation_repository import QuotationRepository
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-class SaleUseCase:
-    def __init__(self, repository: SaleRepository):
+class QuotationUseCase:
+    def __init__(self, repository: QuotationRepository):
         self.repository = repository
-        logger.info('SaleUseCase initialized')
+        logger.info('QuotationUseCase initialized')
 
-    def get_sales(self, page=1, limit=10, search=None, record_type=None, payment_method=None):
-        logger.info(f'=== SaleUseCase.get_sales CALLED ===')
+    def get_quotations(self, page=1, limit=10, search=None, record_type="quotation", payment_method=None):
+        logger.info(f'=== QuotationUseCase.get_quotations CALLED ===')
         logger.info(f'Input parameters: page={page}, limit={limit}, search={search}, record_type={record_type}, payment_method={payment_method}')
         
         try:
@@ -29,15 +29,15 @@ class SaleUseCase:
             # We call repo with None to get all records (sales and quotes) and filter in Python
             data_all, _ = self.repository.find_all(page=1, limit=large_limit, search=search, record_type=None, payment_method=pm)
             
-            # Local filtering to guarantee separation (excluding quotes from sales)
-            filtered_data = [item for item in data_all if item.get("status") != "quote"]
+            # Local filtering to guarantee separation (ONLY quotes for quotations)
+            filtered_data = [item for item in data_all if item.get("status") == "quote"]
             total = len(filtered_data)
             
             # Manual pagination slice
             offset = (page - 1) * limit
             data = filtered_data[offset : offset + limit]
             
-            logger.info(f'After filtering "quote": {len(filtered_data)} total items, showing {len(data)} for page {page}')
+            logger.info(f'After filtering ONLY "quote": {len(filtered_data)} total items, showing {len(data)} for page {page}')
             
             totalPages = math.ceil(total / limit) if limit > 0 else 0
             logger.info(f'Calculated totalPages: {totalPages}')
@@ -51,9 +51,9 @@ class SaleUseCase:
                     "totalPages": totalPages
                 },
             }
-            logger.info(f'=== SaleUseCase.get_sales COMPLETED SUCCESSFULLY ===')
+            logger.info(f'=== QuotationUseCase.get_quotations COMPLETED SUCCESSFULLY ===')
             return result
         
         except Exception as e:
-            logger.error(f'ERROR in SaleUseCase.get_sales: {type(e).__name__}: {str(e)}', exc_info=True)
+            logger.error(f'ERROR in QuotationUseCase.get_quotations: {type(e).__name__}: {str(e)}', exc_info=True)
             raise
