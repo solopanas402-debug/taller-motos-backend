@@ -9,8 +9,8 @@ from flask import request, jsonify
 # Configuración
 JWT_SECRET = os.environ.get("JWT_SECRET", "motorcycle-repair-shop-jwt-secret-key-2024")
 JWT_ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 144066  # 24 horas en lugar de 15 minutos
+REFRESH_TOKEN_EXPIRE_DAYS = 30  # 30 días en lugar de 7
 
 # Supabase
 SUPABASE_URL = os.environ.get("DB_URL", "https://toklwbqrgqsgaovzleev.supabase.co")

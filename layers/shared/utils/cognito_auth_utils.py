@@ -20,8 +20,22 @@ class CognitoAuthUtils:
 
     @staticmethod
     def validate_token(token: str) -> Tuple[bool, Optional[Dict[str, Any]]]:
-        """Validación simple de token Cognito"""
+        """Validación de token - intenta Cognito primero, luego JWT local"""
         try:
+            # Primero intentar validar como JWT local (HS256)
+            jwt_secret = os.getenv("JWT_SECRET")
+            if jwt_secret:
+                try:
+                    payload = jwt.decode(
+                        token,
+                        jwt_secret,
+                        algorithms=["HS256"]
+                    )
+                    return True, payload
+                except (ExpiredSignatureError, InvalidTokenError):
+                    pass  # Si falla, intentar con Cognito
+            
+            # Si no funciona JWT local, intentar con Cognito (RS256)
             region = os.getenv("AWS_REGION", "us-east-1")
             user_pool_id = os.getenv("COGNITO_USER_POOL_ID")
             

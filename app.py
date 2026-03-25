@@ -3,55 +3,14 @@ import sys
 import json
 from flask import Flask, request, jsonify
 from functools import wraps
-import requests
+from dotenv import load_dotenv
 from auth_service import AuthService, token_required
+from lambda_wrapper import ejecutar_lambda
 
-# Agregar paths para importar las lambdas
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'layers/shared'))
+# Cargar variables de entorno
+load_dotenv()
 
 app = Flask(__name__)
-
-# Importar todas las lambdas
-try:
-    from domains.customers.lambdas.get_customers.main import lambda_handler as get_customers_handler
-    from domains.customers.lambdas.get_customer_by_id.main import lambda_handler as get_customer_by_id_handler
-    from domains.customers.lambdas.add_customer.main import lambda_handler as add_customer_handler
-    from domains.customers.lambdas.update_customer.main import lambda_handler as update_customer_handler
-    from domains.customers.lambdas.delete_customer.main import lambda_handler as delete_customer_handler
-
-    from domains.repairs.lambdas.get_repairs.main import lambda_handler as get_repairs_handler
-    from domains.repairs.lambdas.get_repair_by_id.main import lambda_handler as get_repair_by_id_handler
-    from domains.repairs.lambdas.add_repair.main import lambda_handler as add_repair_handler
-    from domains.repairs.lambdas.update_repair.main import lambda_handler as update_repair_handler
-    from domains.repairs.lambdas.delete_repair.main import lambda_handler as delete_repair_handler
-
-    from domains.mechanics.lambdas.get_mechanics.main import lambda_handler as get_mechanics_handler
-    from domains.mechanics.lambdas.get_mechanic_by_id.main import lambda_handler as get_mechanic_by_id_handler
-    from domains.mechanics.lambdas.add_mechanic.main import lambda_handler as add_mechanic_handler
-    from domains.mechanics.lambdas.update_mechanic.main import lambda_handler as update_mechanic_handler
-    from domains.mechanics.lambdas.delete_mechanic.main import lambda_handler as delete_mechanic_handler
-
-    from domains.products.lambdas.get_products.main import lambda_handler as get_products_handler
-    from domains.products.lambdas.get_product_by_id.main import lambda_handler as get_product_by_id_handler
-    from domains.products.lambdas.add_product.main import lambda_handler as add_product_handler
-    from domains.products.lambdas.update_product.main import lambda_handler as update_product_handler
-    from domains.products.lambdas.delete_product.main import lambda_handler as delete_product_handler
-
-    from domains.cashboxes.lambdas.get_cashbox.main import lambda_handler as get_cashbox_handler
-    from domains.cashboxes.lambdas.add_cashbox.main import lambda_handler as add_cashbox_handler
-    from domains.cashboxes.lambdas.close_cashbox.main import lambda_handler as close_cashbox_handler
-    from domains.cashboxes.lambdas.get_current_session.main import lambda_handler as get_current_session_handler
-
-    from domains.brands.lambdas.get_brands.main import lambda_handler as get_brands_handler
-
-    from domains.bulk_products.lambdas.add_products.main import lambda_handler as add_products_bulk_handler
-    
-    LAMBDAS_LOADED = True
-except ImportError as e:
-    print(f"⚠️ Advertencia: No se pudieron cargar todas las lambdas: {e}")
-    print("ℹ️ Los endpoints de autenticación funcionarán normalmente")
-    LAMBDAS_LOADED = False
 
 
 def create_lambda_event(method, path, query_params=None, body=None, path_params=None, user=None):
@@ -75,66 +34,18 @@ def create_lambda_event(method, path, query_params=None, body=None, path_params=
     return event
 
 
-def lambda_route(lambda_handler_func, require_auth=True):
-    """Decorador para ejecutar una lambda y retornar su respuesta"""
-    def decorator(f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            try:
-                # Verificar autenticación si es requerida
-                if require_auth:
-                    token = None
-                    if "Authorization" in request.headers:
-                        auth_header = request.headers["Authorization"]
-                        try:
-                            token = auth_header.split(" ")[1]
-                        except IndexError:
-                            return jsonify({"error": "Token inválido"}), 401
-                    
-                    if not token:
-                        return jsonify({"error": "Token requerido"}), 401
-                    
-                    payload = AuthService.verify_token(token)
-                    if not payload or payload.get("type") != "access":
-                        return jsonify({"error": "Token inválido o expirado"}), 401
-                    
-                    user = payload
-                else:
-                    user = None
-                
-                # Obtener parámetros
-                path_params = kwargs if kwargs else None
-                query_params = request.args.to_dict() if request.args else None
-                body = request.get_json() if request.is_json else None
-                
-                # Crear evento Lambda
-                event = create_lambda_event(
-                    request.method,
-                    request.path,
-                    query_params,
-                    body,
-                    path_params,
-                    user
-                )
-                
-                # Ejecutar lambda
-                response = lambda_handler_func(event, None)
-                
-                # Parsear respuesta
-                status_code = response.get("statusCode", 200)
-                response_body = response.get("body", "{}")
-                
-                if isinstance(response_body, str):
-                    response_body = json.loads(response_body)
-                
-                return jsonify(response_body), status_code
-                
-            except Exception as e:
-                print(f"Error: {str(e)}")
-                return jsonify({"error": str(e)}), 500
-        
-        return wrapper
-    return decorator
+def parse_lambda_response(response):
+    """Parsea la respuesta de una lambda"""
+    status_code = response.get("statusCode", 200)
+    body = response.get("body", "{}")
+    
+    if isinstance(body, str):
+        try:
+            body = json.loads(body)
+        except json.JSONDecodeError:
+            body = {"message": body}
+    
+    return jsonify(body), status_code
 
 
 # ==================== AUTH ENDPOINTS ====================
@@ -231,42 +142,37 @@ def get_current_user():
 
 # ==================== CUSTOMERS ====================
 
-# ==================== CUSTOMERS ====================
-
 @app.route("/customers", methods=["GET"])
 @token_required
 def get_customers():
     """Obtener clientes"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/customers"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 200
-        return jsonify({"error": "Error al obtener clientes"}), response.status_code
+        event = create_lambda_event(
+            "GET", "/customers",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("customers", "get_customers", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/customers/<id>", methods=["GET"])
 @token_required
 def get_customer_by_id(id):
     """Obtener cliente por ID"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/customers?id_customer=eq.{id}"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            data = response.json()
-            return jsonify(data[0] if data else {}), 200
-        return jsonify({"error": "Cliente no encontrado"}), 404
+        event = create_lambda_event(
+            "GET", f"/customers/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("customers", "get_customer_by_id", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/customers", methods=["POST"])
 @token_required
@@ -274,54 +180,47 @@ def add_customer():
     """Crear cliente"""
     try:
         data = request.get_json()
-        url = f"{os.environ.get('DB_URL')}/rest/v1/customers"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-            "Content-Type": "application/json",
-            "Prefer": "return=representation"
-        }
-        response = requests.post(url, json=data, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 201
-        return jsonify({"error": "Error al crear cliente"}), response.status_code
+        event = create_lambda_event(
+            "POST", "/customers",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("customers", "add_customer", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/customers/<id>", methods=["PUT"])
+
+@app.route("/customers/<id>", methods=["PUT", "PATCH"])
 @token_required
 def update_customer(id):
     """Actualizar cliente"""
     try:
         data = request.get_json()
-        url = f"{os.environ.get('DB_URL')}/rest/v1/customers?id_customer=eq.{id}"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-            "Content-Type": "application/json",
-            "Prefer": "return=representation"
-        }
-        response = requests.patch(url, json=data, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 200
-        return jsonify({"error": "Error al actualizar cliente"}), response.status_code
+        event = create_lambda_event(
+            "PUT", f"/customers/{id}",
+            body=data,
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("customers", "update_customer", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/customers/<id>", methods=["DELETE"])
 @token_required
 def delete_customer(id):
     """Eliminar cliente"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/customers?id_customer=eq.{id}"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.delete(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify({"message": "Cliente eliminado"}), 200
-        return jsonify({"error": "Error al eliminar cliente"}), response.status_code
+        event = create_lambda_event(
+            "DELETE", f"/customers/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("customers", "delete_customer", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -333,35 +232,32 @@ def delete_customer(id):
 def get_products():
     """Obtener productos"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/products"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 200
-        return jsonify({"error": "Error al obtener productos"}), response.status_code
+        event = create_lambda_event(
+            "GET", "/products",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("products", "get_products", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/products/<id>", methods=["GET"])
 @token_required
 def get_product_by_id(id):
     """Obtener producto por ID"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/products?id_product=eq.{id}"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            data = response.json()
-            return jsonify(data[0] if data else {}), 200
-        return jsonify({"error": "Producto no encontrado"}), 404
+        event = create_lambda_event(
+            "GET", f"/products/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("products", "get_product_by_id", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/products", methods=["POST"])
 @token_required
@@ -369,17 +265,47 @@ def add_product():
     """Crear producto"""
     try:
         data = request.get_json()
-        url = f"{os.environ.get('DB_URL')}/rest/v1/products"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-            "Content-Type": "application/json",
-            "Prefer": "return=representation"
-        }
-        response = requests.post(url, json=data, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 201
-        return jsonify({"error": "Error al crear producto"}), response.status_code
+        event = create_lambda_event(
+            "POST", "/products",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("products", "add_product", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/products/<id>", methods=["PUT", "PATCH"])
+@token_required
+def update_product(id):
+    """Actualizar producto"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "PUT", f"/products/{id}",
+            body=data,
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("products", "update_product", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/products/<id>", methods=["DELETE"])
+@token_required
+def delete_product(id):
+    """Eliminar producto"""
+    try:
+        event = create_lambda_event(
+            "DELETE", f"/products/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("products", "delete_product", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -391,33 +317,80 @@ def add_product():
 def get_repairs():
     """Obtener reparaciones"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/repairs"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 200
-        return jsonify({"error": "Error al obtener reparaciones"}), response.status_code
+        event = create_lambda_event(
+            "GET", "/repairs",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("repairs", "get_repairs", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/repairs/<id>", methods=["GET"])
 @token_required
 def get_repair_by_id(id):
     """Obtener reparación por ID"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/repairs?id_repair=eq.{id}"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            data = response.json()
-            return jsonify(data[0] if data else {}), 200
-        return jsonify({"error": "Reparación no encontrada"}), 404
+        event = create_lambda_event(
+            "GET", f"/repairs/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("repairs", "get_repair_by_id", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/repairs", methods=["POST"])
+@token_required
+def add_repair():
+    """Crear reparación"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "POST", "/repairs",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("repairs", "add_repair", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/repairs/<id>", methods=["PUT", "PATCH"])
+@token_required
+def update_repair(id):
+    """Actualizar reparación"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "PUT", f"/repairs/{id}",
+            body=data,
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("repairs", "update_repair", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/repairs/<id>", methods=["DELETE"])
+@token_required
+def delete_repair(id):
+    """Eliminar reparación"""
+    try:
+        event = create_lambda_event(
+            "DELETE", f"/repairs/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("repairs", "delete_repair", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -429,53 +402,283 @@ def get_repair_by_id(id):
 def get_mechanics():
     """Obtener mecánicos"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/mechanics"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 200
-        return jsonify({"error": "Error al obtener mecánicos"}), response.status_code
+        event = create_lambda_event(
+            "GET", "/mechanics",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("mechanics", "get_mechanics", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/mechanics/<id>", methods=["GET"])
 @token_required
 def get_mechanic_by_id(id):
     """Obtener mecánico por ID"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/mechanics?id_mechanic=eq.{id}"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            data = response.json()
-            return jsonify(data[0] if data else {}), 200
-        return jsonify({"error": "Mecánico no encontrado"}), 404
+        event = create_lambda_event(
+            "GET", f"/mechanics/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("mechanics", "get_mechanic_by_id", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-# ==================== CASHBOXES ====================
-
-@app.route("/cashboxes", methods=["GET"])
+@app.route("/mechanics", methods=["POST"])
 @token_required
-def get_cashbox():
-    """Obtener cajas"""
+def add_mechanic():
+    """Crear mecánico"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/cashbox"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 200
-        return jsonify({"error": "Error al obtener cajas"}), response.status_code
+        data = request.get_json()
+        event = create_lambda_event(
+            "POST", "/mechanics",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("mechanics", "add_mechanic", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mechanics/<id>", methods=["PUT", "PATCH"])
+@token_required
+def update_mechanic(id):
+    """Actualizar mecánico"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "PUT", f"/mechanics/{id}",
+            body=data,
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("mechanics", "update_mechanic", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/mechanics/<id>", methods=["DELETE"])
+@token_required
+def delete_mechanic(id):
+    """Eliminar mecánico"""
+    try:
+        event = create_lambda_event(
+            "DELETE", f"/mechanics/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("mechanics", "delete_mechanic", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ==================== SUPPLIERS ====================
+
+@app.route("/suppliers", methods=["GET"])
+@token_required
+def get_suppliers():
+    """Obtener proveedores"""
+    try:
+        event = create_lambda_event(
+            "GET", "/suppliers",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("suppliers", "get_suppliers", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/suppliers/<id>", methods=["GET"])
+@token_required
+def get_supplier_by_id(id):
+    """Obtener proveedor por ID"""
+    try:
+        event = create_lambda_event(
+            "GET", f"/suppliers/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("suppliers", "get_supplier_by_id", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/suppliers", methods=["POST"])
+@token_required
+def add_supplier():
+    """Crear proveedor"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "POST", "/suppliers",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("suppliers", "add_supplier", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/suppliers/<id>", methods=["PUT", "PATCH"])
+@token_required
+def update_supplier(id):
+    """Actualizar proveedor"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "PUT", f"/suppliers/{id}",
+            body=data,
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("suppliers", "update_supplier", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/suppliers/<id>", methods=["DELETE"])
+@token_required
+def delete_supplier(id):
+    """Eliminar proveedor"""
+    try:
+        event = create_lambda_event(
+            "DELETE", f"/suppliers/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("suppliers", "delete_supplier", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ==================== SALES ====================
+
+@app.route("/sales", methods=["GET"])
+@token_required
+def get_sales():
+    """Obtener ventas"""
+    try:
+        event = create_lambda_event(
+            "GET", "/sales",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("sales", "get_sales", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/sales/<id>", methods=["GET"])
+@token_required
+def get_sale_by_id(id):
+    """Obtener venta por ID"""
+    try:
+        event = create_lambda_event(
+            "GET", f"/sales/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("sales", "get_sale_by_id", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/sales", methods=["POST"])
+@token_required
+def add_sale():
+    """Crear venta"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "POST", "/sales",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("sales", "add_sale", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/sales/<id>", methods=["PUT", "PATCH"])
+@token_required
+def update_sale(id):
+    """Actualizar venta"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "PUT", f"/sales/{id}",
+            body=data,
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("sales", "update_sale", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/sales/<id>", methods=["DELETE"])
+@token_required
+def delete_sale(id):
+    """Eliminar venta"""
+    try:
+        event = create_lambda_event(
+            "DELETE", f"/sales/{id}",
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("sales", "delete_sale", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/sales/payment-methods", methods=["GET"])
+@token_required
+def get_payment_methods():
+    """Obtener métodos de pago"""
+    try:
+        event = create_lambda_event(
+            "GET", "/sales/payment-methods",
+            user=request.user
+        )
+        response = ejecutar_lambda("sales", "get_payment_methods", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ==================== CATEGORIES ====================
+
+@app.route("/categories", methods=["GET"])
+@token_required
+def get_categories():
+    """Obtener categorías"""
+    try:
+        event = create_lambda_event(
+            "GET", "/categories",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("products", "get_categories", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -487,15 +690,97 @@ def get_cashbox():
 def get_brands():
     """Obtener marcas"""
     try:
-        url = f"{os.environ.get('DB_URL')}/rest/v1/brands"
-        headers = {
-            "apikey": os.environ.get("DB_KEY"),
-            "Authorization": f"Bearer {os.environ.get('DB_KEY')}",
-        }
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code < 400:
-            return jsonify(response.json()), 200
-        return jsonify({"error": "Error al obtener marcas"}), response.status_code
+        event = create_lambda_event(
+            "GET", "/brands",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("products", "get_brands", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ==================== CASHBOXES ====================
+
+@app.route("/cashboxes", methods=["GET"])
+@token_required
+def get_cashbox():
+    """Obtener cajas"""
+    try:
+        event = create_lambda_event(
+            "GET", "/cashboxes",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("cashboxes", "get_cashbox", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/cashboxes", methods=["POST"])
+@token_required
+def add_cashbox():
+    """Crear caja"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "POST", "/cashboxes",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("cashboxes", "add_cashbox", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/cashboxes/current-session", methods=["GET"])
+@token_required
+def get_current_session():
+    """Obtener sesión actual de caja"""
+    try:
+        event = create_lambda_event(
+            "GET", "/cashboxes/current-session",
+            user=request.user
+        )
+        response = ejecutar_lambda("cashboxes", "get_current_session", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/cashboxes/open", methods=["POST"])
+@token_required
+def open_cashbox():
+    """Abrir caja"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "POST", "/cashboxes/open",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("cashboxes", "open_cashbox", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/cashboxes/close", methods=["POST"])
+@token_required
+def close_cashbox():
+    """Cerrar caja"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "POST", "/cashboxes/close",
+            body=data,
+            user=request.user
+        )
+        response = ejecutar_lambda("cashboxes", "close_cashbox", event, None)
+        return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -504,9 +789,10 @@ def get_brands():
 
 @app.route("/health", methods=["GET"])
 def health():
+    """Health check"""
     return jsonify({"status": "ok"}), 200
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port, debug=False)
