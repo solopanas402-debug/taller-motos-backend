@@ -12,7 +12,7 @@ Globals:
   Api:
     Cors:
       AllowMethods: "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
-      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With'"
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Requested-With,x-tenant-id'"
       AllowOrigin: "'*'"
       MaxAge: "'600'"
 Parameters:
@@ -59,7 +59,7 @@ Resources:
               - Arn
       Cors:
         AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
-        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Amz-Security-Token'"
+        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Amz-Security-Token,x-tenant-id'"
         AllowOrigin: "'*'"
   MotorcycleRepairShopUserPool:
     Type: AWS::Cognito::UserPool
