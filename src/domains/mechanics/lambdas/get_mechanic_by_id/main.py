@@ -1,0 +1,38 @@
+import json
+from domains.mechanics.lambdas.get_mechanic_by_id.use_cases.mechanic_use_case import MechanicUseCase
+from utils.response_utils import ResponseUtils
+from decorators.lambda_decorators import cors_enabled, cognito_auth_required
+from domains.mechanics.lambdas.get_mechanic_by_id.repositories.mechanic_repository import MechanicRepository
+from db.db_client import DBClient
+from load_initial_parameters import load_initial_parameters
+
+db_client = DBClient.get_client()
+repository = MechanicRepository(db_client)
+use_case = MechanicUseCase(repository)
+
+
+@cors_enabled
+@cognito_auth_required
+def lambda_handler(event, context):
+    print(f'event: {event}')
+    print(f'context: {context}')
+
+    try:
+        id_customer = load_initial_parameters(event)
+
+        if isinstance(id_customer, dict) and "statusCode" in id_customer:
+            return id_customer
+
+        result = use_case.find_customer_by_id(id_customer)
+
+        return ResponseUtils.success_response({
+            "data": result
+        })
+
+    except Exception as e:
+        error_message = str(e)
+
+        if "No se encontró el mecánico" in error_message:
+            return ResponseUtils.not_found_response(error_message)
+
+        return ResponseUtils.internal_server_error_response(f"Error inesperado: {error_message}")

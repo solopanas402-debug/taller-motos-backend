@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: motorcycle-repair-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: DB_URL
+        scope: run
+      - key: DB_KEY
+        scope: run
+      - key: PORT
+        value: 5000

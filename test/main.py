@@ -1,6 +1,7 @@
 import json
+
 from events import events
-from lambdas import lambdas
+from lambdas import get_lambda
 
 
 class Context:
@@ -10,23 +11,45 @@ class Context:
         self.invoked_function_arn = "arn:aws:lambda:local:test"
         self.aws_request_id = "1234"
 
+
 context = Context()
 
+
 def run(lambda_name, event_name):
-    if lambda_name not in lambdas:
-        print(f"Lambda '{lambda_name}' no encontrada.")
-        return
+    # if lambda_name not in LAMBDA_MODULES:
+    #     raise ValueError(f"Lambda '{lambda_name}' no encontrada")
     if event_name not in events:
         print(f"Evento '{event_name}' no encontrado.")
         return
 
-    lambda_function = lambdas[lambda_name]
+    # lambda_function = lambdas[lambda_name]
+    lambda_function = get_lambda(lambda_name)
     event = events[event_name]
 
-    print(f"\n=== Ejecutando {lambda_name} con evento {event_name} ===")
+    print(f"\n=== Ejecutando {lambda_name} con evento {event_name} ===\n")
     result = lambda_function(event, context)
     print(json.dumps(result, indent=2))
 
+
 if __name__ == "__main__":
-    run("customers_get", "customers_get")
-    # run("orders_post", "orders_post")
+    # Flujo completo de prueba de cashbox
+    # 1. Abrir sesión de caja
+    # run("open_cashbox", "open_cashbox")
+    # 2. Ver sesión actual
+    # run("get_current_session", "get_current_session")
+    
+    # 3. Agregar movimientos
+    # run("add_cashbox", "add_cashbox_income")
+    # run("add_cashbox", "add_cashbox_expense")
+    # run("add_cashbox", "add_cashbox_adjustment")
+    
+    # 4. Ver movimientos
+    # run("get_cashbox", "get_cashbox")
+    
+    # 5. Cerrar sesión
+    # run("close_cashbox", "close_cashbox")
+    
+    # Ejecutar prueba individual
+    lambda_name = "get_brands"
+    resource_name = "get_brands"
+    run(lambda_name, resource_name)

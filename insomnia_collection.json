@@ -1,0 +1,435 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-03-24T22:50:00.000Z",
+  "__export_source": "insomnia.desktop:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_taller_motos",
+      "_type": "workspace",
+      "name": "Taller Motos Backend",
+      "description": "API REST para Taller de Motos",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_taller_motos",
+      "name": "Base",
+      "data": {
+        "base_url": "http://localhost:8000",
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNWQ3ZWJmMzktNDRjNS00N2JhLWExYTgtMDg1MGVkNWIyYjA0IiwiZW1haWwiOiJhZG1pbmlzdHJhZG9yQGdtYWlsLmNvbSIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3ODMwNTQxNjEsImlhdCI6MTc3NDQxMDIwMX0.09bpSFQq9OJkjkaA1f52w34yq3ThE0rZyk0KCUOOJao"
+      }
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Auth"
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Login",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/login",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"email\": \"administrador@gmail.com\", \"password\": \"tu_contraseña\"}"
+      }
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Register",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/register",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"email\": \"nuevo@gmail.com\", \"password\": \"password123\", \"name\": \"Nuevo Usuario\"}"
+      }
+    },
+    {
+      "_id": "req_refresh",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Refresh Token",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/refresh",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"refresh_token\": \"tu_refresh_token\"}"
+      }
+    },
+    {
+      "_id": "req_me",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Get Current User",
+      "method": "GET",
+      "url": "{{ base_url }}/auth/me",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_customers",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Customers"
+    },
+    {
+      "_id": "req_get_customers",
+      "_type": "request",
+      "parentId": "fld_customers",
+      "name": "Get Customers",
+      "method": "GET",
+      "url": "{{ base_url }}/customers?page=1&limit=10",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_customer_by_id",
+      "_type": "request",
+      "parentId": "fld_customers",
+      "name": "Get Customer by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/customers/5d7ebf39-44c5-47ba-a1a8-0850ed5b2b04",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_customer",
+      "_type": "request",
+      "parentId": "fld_customers",
+      "name": "Create Customer",
+      "method": "POST",
+      "url": "{{ base_url }}/customers",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"name\": \"Juan Pérez\", \"email\": \"juan@example.com\", \"phone\": \"1234567890\"}"
+      }
+    },
+    {
+      "_id": "req_update_customer",
+      "_type": "request",
+      "parentId": "fld_customers",
+      "name": "Update Customer",
+      "method": "PUT",
+      "url": "{{ base_url }}/customers/5d7ebf39-44c5-47ba-a1a8-0850ed5b2b04",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"name\": \"Juan Pérez Actualizado\", \"email\": \"juan_updated@example.com\"}"
+      }
+    },
+    {
+      "_id": "req_delete_customer",
+      "_type": "request",
+      "parentId": "fld_customers",
+      "name": "Delete Customer",
+      "method": "DELETE",
+      "url": "{{ base_url }}/customers/5d7ebf39-44c5-47ba-a1a8-0850ed5b2b04",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_products",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Products"
+    },
+    {
+      "_id": "req_get_products",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Get Products",
+      "method": "GET",
+      "url": "{{ base_url }}/products?page=1&limit=10",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_product_by_id",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Get Product by ID",
+      "method": "GET",
+      "url": "{{ base_url }}/products/product-id",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_product",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Create Product",
+      "method": "POST",
+      "url": "{{ base_url }}/products",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"name\": \"Aceite Motor\", \"price\": 50.00, \"stock\": 100}"
+      }
+    },
+    {
+      "_id": "req_get_categories",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Get Categories",
+      "method": "GET",
+      "url": "{{ base_url }}/categories",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_brands",
+      "_type": "request",
+      "parentId": "fld_products",
+      "name": "Get Brands",
+      "method": "GET",
+      "url": "{{ base_url }}/brands",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_repairs",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Repairs"
+    },
+    {
+      "_id": "req_get_repairs",
+      "_type": "request",
+      "parentId": "fld_repairs",
+      "name": "Get Repairs",
+      "method": "GET",
+      "url": "{{ base_url }}/repairs?page=1&limit=10",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_repair",
+      "_type": "request",
+      "parentId": "fld_repairs",
+      "name": "Create Repair",
+      "method": "POST",
+      "url": "{{ base_url }}/repairs",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"description\": \"Cambio de aceite\", \"customer_id\": \"customer-id\", \"status\": \"pending\"}"
+      }
+    },
+    {
+      "_id": "fld_mechanics",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Mechanics"
+    },
+    {
+      "_id": "req_get_mechanics",
+      "_type": "request",
+      "parentId": "fld_mechanics",
+      "name": "Get Mechanics",
+      "method": "GET",
+      "url": "{{ base_url }}/mechanics?page=1&limit=10",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_suppliers",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Suppliers"
+    },
+    {
+      "_id": "req_get_suppliers",
+      "_type": "request",
+      "parentId": "fld_suppliers",
+      "name": "Get Suppliers",
+      "method": "GET",
+      "url": "{{ base_url }}/suppliers?page=1&limit=10",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_sales",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Sales"
+    },
+    {
+      "_id": "req_get_sales",
+      "_type": "request",
+      "parentId": "fld_sales",
+      "name": "Get Sales",
+      "method": "GET",
+      "url": "{{ base_url }}/sales?page=1&limit=10",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_payment_methods",
+      "_type": "request",
+      "parentId": "fld_sales",
+      "name": "Get Payment Methods",
+      "method": "GET",
+      "url": "{{ base_url }}/sales/payment-methods",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_cashboxes",
+      "_type": "request_group",
+      "parentId": "wrk_taller_motos",
+      "name": "Cashboxes"
+    },
+    {
+      "_id": "req_get_cashboxes",
+      "_type": "request",
+      "parentId": "fld_cashboxes",
+      "name": "Get Cashboxes",
+      "method": "GET",
+      "url": "{{ base_url }}/cashboxes",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_current_session",
+      "_type": "request",
+      "parentId": "fld_cashboxes",
+      "name": "Get Current Session",
+      "method": "GET",
+      "url": "{{ base_url }}/cashboxes/current-session",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_open_cashbox",
+      "_type": "request",
+      "parentId": "fld_cashboxes",
+      "name": "Open Cashbox",
+      "method": "POST",
+      "url": "{{ base_url }}/cashboxes/open",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"initial_amount\": 1000.00}"
+      }
+    },
+    {
+      "_id": "req_close_cashbox",
+      "_type": "request",
+      "parentId": "fld_cashboxes",
+      "name": "Close Cashbox",
+      "method": "POST",
+      "url": "{{ base_url }}/cashboxes/close",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ access_token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\"final_amount\": 1500.00}"
+      }
+    },
+    {
+      "_id": "req_health",
+      "_type": "request",
+      "parentId": "wrk_taller_motos",
+      "name": "Health Check",
+      "method": "GET",
+      "url": "{{ base_url }}/health"
+    }
+  ]
+}
