@@ -18,7 +18,7 @@ CORS(app, resources={
     r"/*": {
         "origins": ["http://localhost:5173", "http://localhost:3000"],
         "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"],
+        "allow_headers": ["Content-Type", "Authorization", "x-tenant-id"],
         "supports_credentials": True
     }
 })
@@ -40,7 +40,8 @@ def create_lambda_event(method, path, query_params=None, body=None, path_params=
                     "email": user.get("email") if user else "anonymous@example.com"
                 }
             }
-        }
+        },
+        "user_payload": user if user else {}
     }
     return event
 
@@ -127,15 +128,27 @@ def refresh():
 def logout():
     """Logout e invalidar refresh token"""
     try:
-        data = request.get_json()
+        # Intentar obtener el JSON, si falla usar un dict vacío
+        try:
+            data = request.get_json() or {}
+        except Exception as json_error:
+            print(f"Error al parsear JSON en logout: {json_error}")
+            data = {}
         
-        if not data.get("refresh_token"):
-            return jsonify({"error": "Refresh token requerido"}), 400
+        # El refresh_token es opcional para logout
+        # Si no se proporciona, simplemente confirmamos el logout del lado del cliente
+        refresh_token = data.get("refresh_token")
         
-        result = AuthService.logout_user(data["refresh_token"])
-        
-        status = result.pop("status")
-        return jsonify(result), status
+        if refresh_token:
+            result = AuthService.logout_user(refresh_token)
+            status = result.pop("status")
+            return jsonify(result), status
+        else:
+            # Logout sin invalidar refresh token (solo del lado del cliente)
+            return jsonify({
+                "message": "Logout exitoso",
+                "success": True
+            }), 200
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -145,10 +158,49 @@ def logout():
 @token_required
 def get_current_user():
     """Obtener información del usuario actual"""
-    return jsonify({
-        "user_id": request.user["user_id"],
-        "email": request.user["email"]
-    }), 200
+    try:
+        # Obtener información completa del usuario desde la BD
+        from auth_service import AuthService
+        users = AuthService._make_supabase_request("GET", "users", filters={"id_user": request.user["user_id"]})
+        
+        if not users or len(users) == 0:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+        
+        user = users[0]
+        
+        # Obtener el rol del usuario
+        role_name = "seller"  # Valor por defecto
+        if user.get("id_role"):
+            roles = AuthService._make_supabase_request("GET", "roles", filters={"id_role": user["id_role"]})
+            if roles and len(roles) > 0:
+                # Normalizar el nombre del rol a minúsculas
+                db_role_name = roles[0].get("name", "VENDEDOR").upper()
+                
+                # Mapear roles de la BD a roles del frontend
+                role_mapping = {
+                    "ADMIN": "admin",
+                    "VENDEDOR": "seller",
+                    "MECANICO": "mechanic",
+                    "SELLER": "seller",
+                    "MECHANIC": "mechanic"
+                }
+                
+                role_name = role_mapping.get(db_role_name, "seller")
+        
+        return jsonify({
+            "user": {
+                "id": user["id_user"],
+                "email": user["email"],
+                "username": user.get("username"),
+                "name": user.get("name"),
+                "surname": user.get("surname"),
+                "role": role_name,
+                "role_id": user.get("id_role")
+            }
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ==================== CUSTOMERS ====================
@@ -594,6 +646,22 @@ def get_sales():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/quotations", methods=["GET"])
+@token_required
+def get_quotations():
+    """Obtener cotizaciones (usa el mismo lambda de sales con type=quote)"""
+    try:
+        event = create_lambda_event(
+            "GET", "/sales",
+            query_params=dict(request.args),
+            user=request.user
+        )
+        response = ejecutar_lambda("sales", "get_sales", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/sales/<id>", methods=["GET"])
 @token_required
 def get_sale_by_id(id):
@@ -754,6 +822,7 @@ def get_current_session():
     try:
         event = create_lambda_event(
             "GET", "/cashboxes/current-session",
+            query_params=dict(request.args),
             user=request.user
         )
         response = ejecutar_lambda("cashboxes", "get_current_session", event, None)
@@ -810,7 +879,7 @@ def get_dashboard():
             query_params={"code": code} if code else {},
             user=request.user
         )
-        response = ejecutar_lambda("dashboard", "get_dashboard", event, None)
+        response = ejecutar_lambda("dashboard_datas", "get_dashboard", event, None)
         return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Agregar directorios al sys.path una sola vez al inicio usando rutas absolutas
-project_root = os.path.abspath(os.getcwd())
+# Usar __file__ para obtener la ruta del script actual, más confiable que getcwd()
+project_root = os.path.dirname(os.path.abspath(__file__))
 layers_dir = os.path.join(project_root, "layers", "shared")
 src_dir = os.path.join(project_root, "src")
 
@@ -21,15 +22,34 @@ for path in [layers_dir, src_dir]:
 sys.path.insert(0, src_dir)
 sys.path.insert(0, layers_dir)
 
-print(f"Lambda wrapper initialized - sys.path[0:2]:")
-print(f"  [0]: {sys.path[0]}")
-print(f"  [1]: {sys.path[1]}")
+print(f"Lambda wrapper initialized - sys.path configuration:")
+print(f"  Project root: {project_root}")
+print(f"  Layers dir: {layers_dir}")
+print(f"  Src dir: {src_dir}")
+print(f"  sys.path[0]: {sys.path[0]}")
+print(f"  sys.path[1]: {sys.path[1]}")
+
+class MockContext:
+    """Mock de contexto Lambda para desarrollo local"""
+    def __init__(self):
+        self.function_name = "local-function"
+        self.function_version = "$LATEST"
+        self.invoked_function_arn = "arn:aws:lambda:local:000000000000:function:local-function"
+        self.memory_limit_in_mb = "512"
+        self.aws_request_id = "local-request-id"
+    
+    def get_remaining_time_in_millis(self):
+        return 300000  # 5 minutos
 
 def ejecutar_lambda(dominio, accion, event, context):
     """
     Ejecuta una lambda dinámicamente.
     Los módulos ahora usan imports absolutos desde src/ y layers/shared/
     """
+    # Si no hay contexto, crear uno mock
+    if context is None:
+        context = MockContext()
+    
     try:
         lambda_path = os.path.join(project_root, f"src/domains/{dominio}/lambdas/{accion}/main.py")
         
@@ -38,6 +58,13 @@ def ejecutar_lambda(dominio, accion, event, context):
                 "statusCode": 404,
                 "body": json.dumps({"error": f"Lambda no encontrada: {lambda_path}"})
             }
+        
+        # Log adicional para debugging
+        if dominio == "sales" and accion == "get_sales":
+            print(f"\n🔍 DEBUG SALES LAMBDA:")
+            print(f"   Lambda path: {lambda_path}")
+            print(f"   Event keys: {list(event.keys())}")
+            print(f"   Query params: {event.get('queryStringParameters')}")
         
         # Cargar el módulo con un nombre único basado en timestamp para evitar caché
         import time
@@ -48,10 +75,28 @@ def ejecutar_lambda(dominio, accion, event, context):
         
         # Registrar y ejecutar el módulo
         sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+        try:
+            spec.loader.exec_module(module)
+            if dominio == "sales" and accion == "get_sales":
+                print(f"   ✅ Módulo sales cargado exitosamente")
+                print(f"   Handler disponible: {hasattr(module, 'lambda_handler')}")
+        except ModuleNotFoundError as mnf:
+            print(f"\n⚠️ ModuleNotFoundError durante la carga del módulo:")
+            print(f"   Módulo faltante: {mnf.name}")
+            print(f"   Mensaje: {str(mnf)}")
+            print(f"   sys.path actual:")
+            for i, p in enumerate(sys.path[:5]):
+                print(f"     [{i}]: {p}")
+            raise
         
         # Ejecutar lambda_handler
+        if dominio == "sales" and accion == "get_sales":
+            print(f"   🚀 Ejecutando lambda_handler de sales...")
+        
         response = module.lambda_handler(event, context)
+        
+        if dominio == "sales" and accion == "get_sales":
+            print(f"   ✅ Lambda_handler completado. Status: {response.get('statusCode')}")
         
         # Limpiar el módulo después de usarlo
         if module_name in sys.modules:

@@ -19,9 +19,9 @@ class DashboardRepository:
             dict: Diccionario con los datos del dashboard
         """
         try:
-            response = self.db_client.table("dashboard_summary").select("*").single().execute()
+            response = self.db_client.table("dashboard_summary").select("*").execute()
             
-            if not response.data:
+            if not response.data or len(response.data) == 0:
                 return {
                     "total_products": 0,
                     "pending_repairs": 0,
@@ -31,7 +31,7 @@ class DashboardRepository:
                     "lowest_stock_product_quantity": 0
                 }
             
-            return response.data
+            return response.data[0]
             
         except Exception as e:
             print(f"Error al obtener datos del dashboard: {str(e)}")
@@ -51,9 +51,9 @@ class DashboardRepository:
             dict: Diccionario con los datos del dashboard
         """
         try:
-            response = self.db_client.table("dashboard_summary_seller").select("*").single().execute()
+            response = self.db_client.table("dashboard_summary_seller").select("*").execute()
             
-            if not response.data:
+            if not response.data or len(response.data) == 0:
                 return {
                     "daily_sales": 0,
                     "pending_repairs": 0,
@@ -61,7 +61,7 @@ class DashboardRepository:
                     "total_products": 0
                 }
             
-            return response.data
+            return response.data[0]
             
         except Exception as e:
             print(f"Error al obtener datos del dashboard: {str(e)}")

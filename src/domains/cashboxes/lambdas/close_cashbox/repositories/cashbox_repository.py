@@ -23,9 +23,12 @@ class CloseCashboxRepository:
             response = self.db_client.table("cashbox_sessions") \
                 .select("*") \
                 .eq("id_session", session_id) \
-                .single() \
                 .execute()
-            return response.data if response else None
+            
+            if response.data and len(response.data) > 0:
+                return response.data[0]
+            
+            return None
         except Exception as e:
             print(f"Error al obtener detalles de sesión: {str(e)}")
             return None

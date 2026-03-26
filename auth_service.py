@@ -18,11 +18,9 @@ SUPABASE_KEY = os.environ.get("DB_KEY", "sb_publishable_9ToFd0mY6_QhXaGecuwxQA_i
 
 
 class AuthService:
-    """Servicio de autenticación con JWT y Refresh Tokens"""
     
     @staticmethod
     def _make_supabase_request(method, table, data=None, filters=None):
-        """Hace requests a Supabase REST API"""
         try:
             url = f"{SUPABASE_URL}/rest/v1/{table}"
             headers = {
@@ -62,7 +60,6 @@ class AuthService:
     
     @staticmethod
     def create_access_token(user_id: str, email: str) -> str:
-        """Crea un token de acceso (corta duración)"""
         payload = {
             "user_id": user_id,
             "email": email,
@@ -74,7 +71,6 @@ class AuthService:
     
     @staticmethod
     def create_refresh_token(user_id: str) -> str:
-        """Crea un refresh token (larga duración)"""
         payload = {
             "user_id": user_id,
             "type": "refresh",
@@ -85,7 +81,6 @@ class AuthService:
     
     @staticmethod
     def verify_token(token: str) -> dict:
-        """Verifica y decodifica un token"""
         try:
             payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
             return payload
@@ -98,19 +93,16 @@ class AuthService:
     def register_user(email: str, password: str, name: str = None, username: str = None) -> dict:
         """Registra un nuevo usuario en Supabase"""
         try:
-            # Verificar si el usuario ya existe por email
             users = AuthService._make_supabase_request("GET", "users", filters={"email": email})
             
             if users and len(users) > 0:
                 return {"error": "El usuario ya existe", "status": 400}
             
-            # Verificar si el username ya existe
             if username:
                 users = AuthService._make_supabase_request("GET", "users", filters={"username": username})
                 if users and len(users) > 0:
                     return {"error": "El username ya existe", "status": 400}
             
-            # Obtener un rol por defecto
             roles = AuthService._make_supabase_request("GET", "roles")
             if not roles or len(roles) == 0:
                 return {"error": "No hay roles disponibles", "status": 500}
@@ -147,9 +139,7 @@ class AuthService:
     
     @staticmethod
     def login_user(email: str, password: str) -> dict:
-        """Autentica un usuario y retorna tokens"""
         try:
-            # Buscar usuario por email
             users = AuthService._make_supabase_request("GET", "users", filters={"email": email})
             
             if not users or len(users) == 0:
@@ -165,7 +155,23 @@ class AuthService:
             if user["password"] != password:
                 return {"error": "Usuario o contraseña incorrectos", "status": 401}
             
-            # Generar tokens
+            role_name = "seller" 
+            if user.get("id_role"):
+                roles = AuthService._make_supabase_request("GET", "roles", filters={"id_role": user["id_role"]})
+                if roles and len(roles) > 0:
+                    db_role_name = roles[0].get("name", "VENDEDOR").upper()
+                    print(f"🔍 DEBUG - Rol de BD: {roles[0].get('name')} -> Normalizado: {db_role_name}")
+                    
+                    role_mapping = {
+                        "ADMIN": "admin",
+                        "VENDEDOR": "seller",
+                        "MECANICO": "mechanic",
+                        "SELLER": "seller",
+                        "MECHANIC": "mechanic"
+                    }
+                    
+                    role_name = role_mapping.get(db_role_name, "seller")
+            
             access_token = AuthService.create_access_token(user["id_user"], user["email"])
             refresh_token = AuthService.create_refresh_token(user["id_user"])
             
@@ -187,7 +193,8 @@ class AuthService:
                     "id": user["id_user"],
                     "email": user["email"],
                     "username": user["username"],
-                    "name": user["name"]
+                    "name": user["name"],
+                    "role": role_name
                 },
                 "status": 200
             }

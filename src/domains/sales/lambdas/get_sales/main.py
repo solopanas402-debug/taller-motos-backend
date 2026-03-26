@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         query_params = event.get("queryStringParameters", {}) or {}
         logger.info(f'Query string parameters: {query_params}')
         
-        record_type = query_params.get("recordType", None)
+        record_type = query_params.get("recordType") or query_params.get("type")
         payment_method = query_params.get("payment_method", None)
         logger.info(f'Extracted filters - record_type: {record_type}, payment_method: {payment_method}')
         

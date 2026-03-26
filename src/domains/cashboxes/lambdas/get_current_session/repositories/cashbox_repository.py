@@ -27,9 +27,12 @@ class CurrentSessionRepository:
                 *,
                 opened_user:users!cashbox_sessions_opened_by_fkey(id_user, username, email),
                 closed_user:users!cashbox_sessions_closed_by_fkey(id_user, username, email)
-            """).eq("id_session", session_id).single().execute()
-
-            return response.data if response.data else None
+            """).eq("id_session", session_id).execute()
+            
+            if response.data and len(response.data) > 0:
+                return response.data[0]
+            
+            return None
 
         except Exception as e:
             print(f"Error al obtener detalles de sesión: {str(e)}")
