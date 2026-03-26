@@ -1,7 +1,7 @@
 import json
-from use_cases.cashbox_use_case import CashboxUseCase
+from domains.cashboxes.lambdas.add_cashbox.use_cases.cashbox_use_case import CashboxUseCase
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
-from repositories.cashbox_repository import CashboxRepository
+from domains.cashboxes.lambdas.add_cashbox.repositories.cashbox_repository import CashboxRepository
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils
 from load_initial_parameters import load_initial_parameters

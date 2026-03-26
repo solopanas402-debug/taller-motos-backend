@@ -3,8 +3,8 @@ import logging
 from db.db_client import DBClient
 from decorators.lambda_decorators import debug_event, cognito_auth_required, cors_enabled
 from decorators.validate_pagination_and_search import validate_pagination_and_search
-from repositories.category_repository import CategoryRepository
-from use_cases.category_use_case import CategoryUseCase
+from domains.categories.lambdas.get_categories.repositories.category_repository import CategoryRepository
+from domains.categories.lambdas.get_categories.use_cases.category_use_case import CategoryUseCase
 from utils.response_utils import ResponseUtils
 
 # Configure logger

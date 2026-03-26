@@ -1,4 +1,4 @@
-from repositories.repair_repository import RepairRepository
+from domains.repairs.lambdas.get_repair_by_id.repositories.repair_repository import RepairRepository
 
 
 class RepairUseCase:

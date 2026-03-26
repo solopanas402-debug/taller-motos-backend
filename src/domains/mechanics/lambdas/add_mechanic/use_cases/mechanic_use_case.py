@@ -1,5 +1,5 @@
 import json
-from repositories.mechanic_repository import MechanicRepository
+from domains.mechanics.lambdas.add_mechanic.repositories.mechanic_repository import MechanicRepository
 
 
 class MechanicUseCase:

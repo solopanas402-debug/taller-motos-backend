@@ -1,9 +1,9 @@
 import json
-from use_cases.product_use_cases import ProductUseCase
+from domains.products.lambdas.get_product_by_id.use_cases.product_use_cases import ProductUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 
-from repositories.product_repository import ProductRepository
+from domains.products.lambdas.get_product_by_id.repositories.product_repository import ProductRepository
 from db.db_client import DBClient
 
 db_client = DBClient.get_client()

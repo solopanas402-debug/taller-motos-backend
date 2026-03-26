@@ -1,6 +1,6 @@
 from typing import List
 
-from repositories.storage_repository import StorageRepository
+from domains.repairs.lambdas.add_repair.repositories.storage_repository import StorageRepository
 
 
 class SaveImagesUseCase:

@@ -1,7 +1,7 @@
 import json
-from use_cases.dashboard_use_case import DashboardUseCase
+from domains.dashboard_datas.lambdas.get_dashboard.use_cases.dashboard_use_case import DashboardUseCase
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
-from repositories.dashboard_repository import DashboardRepository
+from domains.dashboard_datas.lambdas.get_dashboard.repositories.dashboard_repository import DashboardRepository
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils
 

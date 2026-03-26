@@ -2,9 +2,9 @@ import re
 import logging
 from typing import Optional
 
-from repositories.product_repository import ProductRepository
-from repositories.sale_detail_repository import SaleDetailRepository
-from repositories.sale_repository import SaleRepository
+from domains.sales.lambdas.add_sale.repositories.product_repository import ProductRepository
+from domains.sales.lambdas.add_sale.repositories.sale_detail_repository import SaleDetailRepository
+from domains.sales.lambdas.add_sale.repositories.sale_repository import SaleRepository
 
 logger = logging.getLogger(__name__)
 

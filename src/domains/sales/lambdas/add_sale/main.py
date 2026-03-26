@@ -3,9 +3,9 @@ from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from db.db_client import DBClient
 from load_initial_parameter import load_initial_parameters
-from repositories.sale_detail_repository import SaleDetailRepository
-from repositories.sale_repository import SaleRepository
-from use_cases.sale_use_case import SaleUseCase
+from domains.sales.lambdas.add_sale.repositories.sale_detail_repository import SaleDetailRepository
+from domains.sales.lambdas.add_sale.repositories.sale_repository import SaleRepository
+from domains.sales.lambdas.add_sale.use_cases.sale_use_case import SaleUseCase
 
 db_client = DBClient.get_client()
 sale_repository = SaleRepository(db_client)

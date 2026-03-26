@@ -1,9 +1,9 @@
 import json
 
-from use_cases.repair_use_case import RepairUseCase
+from domains.repairs.lambdas.delete_repair.use_cases.repair_use_case import RepairUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
-from repositories.repair_repository import RepairRepository
+from domains.repairs.lambdas.delete_repair.repositories.repair_repository import RepairRepository
 from db.db_client import DBClient
 from load_initial_parameters import load_initial_parameters
 

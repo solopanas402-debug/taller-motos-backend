@@ -21,5 +21,5 @@ class MechanicRepository:
                 f"surname.ilike.{search_pattern},"
                 f"email.ilike.{search_pattern}"
             )
-        response = query.range(offset, offset + limit - 1).execute()
+        response = query.limit(limit).offset(offset).execute()
         return response.data, response.count

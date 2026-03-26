@@ -31,15 +31,30 @@ class SaleRepository:
             logger.info(f'Calling RPC: get_sales_cpr')
             
             response = self.db_client.rpc("get_sales_cpr", rpc_params).execute()
-            logger.info(f'RPC response received. Response type: {type(response)}, Response data type: {type(response.data)}')
-            logger.info(f'Response data: {response.data}')
-
-            data = response.data.get("data", [])
-            total = response.data.get("total", 0)
-            logger.info(f'Extracted from response: data items={len(data)}, total={total}')
-            logger.info(f'=== SaleRepository.find_all COMPLETED SUCCESSFULLY ===')
-
-            return data, total
+            logger.info(f'RPC response received. Response type: {type(response)}')
+            
+            if response and response.data:
+                logger.info(f'Response data type: {type(response.data)}')
+                logger.info(f'Response data: {response.data}')
+                
+                # response.data es el resultado del RPC (un dict o lista)
+                if isinstance(response.data, dict):
+                    data = response.data.get("data", [])
+                    total = response.data.get("total", 0)
+                elif isinstance(response.data, list):
+                    # Si el RPC devuelve directamente una lista
+                    data = response.data
+                    total = len(data)
+                else:
+                    data = []
+                    total = 0
+                
+                logger.info(f'Extracted from response: data items={len(data)}, total={total}')
+                logger.info(f'=== SaleRepository.find_all COMPLETED SUCCESSFULLY ===')
+                return data, total
+            else:
+                logger.warning('RPC response is None or has no data')
+                return [], 0
         
         except Exception as e:
             logger.error(f'ERROR in SaleRepository.find_all: {type(e).__name__}: {str(e)}', exc_info=True)

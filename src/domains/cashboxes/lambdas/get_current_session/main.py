@@ -1,7 +1,7 @@
 import json
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
-from repositories.cashbox_repository import CurrentSessionRepository
-from use_cases.cashbox_use_case import CurrentSessionUseCase
+from domains.cashboxes.lambdas.get_current_session.repositories.cashbox_repository import CurrentSessionRepository
+from domains.cashboxes.lambdas.get_current_session.use_cases.cashbox_use_case import CurrentSessionUseCase
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils
 

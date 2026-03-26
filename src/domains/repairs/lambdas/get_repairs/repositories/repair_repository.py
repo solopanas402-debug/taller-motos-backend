@@ -16,7 +16,7 @@ class RepairRepository:
                 f"diagnosis.ilike.{search_pattern}"
             )
 
-        repairs_resp = repairs_query.range(offset, offset + limit - 1).execute()
+        repairs_resp = repairs_query.limit(limit).offset(offset).execute()
         repairs = repairs_resp.data or []
         total = repairs_resp.count or 0
         if not repairs:

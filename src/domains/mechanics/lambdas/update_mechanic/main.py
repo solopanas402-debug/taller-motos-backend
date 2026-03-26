@@ -1,5 +1,5 @@
-from repositories.mechanic_repository import MechanicRepository
-from use_cases.mechanic_use_case import MechanicUseCase
+from domains.mechanics.lambdas.update_mechanic.repositories.mechanic_repository import MechanicRepository
+from domains.mechanics.lambdas.update_mechanic.use_cases.mechanic_use_case import MechanicUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from db.db_client import DBClient

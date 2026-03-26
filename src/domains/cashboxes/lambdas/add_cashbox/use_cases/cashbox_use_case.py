@@ -1,5 +1,5 @@
 from entities.cashbox import Cashbox
-from repositories.cashbox_repository import CashboxRepository
+from domains.cashboxes.lambdas.add_cashbox.repositories.cashbox_repository import CashboxRepository
 
 
 class CashboxUseCase:

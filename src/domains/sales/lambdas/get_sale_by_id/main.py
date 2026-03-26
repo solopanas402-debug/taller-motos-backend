@@ -1,8 +1,8 @@
 import json
-from use_cases.sale_use_case import SaleUseCase
+from domains.sales.lambdas.get_sale_by_id.use_cases.sale_use_case import SaleUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
-from repositories.sale_repository import SaleRepository
+from domains.sales.lambdas.get_sale_by_id.repositories.sale_repository import SaleRepository
 from db.db_client import DBClient
 from load_initial_parameters import load_initial_parameters
 

@@ -1,7 +1,7 @@
 import json
 import os
-from use_cases.category_use_case import CategoryUseCase
-from repositories.category_repository import CategoryRepository
+from domains.products.lambdas.get_categories.use_cases.category_use_case import CategoryUseCase
+from domains.products.lambdas.get_categories.repositories.category_repository import CategoryRepository
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils

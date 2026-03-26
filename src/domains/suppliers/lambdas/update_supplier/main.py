@@ -1,5 +1,5 @@
-from repositories.supplier_repository import SupplierRepository
-from use_cases.supplier_use_case import SupplierUseCase
+from domains.suppliers.lambdas.update_supplier.repositories.supplier_repository import SupplierRepository
+from domains.suppliers.lambdas.update_supplier.use_cases.supplier_use_case import SupplierUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from db.db_client import DBClient

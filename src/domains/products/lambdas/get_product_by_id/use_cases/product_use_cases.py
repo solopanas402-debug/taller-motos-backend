@@ -1,4 +1,4 @@
-from repositories.product_repository import ProductRepository
+from domains.products.lambdas.get_product_by_id.repositories.product_repository import ProductRepository
 
 
 class ProductUseCase:

@@ -4,8 +4,8 @@ from db.db_client import DBClient
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
 from exceptions.validation_exception import ValidationException
 from load_initial_parameters import load_initial_parameters
-from repositories.product_repository import ProductRepository
-from use_cases.product_use_case import ProductUseCase
+from domains.bulk_products.lambdas.add_products.repositories.product_repository import ProductRepository
+from domains.bulk_products.lambdas.add_products.use_cases.product_use_case import ProductUseCase
 
 db_client = DBClient.get_client()
 repository = ProductRepository(db_client)

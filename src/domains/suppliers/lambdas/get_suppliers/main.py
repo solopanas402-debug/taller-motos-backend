@@ -1,8 +1,8 @@
 import json
-from use_cases.supplier_use_case import SupplierUseCase
+from domains.suppliers.lambdas.get_suppliers.use_cases.supplier_use_case import SupplierUseCase
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
 from decorators.validate_pagination_and_search import validate_pagination_and_search
-from repositories.supplier_repository import SupplierRepository
+from domains.suppliers.lambdas.get_suppliers.repositories.supplier_repository import SupplierRepository
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils
 

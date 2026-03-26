@@ -1,5 +1,5 @@
 from entities.product import Product
-from repositories.product_repository import ProductRepository
+from domains.products.lambdas.add_product.repositories.product_repository import ProductRepository
 
 
 class ProductUseCase:

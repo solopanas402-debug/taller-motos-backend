@@ -1,4 +1,4 @@
-from repositories.supplier_repository import SupplierRepository
+from domains.suppliers.lambdas.get_supplier_by_id.repositories.supplier_repository import SupplierRepository
 
 
 class SupplierUseCase:

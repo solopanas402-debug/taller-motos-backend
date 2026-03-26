@@ -1,7 +1,7 @@
 
 import math
 
-from repositories.mechanic_repository import MechanicRepository
+from domains.mechanics.lambdas.get_mechanics.repositories.mechanic_repository import MechanicRepository
 
 
 class MechanicUseCase:

@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from repositories.cashbox_repository import CashboxRepository
+from domains.cashboxes.lambdas.get_cashbox.repositories.cashbox_repository import CashboxRepository
 import math
 
 

@@ -1,4 +1,4 @@
-from repositories.sale_repository import SaleRepository
+from domains.sales.lambdas.get_sale_by_id.repositories.sale_repository import SaleRepository
 
 
 class SaleUseCase:

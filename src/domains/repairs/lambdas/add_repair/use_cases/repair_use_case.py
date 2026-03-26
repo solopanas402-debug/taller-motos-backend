@@ -1,7 +1,7 @@
 import logging
 import re
 
-from repositories.repair_repository import RepairRepository
+from domains.repairs.lambdas.add_repair.repositories.repair_repository import RepairRepository
 
 logger = logging.getLogger(__name__)
 

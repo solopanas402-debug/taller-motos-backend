@@ -1,6 +1,6 @@
 import math
 
-from repositories.category_repository import CategoryRepository
+from domains.categories.lambdas.get_categories.repositories.category_repository import CategoryRepository
 
 
 class CategoryUseCase:

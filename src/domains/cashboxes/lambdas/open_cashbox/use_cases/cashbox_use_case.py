@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from repositories.cashbox_repository import OpenCashboxRepository
+from domains.cashboxes.lambdas.open_cashbox.repositories.cashbox_repository import OpenCashboxRepository
 
 
 class OpenCashboxUseCase:

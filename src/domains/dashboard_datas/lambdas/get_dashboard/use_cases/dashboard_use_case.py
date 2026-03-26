@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from repositories.dashboard_repository import DashboardRepository
+from domains.dashboard_datas.lambdas.get_dashboard.repositories.dashboard_repository import DashboardRepository
 
 
 class DashboardUseCase:

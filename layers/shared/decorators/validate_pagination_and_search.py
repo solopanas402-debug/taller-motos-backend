@@ -12,12 +12,20 @@ def validate_pagination_and_search(max_limit: int = 100):
         @wraps(func)
         def wrapper(event, context):
             try:
-                query_params = event.get("queryStringParameters") or {}
+                query_params = event.get("queryStringParameters")
+                
+                # Si queryStringParameters es None o vacío, usar diccionario vacío
+                if not query_params:
+                    query_params = {}
 
+                # Obtener valores con defaults
+                page_str = query_params.get("page", "1")
+                limit_str = query_params.get("limit", "10")
+                
                 try:
-                    page = int(query_params.get("page", 1))
-                    limit = int(query_params.get("limit", 10))
-                except ValueError:
+                    page = int(page_str)
+                    limit = int(limit_str)
+                except (ValueError, TypeError):
                     return ResponseUtils.bad_request_response(
                         "Los parámetros 'page' y 'limit' deben ser números enteros válidos"
                     )
@@ -50,8 +58,11 @@ def validate_pagination_and_search(max_limit: int = 100):
 
                 return func(event, context)
 
-            except Exception:
-                return ResponseUtils.bad_request_response("Parámetros de paginación inválidos")
+            except Exception as e:
+                print(f"Error en validate_pagination_and_search: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return ResponseUtils.bad_request_response(f"Error validando parámetros: {str(e)}")
         
         return wrapper
     return decorator

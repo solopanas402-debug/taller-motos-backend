@@ -1,5 +1,5 @@
 
-from repositories.customer_repository import CustomerRepository
+from domains.customers.lambdas.get_customers.repositories.customer_repository import CustomerRepository
 import math
 class CustomerUseCase:
     def __init__(self, repository: CustomerRepository):

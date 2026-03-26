@@ -1,4 +1,4 @@
-from repositories.sale_repository import SaleRepository
+from domains.sales.lambdas.update_sale.repositories.sale_repository import SaleRepository
 
 
 class SaleUseCase:

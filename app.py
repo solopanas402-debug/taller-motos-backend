@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from functools import wraps
 from dotenv import load_dotenv
 from auth_service import AuthService, token_required
@@ -11,6 +12,16 @@ from lambda_wrapper import ejecutar_lambda
 load_dotenv()
 
 app = Flask(__name__)
+
+# Configurar CORS
+CORS(app, resources={
+    r"/*": {
+        "origins": ["http://localhost:5173", "http://localhost:3000"],
+        "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 
 def create_lambda_event(method, path, query_params=None, body=None, path_params=None, user=None):
@@ -780,6 +791,26 @@ def close_cashbox():
             user=request.user
         )
         response = ejecutar_lambda("cashboxes", "close_cashbox", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ==================== DASHBOARD ====================
+
+@app.route("/dashboard", methods=["GET"])
+@token_required
+def get_dashboard():
+    """Obtener datos del dashboard"""
+    try:
+        code = request.args.get("code")
+        
+        event = create_lambda_event(
+            "GET", "/dashboard",
+            query_params={"code": code} if code else {},
+            user=request.user
+        )
+        response = ejecutar_lambda("dashboard", "get_dashboard", event, None)
         return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

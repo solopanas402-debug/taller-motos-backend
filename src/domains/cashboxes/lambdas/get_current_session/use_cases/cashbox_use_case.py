@@ -1,5 +1,5 @@
 from typing import Optional, Dict, Any
-from repositories.cashbox_repository import CurrentSessionRepository
+from domains.cashboxes.lambdas.get_current_session.repositories.cashbox_repository import CurrentSessionRepository
 
 
 class CurrentSessionUseCase:

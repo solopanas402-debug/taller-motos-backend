@@ -1,5 +1,5 @@
 import json
-from repositories.supplier_repository import SupplierRepository
+from domains.suppliers.lambdas.add_supplier.repositories.supplier_repository import SupplierRepository
 
 
 class SupplierUseCase:

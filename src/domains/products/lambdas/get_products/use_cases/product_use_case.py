@@ -1,4 +1,4 @@
-from repositories.product_repository import ProductRepository
+from domains.products.lambdas.get_products.repositories.product_repository import ProductRepository
 import math
 
 class ProductUseCase:

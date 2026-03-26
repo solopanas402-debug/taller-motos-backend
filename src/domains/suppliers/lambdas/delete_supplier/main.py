@@ -1,9 +1,9 @@
 import json
 
-from use_cases.supplier_use_case import SupplierUseCase
+from domains.suppliers.lambdas.delete_supplier.use_cases.supplier_use_case import SupplierUseCase
 from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
-from repositories.supplier_repository import SupplierRepository
+from domains.suppliers.lambdas.delete_supplier.repositories.supplier_repository import SupplierRepository
 from db.db_client import DBClient
 from load_initial_parameters import load_initial_parameters
 

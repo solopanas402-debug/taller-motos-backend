@@ -1,4 +1,4 @@
-from repositories.customer_repository import CustomerRepository
+from domains.customers.lambdas.delete_customer.repositories.customer_repository import CustomerRepository
 
 
 class CustomerUseCase:

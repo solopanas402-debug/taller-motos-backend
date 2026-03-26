@@ -1,7 +1,7 @@
 import json
 import os
-from use_cases.brand_use_case import BrandUseCase
-from repositories.brand_repository import BrandRepository
+from domains.products.lambdas.get_brands.use_cases.brand_use_case import BrandUseCase
+from domains.products.lambdas.get_brands.repositories.brand_repository import BrandRepository
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required, debug_event
 from db.db_client import DBClient
 from utils.response_utils import ResponseUtils

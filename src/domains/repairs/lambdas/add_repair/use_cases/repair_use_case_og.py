@@ -1,7 +1,7 @@
 import re
 
-from repositories.repair_repository import RepairRepository
-from repositories.vehicle_repository import VehicleRepository
+from domains.repairs.lambdas.add_repair.repositories.repair_repository import RepairRepository
+from domains.repairs.lambdas.add_repair.repositories.vehicle_repository import VehicleRepository
 
 
 class RepairUseCase:

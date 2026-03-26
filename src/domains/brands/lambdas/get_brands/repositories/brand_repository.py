@@ -19,5 +19,5 @@ class BrandRepository:
         if type_brand:
             query = query.eq("type_brand", type_brand)
 
-        response = query.range(offset, offset + limit - 1).execute()
+        response = query.limit(limit).offset(offset).execute()
         return response.data, response.count

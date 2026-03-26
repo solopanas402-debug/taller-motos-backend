@@ -3,11 +3,11 @@ from utils.response_utils import ResponseUtils
 from decorators.lambda_decorators import cors_enabled, cognito_auth_required
 from db.db_client import DBClient
 from load_initial_parameters import load_initial_parameters
-from repositories.repair_repository import RepairRepository
-from repositories.storage_repository import StorageRepository
-from repositories.vehicle_repository import VehicleRepository
-from use_cases.repair_use_case import RepairUseCase
-from use_cases.save_images_use_case import SaveImagesUseCase
+from domains.repairs.lambdas.add_repair.repositories.repair_repository import RepairRepository
+from domains.repairs.lambdas.add_repair.repositories.storage_repository import StorageRepository
+from domains.repairs.lambdas.add_repair.repositories.vehicle_repository import VehicleRepository
+from domains.repairs.lambdas.add_repair.use_cases.repair_use_case import RepairUseCase
+from domains.repairs.lambdas.add_repair.use_cases.save_images_use_case import SaveImagesUseCase
 
 db_client = DBClient.get_client()
 repair_repository = RepairRepository(db_client)

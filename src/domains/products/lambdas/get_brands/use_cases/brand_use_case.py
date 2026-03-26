@@ -1,4 +1,4 @@
-from repositories.brand_repository import BrandRepository
+from domains.products.lambdas.get_brands.repositories.brand_repository import BrandRepository
 import math
 
 class BrandUseCase:

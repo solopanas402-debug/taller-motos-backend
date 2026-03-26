@@ -1,4 +1,4 @@
-from repositories.mechanic_repository import MechanicRepository
+from domains.mechanics.lambdas.update_mechanic.repositories.mechanic_repository import MechanicRepository
 
 
 class MechanicUseCase:

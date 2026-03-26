@@ -1,7 +1,7 @@
 import math
 import logging
 
-from repositories.sale_repository import SaleRepository
+from domains.sales.lambdas.get_sales.repositories.sale_repository import SaleRepository
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
