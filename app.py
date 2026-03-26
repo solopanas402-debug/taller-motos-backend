@@ -16,7 +16,7 @@ app = Flask(__name__)
 # Configurar CORS
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:5173", "http://localhost:3000"],
+        "origins": ["http://localhost:5173", "http://localhost:3000","https://taller-moto-acurio-gold.vercel.app"],
         "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "x-tenant-id"],
         "supports_credentials": True
