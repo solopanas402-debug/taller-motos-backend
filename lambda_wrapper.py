@@ -70,6 +70,39 @@ def ejecutar_lambda(dominio, accion, event, context):
         import time
         module_name = f"lambda_{dominio}_{accion}_{int(time.time() * 1000000)}"
         
+        # Agregar el directorio del lambda al sys.path para que pueda importar
+        # sus propios módulos locales (load_initial_parameters, etc.)
+        lambda_dir = os.path.dirname(lambda_path)
+
+        # Remove lambda_dir from sys.path first to ensure clean state
+        while lambda_dir in sys.path:
+            sys.path.remove(lambda_dir)
+        sys.path.insert(0, lambda_dir)
+
+        # Clear any cached local modules from previous lambda executions
+        # to prevent load_initial_parameters from one lambda bleeding into another
+        local_modules_to_clear = [
+            key for key in sys.modules
+            if key in ("load_initial_parameters", "load_initial_parameter",
+                       "repositories", "use_cases", "entities", "port")
+            or (not key.startswith("domains.") and not key.startswith("utils.")
+                and not key.startswith("decorators.") and not key.startswith("db.")
+                and not key.startswith("exceptions.") and not key.startswith("entities.")
+                and "lambda_" not in key
+                and key not in sys.builtin_module_names
+                and hasattr(sys.modules.get(key), "__file__")
+                and sys.modules[key] is not None
+                and hasattr(sys.modules[key], "__file__")
+                and sys.modules[key].__file__ is not None
+                and "layers" not in (sys.modules[key].__file__ or "")
+                and "src" not in (sys.modules[key].__file__ or "").replace(project_root, "")[:5]
+            )
+        ]
+        # Simpler: just always remove load_initial_parameters* from cache
+        for key in list(sys.modules.keys()):
+            if key.startswith("load_initial_param"):
+                del sys.modules[key]
+        
         spec = importlib.util.spec_from_file_location(module_name, lambda_path)
         module = importlib.util.module_from_spec(spec)
         
@@ -101,6 +134,10 @@ def ejecutar_lambda(dominio, accion, event, context):
         # Limpiar el módulo después de usarlo
         if module_name in sys.modules:
             del sys.modules[module_name]
+        
+        # Limpiar el directorio del lambda del sys.path
+        if lambda_dir in sys.path:
+            sys.path.remove(lambda_dir)
         
         return response
     

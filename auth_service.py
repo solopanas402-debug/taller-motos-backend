@@ -91,7 +91,6 @@ class AuthService:
     
     @staticmethod
     def register_user(email: str, password: str, name: str = None, username: str = None) -> dict:
-        """Registra un nuevo usuario en Supabase"""
         try:
             users = AuthService._make_supabase_request("GET", "users", filters={"email": email})
             
@@ -251,6 +250,10 @@ def token_required(f):
     """Decorador para proteger rutas que requieren token"""
     @wraps(f)
     def decorated(*args, **kwargs):
+        # Allow CORS preflight requests without authentication
+        if request.method == "OPTIONS":
+            return jsonify({}), 200
+
         token = None
         
         # Obtener token del header

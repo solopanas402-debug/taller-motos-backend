@@ -11,11 +11,12 @@ class SaleRepository:
         """
         try:
 
+            # Optimizado: pasar solo ID en RPC para búsqueda por ID
             response = self.db_client.rpc("get_sales_cpr", {
                 "p_id_sale": id_sale,
                 "p_search": None,
-                "p_limit": None,
-                "p_offset": None,
+                "p_limit": 1,
+                "p_offset": 0,
                 "p_record_type": None,
                 "p_payment_method": None
             }).execute()

@@ -92,7 +92,9 @@ def validate_fields(request_body: dict):
         list: ["products"]
     }
 
-    validation_exception.validate_fields(request_body, required_fields)
+    validation_exception.validate_fields(request_body, required_fields, field_rules={
+        "products": {"required": False}
+    })
 
     vehicle = request_body["vehicle"]
     vehicle_fields = {
@@ -100,7 +102,10 @@ def validate_fields(request_body: dict):
         int: ["year", "mileage"]
     }
 
-    validation_exception.validate_fields(vehicle, vehicle_fields)
+    validation_exception.validate_fields(vehicle, vehicle_fields, field_rules={
+        "mileage": {"allow_zero": True},
+        "year": {"allow_zero": True},
+    })
 
     repair_fields = {
         str: ["id_mechanic", "fault_description", "diagnosis", "status", "priority", "notes", "id_created_by", "entry_date", "delivery_date"],
@@ -108,7 +113,12 @@ def validate_fields(request_body: dict):
     }
 
     repair = request_body["repair"]
-    validation_exception.validate_fields(repair, repair_fields)
+    validation_exception.validate_fields(repair, repair_fields, field_rules={
+        "estimated_cost": {"allow_zero": True},
+        "final_cost": {"allow_zero": True},
+        "diagnosis": {"required": False},
+        "notes": {"required": False},
+    })
 
     labor_fields = {
         str: ["id_service_type", "start_date", "completion_date"],
@@ -117,7 +127,10 @@ def validate_fields(request_body: dict):
         bool: ["completed"]
     }
     labor = request_body["labor"]
-    validation_exception.validate_fields(labor, labor_fields)
+    validation_exception.validate_fields(labor, labor_fields, field_rules={
+        "actual_hours": {"allow_zero": True},
+        "agreed_price": {"allow_zero": True},
+    })
 
     product_fields = {
         str: ['id_product'],
@@ -182,7 +195,7 @@ def generate_repair_data(request_body: dict) -> dict:
 
     materials = []
 
-    for product in request_body["products"]:
+    for product in request_body.get("products", []):
         material = {
             "id_repair_material": generate_uuid_hex(),
             "id_vehicle": id_vehicle,

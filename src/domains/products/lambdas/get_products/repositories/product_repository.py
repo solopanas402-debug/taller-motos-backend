@@ -10,32 +10,23 @@ class ProductRepository:
     def find_all(self, page: int = 1, limit: int = 10, search: str | None = None) -> Tuple[list[dict], int]:
         offset = (page - 1) * limit
         
-        # Construir query base
-        query = self.db_client.table("products").select("*")
+        # Seleccionar columnas específicas para reducir ancho de banda
+        query = self.db_client.table("products").select(
+            "id_product, name, code, price, stock, category_id, description, created_at",
+            count="exact"
+        )
         
         if search:
+            # Buscar primero en campos indexados (name y code)
             search_pattern = f"%{search}%"
             query = query.or_(
                 f"name.ilike.{search_pattern},"
-                f"description.ilike.{search_pattern},"
                 f"code.ilike.{search_pattern}"
             )
         
-        # Ejecutar query con paginación usando limit y offset
+        # Una sola query con count en el mismo llamado
         response = query.limit(limit).offset(offset).execute()
-        
-        # Obtener el total de registros con una query separada
-        count_query = self.db_client.table("products").select("*", count="exact")
-        if search:
-            search_pattern = f"%{search}%"
-            count_query = count_query.or_(
-                f"name.ilike.{search_pattern},"
-                f"description.ilike.{search_pattern},"
-                f"code.ilike.{search_pattern}"
-            )
-        
-        count_response = count_query.execute()
-        total = count_response.count if hasattr(count_response, 'count') else len(response.data or [])
+        total = response.count if hasattr(response, 'count') else 0
         
         return (response.data or [], total)
 

@@ -19,13 +19,14 @@ class SaleRepository:
             offset = (page - 1) * limit
             logger.info(f'Calculated offset: {offset}')
 
+            # Optimizado: pasar solo parámetros necesarios al RPC
             rpc_params = {
                 "p_id_sale": None,
-                "p_search": search,
+                "p_search": search if search else None,
                 "p_limit": limit,
                 "p_offset": offset,
-                "p_record_type": record_type,
-                "p_payment_method": payment_method
+                "p_record_type": record_type if record_type else None,
+                "p_payment_method": payment_method if payment_method else None
             }
             logger.info(f'RPC parameters: {rpc_params}')
             logger.info(f'Calling RPC: get_sales_cpr')

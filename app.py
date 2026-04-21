@@ -16,7 +16,12 @@ app = Flask(__name__)
 # Configurar CORS
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:5173", "http://localhost:3000","https://taller-moto-acurio-gold.vercel.app"],
+        "origins": [
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "http://192.168.100.18:5173",
+            "https://taller-moto-acurio-gold.vercel.app"
+        ],
         "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "x-tenant-id"],
         "supports_credentials": True
@@ -453,6 +458,24 @@ def delete_repair(id):
             user=request.user
         )
         response = ejecutar_lambda("repairs", "delete_repair", event, None)
+        return parse_lambda_response(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/repairs/<id>/materials", methods=["PATCH"])
+@token_required
+def update_repair_materials(id):
+    """Actualizar materiales de una reparación"""
+    try:
+        data = request.get_json()
+        event = create_lambda_event(
+            "PATCH", f"/repairs/{id}/materials",
+            body=data,
+            path_params={"id": id},
+            user=request.user
+        )
+        response = ejecutar_lambda("repairs", "update_repair_materials", event, None)
         return parse_lambda_response(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500

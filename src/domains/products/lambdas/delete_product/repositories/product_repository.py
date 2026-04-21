@@ -24,9 +24,11 @@ class ProductRepository:
         Busca un producto por ID.
         """
         try:
+            # Seleccionar columnas específicas
             response = self.db_client.table("products") \
-                .select("*") \
+                .select("id_product, name, code, price, stock, category_id, description, created_at") \
                 .eq('id_product', id_product) \
+                .single() \
                 .execute()
 
             if not response.data:

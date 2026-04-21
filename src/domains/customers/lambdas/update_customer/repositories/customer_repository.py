@@ -10,15 +10,14 @@ class CustomerRepository:
         Busca un cliente por ID.
         """
         try:
+            # Seleccionar columnas específicas
             response = self.db_client.table("customers") \
-                .select("*") \
+                .select("id_customer, name, surname, email, id_number, phone, address, city, created_at") \
                 .eq('id_customer', id_customer) \
+                .single() \
                 .execute()
 
-            if not response.data:
-                return None
-
-            return response.data[0]
+            return response.data
         except Exception as e:
             print(f"Error al buscar el cliente: {str(e)}")
             raise Exception(f'Ha ocurrido un problema al buscar el cliente: {str(e)}')
